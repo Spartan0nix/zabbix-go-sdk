@@ -1,9 +1,14 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-)
+type ApiUser struct {
+	User string
+	Pwd  string
+}
+
+type AuthService struct {
+	Client *ApiClient
+	User   *ApiUser
+}
 
 type AuthRequest struct {
 	Jsonrpc string            `json:"jsonrpc"`
@@ -13,14 +18,7 @@ type AuthRequest struct {
 	Auth    *string           `json:"auth"`
 }
 
-type AuthReponse struct {
-	Jsonrpc string        `json:"jsonrpc"`
-	Result  string        `json:"result"`
-	Error   ResponseError `json:"error,omitempty"`
-	Id      int           `json:"id"`
-}
-
-func (a *ApiClient) NewAuthRequest(user string, password string) (AuthRequest, error) {
+func (s *AuthService) NewAuthRequest(user string, password string) (AuthRequest, error) {
 	body := AuthRequest{
 		Jsonrpc: "2.0",
 		Method:  "user.login",
@@ -35,37 +33,37 @@ func (a *ApiClient) NewAuthRequest(user string, password string) (AuthRequest, e
 	return body, nil
 }
 
-func (a *ApiClient) GetCredentials(user string, password string) (*AuthReponse, error) {
-	params, err := a.NewAuthRequest(user, password)
+func (s *AuthService) GetCredentials(user string, password string) (*Response, error) {
+	params, err := s.NewAuthRequest(user, password)
 	if err != nil {
 		return nil, err
 	}
 
-	b, err := a.Post(params)
+	res, err := s.Client.Post(params)
 	if err != nil {
 		return nil, err
 	}
 
-	res := AuthReponse{}
-	err = json.Unmarshal(b, &res)
-	if err != nil {
-		return nil, err
-	}
-
-	return &res, nil
+	return res, nil
 }
 
-func (a *ApiClient) Authenticate() error {
-	resp, err := a.GetCredentials(a.User.User, a.User.Pwd)
+func (s *ZabbixService) Authenticate() error {
+	res, err := s.Auth.GetCredentials(s.Auth.User.User, s.Auth.User.Pwd)
 	if err != nil {
 		return err
 	}
 
-	if resp.Result == "" {
-		return fmt.Errorf("Code : %d\nMessage : %s\nData : %s", resp.Error.Code, resp.Error.Message, resp.Error.Data)
+	var token string
+	err = s.Auth.Client.ConvertResponse(*res, &token)
+	if err != nil {
+		return err
 	}
 
-	a.Token = resp.Result
+	if token == "" {
+		return s.Auth.Client.Error(*res)
+	}
+
+	s.SetToken(token)
 
 	return nil
 }

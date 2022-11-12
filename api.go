@@ -3,20 +3,15 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
-type ApiUser struct {
-	User string
-	Pwd  string
-}
-
 type ApiClient struct {
-	http  *http.Client
-	Url   string
-	User  ApiUser
-	Token string
+	client *http.Client
+	Url    string
+	Token  string
 }
 
 type Request struct {
@@ -40,15 +35,18 @@ type Response struct {
 	Id      int             `json:"id"`
 }
 
-func NewApiClient() *ApiClient {
-	return &ApiClient{
-		http: &http.Client{},
-		User: ApiUser{},
+func (a *ApiClient) NewRequest(method string, params interface{}) Request {
+	return Request{
+		Jsonrpc: "2.0",
+		Method:  method,
+		Params:  params,
+		Id:      1,
+		Auth:    a.Token,
 	}
 }
 
-func (s *ApiClient) ExecuteRequest(r *http.Request) ([]byte, error) {
-	resp, err := s.http.Do(r)
+func (a *ApiClient) ExecuteRequest(r *http.Request) ([]byte, error) {
+	resp, err := a.client.Do(r)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +61,8 @@ func (s *ApiClient) ExecuteRequest(r *http.Request) ([]byte, error) {
 	return b, nil
 }
 
-func (a *ApiClient) Post(params interface{}) ([]byte, error) {
-	b, err := json.Marshal(params)
+func (a *ApiClient) Post(body interface{}) (*Response, error) {
+	b, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +74,37 @@ func (a *ApiClient) Post(params interface{}) ([]byte, error) {
 
 	req.Header.Set("Content-Type", "application/json-rpc")
 
-	res, err := a.ExecuteRequest(req)
+	b, err = a.ExecuteRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return res, nil
+	res := Response{}
+	err = json.Unmarshal(b, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (a *ApiClient) ConvertResponse(r Response, v interface{}) error {
+	err := json.Unmarshal(r.Result, &v)
+	if err != nil {
+		// Check if an error was returned by the Zabbix Server
+		// If an error occure, the result field is empty
+		// This while leads to Unmarshal error
+		if r.Error.Code != 0 {
+			err = a.Error(r)
+			return err
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func (a *ApiClient) Error(r Response) error {
+	return fmt.Errorf("Code : %d\nMessage : %s\nData : %s", r.Error.Code, r.Error.Message, r.Error.Data)
 }
