@@ -5,17 +5,29 @@ import (
 	"testing"
 )
 
-func newTestingClient() *ApiClient {
-	client := NewApiClient()
-	client.Url = "http://localhost:4444/"
+func NewTestingService() (*ZabbixService, error) {
+	client := NewZabbixService()
+	client.SetUrl("http://localhost:4444/api_jsonrpc.php")
+	client.SetUser(&ApiUser{
+		User: "Admin",
+		Pwd:  "zabbix",
+	})
 
-	return client
+	err := client.Authenticate()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
 
 func TestNewApiClient(t *testing.T) {
-	client := NewApiClient()
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
 
-	if reflect.TypeOf(client) != reflect.TypeOf(&ApiClient{}) {
+	if reflect.TypeOf(client) != reflect.TypeOf(&ZabbixService{}) {
 		t.Fail()
 	}
 }

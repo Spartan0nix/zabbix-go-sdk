@@ -7,21 +7,25 @@ import (
 
 const (
 	URL      = "http://localhost:8080/api_jsonrpc.php"
-	USER     = "zabbix-api"
-	USER_PWD = "kRTALYSh"
-	// USER_PWD = "kRTALY"
+	USER     = "Admin"
+	USER_PWD = "zabbix"
+	// USER_PWD = "zabb"
 )
 
 func main() {
-	client := NewApiClient()
-	client.Url = URL
-	client.User.User = USER
-	client.User.Pwd = USER_PWD
+	client := NewZabbixService()
+	client.SetUrl(URL)
+	client.SetUser(&ApiUser{
+		User: USER,
+		Pwd:  USER_PWD,
+	})
 
 	err := client.Authenticate()
 	if err != nil {
-		log.Fatalf("Error when retrieving API credentials.\nReason : %v1", err)
+		log.Fatalf("Error when retrieving API credentials.\nReason : %v", err)
 	}
 
-	fmt.Println(client.Token)
+	fmt.Println(client.Auth.Client.Token)
+	// fmt.Println(client.UserGroup.Client.Token)
+
 }
