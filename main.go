@@ -25,15 +25,7 @@ func main() {
 		log.Fatalf("Error when retrieving API credentials.\nReason : %v", err)
 	}
 
-	// fmt.Println(client.Auth.Client.Token)
+	fmt.Println(client.Auth.Client.Token)
 	// fmt.Println(client.UserGroup.Client.Token)
 
-	groups, err := client.UserGroup.Delete([]string{
-		"18",
-	})
-	if err != nil {
-		log.Fatalf("Error when deleting UserGroup.\nReason : %v", err)
-	}
-
-	fmt.Println(groups)
 }

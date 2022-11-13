@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 )
 
 type ApiClient struct {
@@ -107,4 +108,13 @@ func (a *ApiClient) ConvertResponse(r Response, v interface{}) error {
 
 func (a *ApiClient) Error(r Response) error {
 	return fmt.Errorf("Code : %d\nMessage : %s\nData : %s", r.Error.Code, r.Error.Message, r.Error.Data)
+}
+
+func (a *ApiClient) ResourceAlreadyExist(resource string, value string, err ResponseError) bool {
+	re := regexp.MustCompile(fmt.Sprintf("%s \"%s\" already exists", resource, value))
+	if re.Match([]byte(err.Data)) {
+		return true
+	} else {
+		return false
+	}
 }
