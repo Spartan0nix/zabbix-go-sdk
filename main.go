@@ -27,16 +27,14 @@ func main() {
 
 	// fmt.Println(client.Auth.Client.Token)
 	// fmt.Println(client.UserGroup.Client.Token)
-	groups, err := client.UserGroup.Get(&UserGroupGetParameters{
-		Output: "extend",
-		Userids: []string{
-			"1",
-		},
-	})
-
-	if err != nil {
-		log.Fatalf("Error when retrieving UserGroups.\nReason : %v", err)
+	params := UserGroupCreateParameters{
+		Name: "Test",
 	}
 
-	fmt.Println(groups)
+	group_id, err := client.UserGroup.Create(&params)
+	if err != nil {
+		log.Fatalf("Error when creating UserGroup.\nReason : %v", err)
+	}
+
+	fmt.Println(group_id)
 }
