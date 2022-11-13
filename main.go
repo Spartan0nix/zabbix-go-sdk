@@ -27,14 +27,13 @@ func main() {
 
 	// fmt.Println(client.Auth.Client.Token)
 	// fmt.Println(client.UserGroup.Client.Token)
-	params := UserGroupCreateParameters{
-		Name: "Test",
-	}
 
-	group_id, err := client.UserGroup.Create(&params)
+	groups, err := client.UserGroup.Delete([]string{
+		"18",
+	})
 	if err != nil {
-		log.Fatalf("Error when creating UserGroup.\nReason : %v", err)
+		log.Fatalf("Error when deleting UserGroup.\nReason : %v", err)
 	}
 
-	fmt.Println(group_id)
+	fmt.Println(groups)
 }

@@ -98,23 +98,41 @@ type UserGroupCreateParameters struct {
 	// Users                []map[string]string      `json:"users,omitempty"`
 }
 
-type UserGroupCreateResponse struct {
+type UserGroupResponse struct {
 	Usrgrpids []string `json:"usrgrpids"`
 }
 
-func (u *UserGroupService) Create(params *UserGroupCreateParameters) (string, error) {
+func (u *UserGroupService) Create(params *UserGroupCreateParameters) (*UserGroupResponse, error) {
 	req := u.Client.NewRequest("usergroup.create", params)
 
 	res, err := u.Client.Post(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	g := UserGroupCreateResponse{}
+	g := UserGroupResponse{}
 	err = u.Client.ConvertResponse(*res, &g)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return g.Usrgrpids[0], nil
+	return &g, nil
+}
+
+func (u *UserGroupService) Delete(ids []string) (*UserGroupResponse, error) {
+	req := u.Client.NewRequest("usergroup.delete", ids)
+
+	res, err := u.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	g := UserGroupResponse{}
+	err = u.Client.ConvertResponse(*res, &g)
+	if err != nil {
+		return nil, err
+	}
+
+	return &g, nil
+
 }
