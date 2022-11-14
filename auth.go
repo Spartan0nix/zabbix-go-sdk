@@ -20,7 +20,7 @@ type AuthRequest struct {
 	Auth    *string           `json:"auth"`
 }
 
-func (s *AuthService) NewAuthRequest(user string, password string) (AuthRequest, error) {
+func (s *AuthService) NewAuthRequest(user string, password string) AuthRequest {
 	body := AuthRequest{
 		Jsonrpc: "2.0",
 		Method:  "user.login",
@@ -32,14 +32,11 @@ func (s *AuthService) NewAuthRequest(user string, password string) (AuthRequest,
 		Auth: nil,
 	}
 
-	return body, nil
+	return body
 }
 
 func (s *AuthService) GetCredentials(user string, password string) (*Response, error) {
-	params, err := s.NewAuthRequest(user, password)
-	if err != nil {
-		return nil, err
-	}
+	params := s.NewAuthRequest(user, password)
 
 	res, err := s.Client.Post(params)
 	if err != nil {
