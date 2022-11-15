@@ -18,6 +18,6 @@ jobs:
         go-version: 1.18
 
     - name: Run test
-      run: run.sh --test --coverage
+      run: ./run.sh --test --coverage
       shell: bash
    
