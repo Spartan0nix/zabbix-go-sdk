@@ -28,6 +28,10 @@ func TestSetUrl(t *testing.T) {
 	if client.UserGroup.Client.Url != url {
 		t.Fatalf("UserGroup client 'url' property was not set correctly\n.Value : %s", client.UserGroup.Client.Url)
 	}
+
+	if client.UserMacro.Client.Url != url {
+		t.Fatalf("UserMacro client 'url' property was not set correctly\n.Value : %s", client.UserGroup.Client.Url)
+	}
 }
 
 func TestSetUser(t *testing.T) {
@@ -62,5 +66,9 @@ func TestToken(t *testing.T) {
 
 	if client.UserGroup.Client.Token != token {
 		t.Fatalf("UserGroup client 'token' property was not set correctly\n.Value : %s", client.UserGroup.Client.Token)
+	}
+
+	if client.UserMacro.Client.Token != token {
+		t.Fatalf("UserMacro client 'token' property was not set correctly\n.Value : %s", client.UserGroup.Client.Token)
 	}
 }
