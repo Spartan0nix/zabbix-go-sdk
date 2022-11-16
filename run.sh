@@ -5,10 +5,8 @@ arg_2=$2
 
 case $arg_1 in
 --test)
-    podman system renumber
-
     echo "Running container stack..."
-    podman-compose -f ./build/container-compose-test.yml up -d
+    docker compose -f ./build/container-compose-test.yml up -d
 
     TIMER=40
     echo "Waiting $TIMER\\s for Zabbix server to initialize"
@@ -33,14 +31,13 @@ case $arg_1 in
     fi
 
     echo "Destroying container stack"
-    podman-compose -f ./build/container-compose-test.yml down
+    docker compose -f ./build/container-compose-test.yml down
 ;;
 --up)
-    podman system renumber
-    podman-compose -f ./build/container-compose.yml up
+    docker compose -f ./build/container-compose.yml up
 ;;
 --down)
-    podman-compose -f ./build/container-compose.yml down
+    docker compose -f ./build/container-compose.yml down
 ;;
 --run)
     go run  $(go list ./... | grep -v _test)
