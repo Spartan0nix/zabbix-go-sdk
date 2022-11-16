@@ -111,7 +111,7 @@ func (a *ApiClient) Error(r Response) error {
 }
 
 func (a *ApiClient) ResourceAlreadyExist(resource string, value string, err ResponseError) bool {
-	re := regexp.MustCompile(fmt.Sprintf("%s \"%s\" already exists", resource, value))
+	re := regexp.MustCompile(fmt.Sprintf("%s \"%s\" already exists", resource, value) + `.*`)
 	if re.Match([]byte(err.Data)) {
 		return true
 	} else {
