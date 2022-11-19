@@ -69,3 +69,49 @@ func TestGlobalMacroCreateWrongFormat(t *testing.T) {
 		t.Fatal("No error returned when trying to create a global macro without following Zabbix required format")
 	}
 }
+
+func TestUserMacroDelete(t *testing.T) {
+	// client, err := NewTestingService()
+	// if err != nil {
+	// 	t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	// }
+
+	/*
+	* Waiting for usermacro.get implementation
+	 */
+
+	// h, err = client.UserMacro.Delete([]string{
+	// 	h.Hostmacroids[0],
+	// })
+
+	// if err != nil {
+	// 	t.Fatalf("Error when deleting user macro.\nReason : %v", err)
+	// }
+
+	// if h.Hostmacroids[0] == "" {
+	// 	t.Fatalf("Delete request returned an empty response.")
+	// }
+}
+
+func TestUserMacroDeleteGlobal(t *testing.T) {
+	// client, err := NewTestingService()
+	// if err != nil {
+	// 	t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	// }
+
+	/*
+	* Waiting for usermacro.get implementation
+	 */
+
+	// h, err = client.UserMacro.DeleteGlobal([]string{
+	// 	h.Hostmacroids[0],
+	// })
+
+	// if err != nil {
+	// 	t.Fatalf("Error when deleting global macro.\nReason : %v", err)
+	// }
+
+	// if h.Globalmacroids[0] == "" {
+	// 	t.Fatalf("Delete request returned an empty response.")
+	// }
+}

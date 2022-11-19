@@ -96,3 +96,37 @@ func (u *UserMacroService) CreateGlobal(g GlobalMacro) (*GlobalMacroResponse, er
 
 	return &r, nil
 }
+
+func (u *UserMacroService) Delete(ids []string) (*HostMacroResponse, error) {
+	req := u.Client.NewRequest("usermacro.delete", ids)
+
+	res, err := u.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := HostMacroResponse{}
+	err = u.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+func (u *UserMacroService) DeleteGlobal(ids []string) (*GlobalMacroResponse, error) {
+	req := u.Client.NewRequest("usermacro.deleteglobal", ids)
+
+	res, err := u.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := GlobalMacroResponse{}
+	err = u.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
