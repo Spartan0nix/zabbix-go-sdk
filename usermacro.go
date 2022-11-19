@@ -73,7 +73,7 @@ type UserMacroGetParameters struct {
 	BaseParameters       *GetRequestBaseParameters
 }
 
-func (u *UserMacroService) GetHostMacro(p *UserMacroGetParameters) (*[]HostMacro, error) {
+func (u *UserMacroService) GetHostMacro(p *UserMacroGetParameters) ([]HostMacro, error) {
 	p.Globalmacro = false
 
 	req := u.Client.NewRequest("usermacro.get", p)
@@ -89,10 +89,10 @@ func (u *UserMacroService) GetHostMacro(p *UserMacroGetParameters) (*[]HostMacro
 		return nil, err
 	}
 
-	return &r, nil
+	return r, nil
 }
 
-func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) (*[]GlobalMacro, error) {
+func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) ([]GlobalMacro, error) {
 	p.Globalmacro = true
 
 	req := u.Client.NewRequest("usermacro.get", p)
@@ -108,7 +108,7 @@ func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) (*[]GlobalM
 		return nil, err
 	}
 
-	return &r, nil
+	return r, nil
 }
 
 func (u *UserMacroService) Create(h HostMacro) (*HostMacroResponse, error) {

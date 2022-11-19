@@ -108,48 +108,72 @@ func TestUserMacroGetGlobalMacro(t *testing.T) {
 	}
 }
 
-func TestUserMacroDelete(t *testing.T) {
-	// client, err := NewTestingService()
-	// if err != nil {
-	// 	t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	// }
+func TestUserMacroDeleteHostMacro(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
 
-	/*
-	* Waiting for usermacro.get implementation
-	 */
+	m, err := client.UserMacro.GetHostMacro(&UserMacroGetParameters{
+		Hostids: []string{
+			"10084",
+		},
+	})
 
-	// h, err = client.UserMacro.Delete([]string{
-	// 	h.Hostmacroids[0],
-	// })
+	if err != nil {
+		t.Fatalf("Error when retrieving host macros.\nReason : %v", err)
+	}
 
-	// if err != nil {
-	// 	t.Fatalf("Error when deleting user macro.\nReason : %v", err)
-	// }
+	if m == nil {
+		t.Fatalf("An empty response was returned when retrieving macros for host '%s'.", "10084")
+	}
 
-	// if h.Hostmacroids[0] == "" {
-	// 	t.Fatalf("Delete request returned an empty response.")
-	// }
+	d, err := client.UserMacro.Delete([]string{
+		m[0].Id,
+	})
+
+	if err != nil {
+		t.Fatalf("Error when deleting user macro.\nReason : %v", err)
+	}
+
+	if d.Hostmacroids[0] == "" {
+		t.Fatalf("Delete request returned an empty response.")
+	}
+
+	if d.Hostmacroids[0] != m[0].Id {
+		t.Fatalf("Error during delete request.\nId of the deleted host macro is '%s'.\nHost macro with id '%s' was requested for deletion.", d.Hostmacroids[0], m[0].Id)
+	}
 }
 
-func TestUserMacroDeleteGlobal(t *testing.T) {
-	// client, err := NewTestingService()
-	// if err != nil {
-	// 	t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	// }
+func TestUserMacroDeleteGlobalMacro(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
 
-	/*
-	* Waiting for usermacro.get implementation
-	 */
+	m, err := client.UserMacro.GetGlobalMacro(&UserMacroGetParameters{})
 
-	// h, err = client.UserMacro.DeleteGlobal([]string{
-	// 	h.Hostmacroids[0],
-	// })
+	if err != nil {
+		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
+	}
 
-	// if err != nil {
-	// 	t.Fatalf("Error when deleting global macro.\nReason : %v", err)
-	// }
+	if m == nil {
+		t.Fatal("An empty response was returned when retrieving server global macros.")
+	}
 
-	// if h.Globalmacroids[0] == "" {
-	// 	t.Fatalf("Delete request returned an empty response.")
-	// }
+	d, err := client.UserMacro.DeleteGlobal([]string{
+		m[0].Id,
+	})
+
+	if err != nil {
+		t.Fatalf("Error when deleting global macro.\nReason : %v", err)
+	}
+
+	if d.Globalmacroids[0] == "" {
+		t.Fatalf("Delete request returned an empty response.")
+	}
+
+	if d.Globalmacroids[0] != m[0].Id {
+		t.Fatalf("Error during delete request.\nId of the deleted global macro is '%s'.\nGlobal macro with id '%s' was requested for deletion.", d.Globalmacroids[0], m[0].Id)
+	}
 }
