@@ -8,7 +8,7 @@ func TestUserMacroCreate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	h, err := client.UserMacro.Create(HostMacro{
+	h, err := client.UserMacro.Create(&HostMacro{
 		Hostid: "10084",
 		Macro:  "{$TEST}",
 		Value:  "test",
@@ -26,7 +26,7 @@ func TestUserMacroCreate(t *testing.T) {
 func TestUserMacroCreateWrongFormat(t *testing.T) {
 	client := NewZabbixService()
 
-	_, err := client.UserMacro.Create(HostMacro{
+	_, err := client.UserMacro.Create(&HostMacro{
 		Hostid: "10084",
 		Macro:  "TEST",
 		Value:  "test",
@@ -40,7 +40,7 @@ func TestUserMacroCreateWrongFormat(t *testing.T) {
 func TestUserMacroCreateWrongMissingId(t *testing.T) {
 	client := NewZabbixService()
 
-	_, err := client.UserMacro.Create(HostMacro{
+	_, err := client.UserMacro.Create(&HostMacro{
 		Macro: "TEST",
 		Value: "test",
 	})
@@ -50,46 +50,13 @@ func TestUserMacroCreateWrongMissingId(t *testing.T) {
 	}
 }
 
-func TestGlobalMacroCreate(t *testing.T) {
+func TestUserMacroGet(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	h, err := client.UserMacro.CreateGlobal(GlobalMacro{
-		Macro: "{$TEST}",
-		Value: "test",
-	})
-
-	if err != nil {
-		t.Fatalf("Error when creating global macro.\nReason : %v", err)
-	}
-
-	if h.Globalmacroids[0] == "" {
-		t.Fatalf("Create request returned an empty response.")
-	}
-}
-
-func TestGlobalMacroCreateWrongFormat(t *testing.T) {
-	client := NewZabbixService()
-
-	_, err := client.UserMacro.CreateGlobal(GlobalMacro{
-		Macro: "TEST",
-		Value: "test",
-	})
-
-	if err == nil {
-		t.Fatal("No error returned when trying to create a global macro without following Zabbix required format")
-	}
-}
-
-func TestUserMacroGetHostMacro(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	m, err := client.UserMacro.GetHostMacro(&UserMacroGetParameters{
+	m, err := client.UserMacro.Get(&UserMacroGetParameters{
 		Hostids: []string{
 			"10084",
 		},
@@ -104,30 +71,13 @@ func TestUserMacroGetHostMacro(t *testing.T) {
 	}
 }
 
-func TestUserMacroGetGlobalMacro(t *testing.T) {
+func TestUserMacroUpdate(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.GetGlobalMacro(&UserMacroGetParameters{})
-
-	if err != nil {
-		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
-	}
-
-	if m == nil {
-		t.Fatal("An empty response was returned when retrieving server global macros.")
-	}
-}
-
-func TestUserMacroUpdateHostMacro(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	m, err := client.UserMacro.GetHostMacro(&UserMacroGetParameters{
+	m, err := client.UserMacro.Get(&UserMacroGetParameters{
 		Hostids: []string{
 			"10084",
 		},
@@ -154,42 +104,13 @@ func TestUserMacroUpdateHostMacro(t *testing.T) {
 	}
 }
 
-func TestUserMacroUpdatGlobalMacro(t *testing.T) {
+func TestUserMacroDelete(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.GetGlobalMacro(&UserMacroGetParameters{})
-
-	if err != nil {
-		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
-	}
-
-	if m == nil {
-		t.Fatal("An empty response was returned when retrieving server global macros.")
-	}
-
-	m[0].Type = Secret
-	m[0].Value = "new-secret-value"
-
-	updated_m, err := client.UserMacro.UpdateGlobal(m[0])
-	if err != nil {
-		t.Fatalf("Error when updating global macro.\nReason : %v", err)
-	}
-
-	if updated_m == nil {
-		t.Fatalf("An empty response was returned when updating global macro.\nDesired state : %v", m[0])
-	}
-}
-
-func TestUserMacroDeleteHostMacro(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	m, err := client.UserMacro.GetHostMacro(&UserMacroGetParameters{
+	m, err := client.UserMacro.Get(&UserMacroGetParameters{
 		Hostids: []string{
 			"10084",
 		},
@@ -220,13 +141,94 @@ func TestUserMacroDeleteHostMacro(t *testing.T) {
 	}
 }
 
-func TestUserMacroDeleteGlobalMacro(t *testing.T) {
+// -----------------------------------
+
+func TestUserMacroCreateGlobal(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.GetGlobalMacro(&UserMacroGetParameters{})
+	h, err := client.UserMacro.CreateGlobal(&GlobalMacro{
+		Macro: "{$TEST}",
+		Value: "test",
+	})
+
+	if err != nil {
+		t.Fatalf("Error when creating global macro.\nReason : %v", err)
+	}
+
+	if h.Globalmacroids[0] == "" {
+		t.Fatalf("Create request returned an empty response.")
+	}
+}
+
+func TestUserMacroCreateGlobalWrongFormat(t *testing.T) {
+	client := NewZabbixService()
+
+	_, err := client.UserMacro.CreateGlobal(&GlobalMacro{
+		Macro: "TEST",
+		Value: "test",
+	})
+
+	if err == nil {
+		t.Fatal("No error returned when trying to create a global macro without following Zabbix required format")
+	}
+}
+
+func TestUserMacroGetGlobal(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
+	}
+
+	if m == nil {
+		t.Fatal("An empty response was returned when retrieving server global macros.")
+	}
+}
+
+func TestUserMacroUpdateGlobal(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
+	}
+
+	if m == nil {
+		t.Fatal("An empty response was returned when retrieving server global macros.")
+	}
+
+	m[0].Type = Secret
+	m[0].Value = "new-secret-value"
+
+	updated_m, err := client.UserMacro.UpdateGlobal(m[0])
+	if err != nil {
+		t.Fatalf("Error when updating global macro.\nReason : %v", err)
+	}
+
+	if updated_m == nil {
+		t.Fatalf("An empty response was returned when updating global macro.\nDesired state : %v", m[0])
+	}
+}
+
+func TestUserMacroDeleteGlobal(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{})
 
 	if err != nil {
 		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)

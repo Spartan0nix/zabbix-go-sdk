@@ -43,7 +43,18 @@ type GlobalMacroResponse struct {
 	Globalmacroids []string `json:"globalmacroids"`
 }
 
-type GetRequestBaseParameters struct {
+type UserMacroGetParameters struct {
+	Globalmacro            bool        `json:"globalmacro,omitempty"`
+	Globalmacroids         []string    `json:"globalmacroids,omitempty"`
+	Groupids               []string    `json:"groupids,omitempty"`
+	Hostids                []string    `json:"hostids,omitempty"`
+	Hostmacroids           []string    `json:"hostmacroids,omitempty"`
+	Inherited              bool        `json:"inherited,omitempty"`
+	SelectHostGroups       interface{} `json:"selectHostGroups,omitempty"`
+	SelectHosts            interface{} `json:"selectHosts,omitempty"`
+	SelectTemplateGroups   interface{} `json:"selectTemplateGroups,omitempty"`
+	SelectTemplates        interface{} `json:"selectTemplates,omitempty"`
+	Sortfield              []string    `json:"sortfield,omitempty"`
 	CountOutput            bool        `json:"countOutput,omitempty"`
 	Editable               bool        `json:"editable,omitempty"`
 	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
@@ -58,22 +69,7 @@ type GetRequestBaseParameters struct {
 	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
-type UserMacroGetParameters struct {
-	Globalmacro          bool        `json:"globalmacro,omitempty"`
-	Globalmacroids       []string    `json:"globalmacroids,omitempty"`
-	Groupids             []string    `json:"groupids,omitempty"`
-	Hostids              []string    `json:"hostids,omitempty"`
-	Hostmacroids         []string    `json:"hostmacroids,omitempty"`
-	Inherited            bool        `json:"inherited,omitempty"`
-	SelectHostGroups     interface{} `json:"selectHostGroups,omitempty"`
-	SelectHosts          interface{} `json:"selectHosts,omitempty"`
-	SelectTemplateGroups interface{} `json:"selectTemplateGroups,omitempty"`
-	SelectTemplates      interface{} `json:"selectTemplates,omitempty"`
-	Sortfield            []string    `json:"sortfield,omitempty"`
-	BaseParameters       *GetRequestBaseParameters
-}
-
-func (u *UserMacroService) GetHostMacro(p *UserMacroGetParameters) ([]HostMacro, error) {
+func (u *UserMacroService) Get(p *UserMacroGetParameters) ([]*HostMacro, error) {
 	p.Globalmacro = false
 
 	req := u.Client.NewRequest("usermacro.get", p)
@@ -83,7 +79,7 @@ func (u *UserMacroService) GetHostMacro(p *UserMacroGetParameters) ([]HostMacro,
 		return nil, err
 	}
 
-	r := make([]HostMacro, 0)
+	r := make([]*HostMacro, 0)
 	err = u.Client.ConvertResponse(*res, &r)
 	if err != nil {
 		return nil, err
@@ -92,7 +88,7 @@ func (u *UserMacroService) GetHostMacro(p *UserMacroGetParameters) ([]HostMacro,
 	return r, nil
 }
 
-func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) ([]GlobalMacro, error) {
+func (u *UserMacroService) GetGlobal(p *UserMacroGetParameters) ([]*GlobalMacro, error) {
 	p.Globalmacro = true
 
 	req := u.Client.NewRequest("usermacro.get", p)
@@ -102,7 +98,7 @@ func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) ([]GlobalMa
 		return nil, err
 	}
 
-	r := make([]GlobalMacro, 0)
+	r := make([]*GlobalMacro, 0)
 	err = u.Client.ConvertResponse(*res, &r)
 	if err != nil {
 		return nil, err
@@ -111,7 +107,7 @@ func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) ([]GlobalMa
 	return r, nil
 }
 
-func (u *UserMacroService) Create(h HostMacro) (*HostMacroResponse, error) {
+func (u *UserMacroService) Create(h *HostMacro) (*HostMacroResponse, error) {
 	if h.Hostid == "" {
 		return nil, fmt.Errorf("Missing required field 'HostId' in the given object.\nObject passed : %v", h)
 	}
@@ -142,7 +138,7 @@ func (u *UserMacroService) Create(h HostMacro) (*HostMacroResponse, error) {
 	return &r, nil
 }
 
-func (u *UserMacroService) CreateGlobal(g GlobalMacro) (*GlobalMacroResponse, error) {
+func (u *UserMacroService) CreateGlobal(g *GlobalMacro) (*GlobalMacroResponse, error) {
 	re := regexp.MustCompile(`^{\$.*}$`)
 	if !re.Match([]byte(g.Macro)) {
 		return nil, fmt.Errorf("The following macro '%s' does not complies with the required format.\nFormat : {$...your data..}", g.Macro)
@@ -203,7 +199,7 @@ func (u *UserMacroService) DeleteGlobal(ids []string) (*GlobalMacroResponse, err
 	return &r, nil
 }
 
-func (u *UserMacroService) Update(h HostMacro) (*HostMacroResponse, error) {
+func (u *UserMacroService) Update(h *HostMacro) (*HostMacroResponse, error) {
 	if h.Id == "" {
 		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", h)
 	}
@@ -226,7 +222,7 @@ func (u *UserMacroService) Update(h HostMacro) (*HostMacroResponse, error) {
 	return &r, nil
 }
 
-func (u *UserMacroService) UpdateGlobal(m GlobalMacro) (*GlobalMacroResponse, error) {
+func (u *UserMacroService) UpdateGlobal(m *GlobalMacro) (*GlobalMacroResponse, error) {
 	if m.Id == "" {
 		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", m)
 	}

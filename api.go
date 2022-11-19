@@ -15,6 +15,21 @@ type ApiClient struct {
 	Token  string
 }
 
+// type GetRequestBaseParameters struct {
+// 	CountOutput            bool        `json:"countOutput,omitempty"`
+// 	Editable               bool        `json:"editable,omitempty"`
+// 	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
+// 	Filter                 interface{} `json:"filter,omitempty"`
+// 	Limit                  int         `json:"limit,omitempty"`
+// 	Output                 interface{} `json:"output,omitempty"`
+// 	Preservekeys           bool        `json:"preservekeys,omitempty"`
+// 	Search                 interface{} `json:"search,omitempty"`
+// 	SearchByAny            bool        `json:"searchByAny,omitempty"`
+// 	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
+// 	Sortorder              []string    `json:"sortorder,omitempty"`
+// 	StartSearch            bool        `json:"startSearch,omitempty"`
+// }
+
 type Request struct {
 	Jsonrpc string      `json:"jsonrpc"`
 	Method  string      `json:"method"`

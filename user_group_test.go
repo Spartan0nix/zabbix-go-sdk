@@ -6,7 +6,7 @@ const (
 	name = "test-user-group"
 )
 
-func TestListUserGroup(t *testing.T) {
+func TestUserGroupList(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
@@ -22,13 +22,13 @@ func TestListUserGroup(t *testing.T) {
 	}
 }
 
-func TestCreateUserGroup(t *testing.T) {
+func TestUserGroupCreate(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	group, err := client.UserGroup.Create(&UserGroupCreateParameters{
+	group, err := client.UserGroup.Create(&UserGroupExtendedParameters{
 		Name: name,
 	})
 
@@ -41,7 +41,7 @@ func TestCreateUserGroup(t *testing.T) {
 	}
 }
 
-func TestGetUserGroup(t *testing.T) {
+func TestUserGroupGet(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
@@ -62,7 +62,7 @@ func TestGetUserGroup(t *testing.T) {
 	}
 }
 
-func TestUpdateUserGroup(t *testing.T) {
+func TestUserGroupUpdate(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
@@ -72,6 +72,7 @@ func TestUpdateUserGroup(t *testing.T) {
 		Filter: map[string]string{
 			"name": name,
 		},
+		Output: "extend",
 	})
 
 	if err != nil {
@@ -82,7 +83,7 @@ func TestUpdateUserGroup(t *testing.T) {
 		t.Fatalf("Failed to get user group '%s'.", name)
 	}
 
-	updated_group, err := client.UserGroup.Update(&UserGroupUpdateParameters{
+	updated_group, err := client.UserGroup.Update(&UserGroupExtendedParameters{
 		Id:         group[0].Id,
 		Debug_mode: 1,
 		Gui_access: 0,
@@ -97,7 +98,7 @@ func TestUpdateUserGroup(t *testing.T) {
 	}
 }
 
-func TestDeleteUserGroup(t *testing.T) {
+func TestUserGroupDelete(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
@@ -107,6 +108,7 @@ func TestDeleteUserGroup(t *testing.T) {
 		Filter: map[string]string{
 			"name": name,
 		},
+		Output: "extend",
 	})
 
 	if err != nil {
