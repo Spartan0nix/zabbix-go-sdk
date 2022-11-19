@@ -28,7 +28,7 @@ type GlobalMacro struct {
 
 type HostMacro struct {
 	Id          string    `json:"hostmacroid,omitempty"`
-	Hostid      string    `json:"hostid"`
+	Hostid      string    `json:"hostid,omitempty"`
 	Macro       string    `json:"macro"`
 	Value       string    `json:"value"`
 	Type        MacroType `json:"type,omitempty"`
@@ -112,6 +112,10 @@ func (u *UserMacroService) GetGlobalMacro(p *UserMacroGetParameters) ([]GlobalMa
 }
 
 func (u *UserMacroService) Create(h HostMacro) (*HostMacroResponse, error) {
+	if h.Hostid == "" {
+		return nil, fmt.Errorf("Missing required field 'HostId' in the given object.\nObject passed : %v", h)
+	}
+
 	re := regexp.MustCompile(`^{\$.*}$`)
 	if !re.Match([]byte(h.Macro)) {
 		return nil, fmt.Errorf("The following macro '%s' does not complies with the required format.\nFormat : {$...your data..}", h.Macro)
@@ -184,6 +188,50 @@ func (u *UserMacroService) Delete(ids []string) (*HostMacroResponse, error) {
 
 func (u *UserMacroService) DeleteGlobal(ids []string) (*GlobalMacroResponse, error) {
 	req := u.Client.NewRequest("usermacro.deleteglobal", ids)
+
+	res, err := u.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := GlobalMacroResponse{}
+	err = u.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+func (u *UserMacroService) Update(h HostMacro) (*HostMacroResponse, error) {
+	if h.Id == "" {
+		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", h)
+	}
+
+	h.Hostid = ""
+
+	req := u.Client.NewRequest("usermacro.update", h)
+
+	res, err := u.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := HostMacroResponse{}
+	err = u.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+func (u *UserMacroService) UpdateGlobal(m GlobalMacro) (*GlobalMacroResponse, error) {
+	if m.Id == "" {
+		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", m)
+	}
+
+	req := u.Client.NewRequest("usermacro.updateglobal", m)
 
 	res, err := u.Client.Post(req)
 	if err != nil {

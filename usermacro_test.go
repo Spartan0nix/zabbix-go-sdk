@@ -37,6 +37,19 @@ func TestUserMacroCreateWrongFormat(t *testing.T) {
 	}
 }
 
+func TestUserMacroCreateWrongMissingId(t *testing.T) {
+	client := NewZabbixService()
+
+	_, err := client.UserMacro.Create(HostMacro{
+		Macro: "TEST",
+		Value: "test",
+	})
+
+	if err == nil {
+		t.Fatal("No error returned when trying to create a user macro without the required 'Id' field.")
+	}
+}
+
 func TestGlobalMacroCreate(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
@@ -105,6 +118,68 @@ func TestUserMacroGetGlobalMacro(t *testing.T) {
 
 	if m == nil {
 		t.Fatal("An empty response was returned when retrieving server global macros.")
+	}
+}
+
+func TestUserMacroUpdateHostMacro(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetHostMacro(&UserMacroGetParameters{
+		Hostids: []string{
+			"10084",
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving host macros.\nReason : %v", err)
+	}
+
+	if m == nil {
+		t.Fatalf("An empty response was returned when retrieving macros for host '%s'.", "10084")
+	}
+
+	m[0].Type = Secret
+	m[0].Value = "new-secret-value"
+
+	updated_m, err := client.UserMacro.Update(m[0])
+	if err != nil {
+		t.Fatalf("Error when updating host macro.\nReason : %v", err)
+	}
+
+	if updated_m == nil {
+		t.Fatalf("An empty response was returned when updating host macro.\nDesired state : %v", m[0])
+	}
+}
+
+func TestUserMacroUpdatGlobalMacro(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetGlobalMacro(&UserMacroGetParameters{})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
+	}
+
+	if m == nil {
+		t.Fatal("An empty response was returned when retrieving server global macros.")
+	}
+
+	m[0].Type = Secret
+	m[0].Value = "new-secret-value"
+
+	updated_m, err := client.UserMacro.UpdateGlobal(m[0])
+	if err != nil {
+		t.Fatalf("Error when updating global macro.\nReason : %v", err)
+	}
+
+	if updated_m == nil {
+		t.Fatalf("An empty response was returned when updating global macro.\nDesired state : %v", m[0])
 	}
 }
 
