@@ -70,6 +70,44 @@ func TestGlobalMacroCreateWrongFormat(t *testing.T) {
 	}
 }
 
+func TestUserMacroGetHostMacro(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetHostMacro(&UserMacroGetParameters{
+		Hostids: []string{
+			"10084",
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving host macros.\nReason : %v", err)
+	}
+
+	if m == nil {
+		t.Fatalf("An empty response was returned when retrieving macros for host '%s'.", "10084")
+	}
+}
+
+func TestUserMacroGetGlobalMacro(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	m, err := client.UserMacro.GetGlobalMacro(&UserMacroGetParameters{})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
+	}
+
+	if m == nil {
+		t.Fatal("An empty response was returned when retrieving server global macros.")
+	}
+}
+
 func TestUserMacroDelete(t *testing.T) {
 	// client, err := NewTestingService()
 	// if err != nil {
