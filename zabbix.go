@@ -5,6 +5,7 @@ import "net/http"
 type ZabbixService struct {
 	Auth      *AuthService
 	UserGroup *UserGroupService
+	UserMacro *UserMacroService
 }
 
 func NewZabbixService() *ZabbixService {
@@ -19,12 +20,16 @@ func NewZabbixService() *ZabbixService {
 		UserGroup: &UserGroupService{
 			Client: c,
 		},
+		UserMacro: &UserMacroService{
+			Client: c,
+		},
 	}
 }
 
 func (s ZabbixService) SetUrl(url string) {
 	s.Auth.Client.Url = url
 	s.UserGroup.Client.Url = url
+	s.UserMacro.Client.Url = url
 }
 
 func (s ZabbixService) SetUser(user *ApiUser) {
@@ -34,4 +39,5 @@ func (s ZabbixService) SetUser(user *ApiUser) {
 func (s ZabbixService) SetToken(token string) {
 	s.Auth.Client.Token = token
 	s.UserGroup.Client.Token = token
+	s.UserMacro.Client.Token = token
 }
