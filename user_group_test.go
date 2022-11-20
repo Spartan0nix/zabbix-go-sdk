@@ -3,7 +3,7 @@ package main
 import "testing"
 
 const (
-	name = "test-user-group"
+	userGroupName = "test-user-group"
 )
 
 func TestUserGroupList(t *testing.T) {
@@ -29,11 +29,11 @@ func TestUserGroupCreate(t *testing.T) {
 	}
 
 	group, err := client.UserGroup.Create(&UserGroupExtendedParameters{
-		Name: name,
+		Name: userGroupName,
 	})
 
 	if err != nil {
-		t.Fatalf("Error when creating user group '%s'.\nReason : %v", name, err)
+		t.Fatalf("Error when creating user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
 	if group.Usrgrpids[0] == "" {
@@ -49,15 +49,15 @@ func TestUserGroupGet(t *testing.T) {
 
 	group, err := client.UserGroup.Get(&UserGroupGetParameters{
 		Filter: map[string]string{
-			"name": name,
+			"name": userGroupName,
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("Error when getting user group '%s'.\nReason : %v", name, err)
+		t.Fatalf("Error when getting user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if group[0].Name != name {
+	if group[0].Name != userGroupName {
 		t.Fail()
 	}
 }
@@ -70,17 +70,17 @@ func TestUserGroupUpdate(t *testing.T) {
 
 	group, err := client.UserGroup.Get(&UserGroupGetParameters{
 		Filter: map[string]string{
-			"name": name,
+			"name": userGroupName,
 		},
 		Output: "extend",
 	})
 
 	if err != nil {
-		t.Fatalf("Error when getting user group '%s'.\nReason : %v", name, err)
+		t.Fatalf("Error when getting user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if group[0].Name != name {
-		t.Fatalf("Failed to get user group '%s'.", name)
+	if group[0].Name != userGroupName {
+		t.Fatalf("Failed to get user group '%s'.", userGroupName)
 	}
 
 	updated_group, err := client.UserGroup.Update(&UserGroupExtendedParameters{
@@ -90,7 +90,7 @@ func TestUserGroupUpdate(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when updating user group '%s'.\nReason : %v", name, err)
+		t.Fatalf("Error when updating user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
 	if updated_group.Usrgrpids[0] == "" {
@@ -106,17 +106,17 @@ func TestUserGroupDelete(t *testing.T) {
 
 	group, err := client.UserGroup.Get(&UserGroupGetParameters{
 		Filter: map[string]string{
-			"name": name,
+			"name": userGroupName,
 		},
 		Output: "extend",
 	})
 
 	if err != nil {
-		t.Fatalf("Error when getting user group '%s'.\nReason : %v", name, err)
+		t.Fatalf("Error when getting user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if group[0].Name != name {
-		t.Fatalf("Failed to get user group '%s'.", name)
+	if group[0].Name != userGroupName {
+		t.Fatalf("Failed to get user group '%s'.", userGroupName)
 	}
 
 	deleted_group, err := client.UserGroup.Delete([]string{
@@ -124,7 +124,7 @@ func TestUserGroupDelete(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when deleting user group '%s'.\nReason : %v", name, err)
+		t.Fatalf("Error when deleting user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
 	if deleted_group.Usrgrpids[0] == "" {
