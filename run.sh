@@ -21,13 +21,13 @@ case $arg_1 in
     if [[ $arg_2 == "--coverage"* ]]
     then
         echo "Running test... (with coverage)"
-        go test -v -coverprofile=coverage.out
+        go test -coverprofile=coverage.out
 
         echo "Formatting coverage report to HTML..."
         go tool cover -html=coverage.out -o=coverage.html
     else
         echo "Running test..."
-        go test -v
+        go test 
     fi
 
     echo "Destroying container stack"
