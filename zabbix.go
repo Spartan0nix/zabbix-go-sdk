@@ -7,6 +7,7 @@ type ZabbixService struct {
 	UserGroup *UserGroupService
 	UserMacro *UserMacroService
 	HostGroup *HostGroupService
+	Template  *TemplateService
 }
 
 func NewZabbixService() *ZabbixService {
@@ -25,6 +26,9 @@ func NewZabbixService() *ZabbixService {
 			Client: c,
 		},
 		HostGroup: &HostGroupService{
+			Client: c,
+		},
+		Template: &TemplateService{
 			Client: c,
 		},
 	}
