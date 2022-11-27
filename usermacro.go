@@ -69,6 +69,24 @@ type UserMacroGetParameters struct {
 	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
+func (g *GlobalMacro) ValidateMacro() error {
+	re := regexp.MustCompile(`^{\$[A-Z0-9_.]*}$`)
+	if !re.Match([]byte(g.Macro)) {
+		return fmt.Errorf("The following macro '%s' does not complies with the required format.\n- Start with : {$\n- End with : }\n- Contain only : A-Z // 0-9 // _ // .", g.Macro)
+	}
+
+	return nil
+}
+
+func (h *HostMacro) ValidateMacro() error {
+	re := regexp.MustCompile(`^{\$[A-Z0-9_.]*}$`)
+	if !re.Match([]byte(h.Macro)) {
+		return fmt.Errorf("The following macro '%s' does not complies with the required format.\n- Start with : {$\n- End with : }\n- Contain only : A-Z // 0-9 // _ // .", h.Macro)
+	}
+
+	return nil
+}
+
 func (u *UserMacroService) Get(p *UserMacroGetParameters) ([]*HostMacro, error) {
 	p.Globalmacro = false
 
@@ -112,9 +130,8 @@ func (u *UserMacroService) Create(h *HostMacro) (*HostMacroResponse, error) {
 		return nil, fmt.Errorf("Missing required field 'HostId' in the given object.\nObject passed : %v", h)
 	}
 
-	re := regexp.MustCompile(`^{\$.*}$`)
-	if !re.Match([]byte(h.Macro)) {
-		return nil, fmt.Errorf("The following macro '%s' does not complies with the required format.\nFormat : {$...your data..}", h.Macro)
+	if err := h.ValidateMacro(); err != nil {
+		return nil, err
 	}
 
 	req := u.Client.NewRequest("usermacro.create", h)
@@ -139,9 +156,8 @@ func (u *UserMacroService) Create(h *HostMacro) (*HostMacroResponse, error) {
 }
 
 func (u *UserMacroService) CreateGlobal(g *GlobalMacro) (*GlobalMacroResponse, error) {
-	re := regexp.MustCompile(`^{\$.*}$`)
-	if !re.Match([]byte(g.Macro)) {
-		return nil, fmt.Errorf("The following macro '%s' does not complies with the required format.\nFormat : {$...your data..}", g.Macro)
+	if err := g.ValidateMacro(); err != nil {
+		return nil, err
 	}
 
 	req := u.Client.NewRequest("usermacro.createglobal", g)

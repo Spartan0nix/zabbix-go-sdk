@@ -1,6 +1,30 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
+
+func TestUserMacroValidateHostMacro(t *testing.T) {
+	m := &HostMacro{
+		Macro: "{$GOOD_FORMAT}",
+		Value: "value",
+	}
+
+	if err := m.ValidateMacro(); err != nil {
+		t.Fatalf("ValidateMacro for HostMacro should not have had return an error.\nError returned : %v", err)
+	}
+}
+
+func TestUserMacroValidateHostMacroError(t *testing.T) {
+	m := &HostMacro{
+		Macro: "{$WRONG-FORMAT}",
+		Value: "value",
+	}
+
+	if err := m.ValidateMacro(); err == nil {
+		t.Fatalf("ValidateMacro for HostMacro should have returned an error.")
+	}
+}
 
 func TestUserMacroCreate(t *testing.T) {
 	client, err := NewTestingService()
@@ -142,6 +166,27 @@ func TestUserMacroDelete(t *testing.T) {
 }
 
 // -----------------------------------
+func TestUserMacroValidateGlobalMacro(t *testing.T) {
+	m := &GlobalMacro{
+		Macro: "{$GOOD_FORMAT}",
+		Value: "value",
+	}
+
+	if err := m.ValidateMacro(); err != nil {
+		t.Fatalf("ValidateMacro for GlobalMacro should not have had return an error.\nError returned : %v", err)
+	}
+}
+
+func TestUserMacroValidateGlobalMacroError(t *testing.T) {
+	m := &GlobalMacro{
+		Macro: "{$WRONG-FORMAT}",
+		Value: "value",
+	}
+
+	if err := m.ValidateMacro(); err == nil {
+		t.Fatalf("ValidateMacro for GlobalMacro should have returned an error.")
+	}
+}
 
 func TestUserMacroCreateGlobal(t *testing.T) {
 	client, err := NewTestingService()
