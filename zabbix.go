@@ -3,11 +3,12 @@ package main
 import "net/http"
 
 type ZabbixService struct {
-	Auth      *AuthService
-	UserGroup *UserGroupService
-	UserMacro *UserMacroService
-	HostGroup *HostGroupService
-	Template  *TemplateService
+	Auth          *AuthService
+	UserGroup     *UserGroupService
+	UserMacro     *UserMacroService
+	HostGroup     *HostGroupService
+	Template      *TemplateService
+	HostInterface *HostInterfaceService
 }
 
 func NewZabbixService() *ZabbixService {
@@ -31,6 +32,9 @@ func NewZabbixService() *ZabbixService {
 		Template: &TemplateService{
 			Client: c,
 		},
+		HostInterface: &HostInterfaceService{
+			Client: c,
+		},
 	}
 }
 
@@ -39,6 +43,7 @@ func (s ZabbixService) SetUrl(url string) {
 	s.UserGroup.Client.Url = url
 	s.UserMacro.Client.Url = url
 	s.HostGroup.Client.Url = url
+	s.HostInterface.Client.Url = url
 }
 
 func (s ZabbixService) SetUser(user *ApiUser) {
@@ -50,4 +55,5 @@ func (s ZabbixService) SetToken(token string) {
 	s.UserGroup.Client.Token = token
 	s.UserMacro.Client.Token = token
 	s.HostGroup.Client.Token = token
+	s.HostInterface.Client.Token = token
 }

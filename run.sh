@@ -27,7 +27,7 @@ case $arg_1 in
         go tool cover -html=coverage.out -o=coverage.html
     else
         echo "Running test..."
-        go test 
+        go test
     fi
 
     echo "Destroying container stack"
