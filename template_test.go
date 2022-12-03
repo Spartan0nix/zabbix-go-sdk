@@ -10,7 +10,7 @@ const (
 var templateId string
 var apacheTemplateId string
 
-func TestTeamplateCreate(t *testing.T) {
+func TestTemplateCreate(t *testing.T) {
 	client, err := NewTestingService()
 	if err != nil {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
