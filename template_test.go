@@ -60,7 +60,7 @@ func TestTemplateGet(t *testing.T) {
 	}
 
 	template, err := client.Template.Get(&TemplateGetParameters{
-		Search: map[string]string{
+		Filter: map[string]string{
 			"name": templateName,
 		},
 	})
@@ -89,7 +89,7 @@ func TestTemplateMassAdd(t *testing.T) {
 	}
 
 	template, err := client.Template.Get(&TemplateGetParameters{
-		Search: map[string]string{
+		Filter: map[string]string{
 			"name": "Apache by HTTP",
 		},
 	})
@@ -112,7 +112,7 @@ func TestTemplateMassAdd(t *testing.T) {
 		},
 		TemplatesLink: []*TemplateId{
 			{
-				apacheTemplateId,
+				Id: apacheTemplateId,
 			},
 		},
 		Macros: []*HostMacro{
