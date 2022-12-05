@@ -18,9 +18,9 @@ func TestTemplateCreate(t *testing.T) {
 
 	template, err := client.Template.Create(&TemplateCreateParameters{
 		Host: templateName,
-		Groups: []*TemplateGroup{
+		Groups: []*HostGroupId{
 			{
-				Id: "1",
+				Groupid: "1",
 			},
 		},
 	})

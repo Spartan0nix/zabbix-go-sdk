@@ -17,30 +17,34 @@ type HostInterfaceAuthProtocol string
 type HostInterfacePrivProtocol string
 
 const (
-	NotDefault   HostInterfaceMain          = "0"
-	Default      HostInterfaceMain          = "1"
-	Agent        HostInterfaceType          = "1"
-	SNMP         HostInterfaceType          = "2"
-	IPMI         HostInterfaceType          = "3"
-	JMX          HostInterfaceType          = "4"
-	SNMPv1       HostInterfaceVersion       = "1"
-	SNMPv2c      HostInterfaceVersion       = "2"
-	SNMPv3       HostInterfaceVersion       = "3"
+	NotDefault HostInterfaceMain = "0"
+	Default    HostInterfaceMain = "1"
+
+	Agent HostInterfaceType = "1"
+	SNMP  HostInterfaceType = "2"
+	IPMI  HostInterfaceType = "3"
+	JMX   HostInterfaceType = "4"
+
+	SNMPv1  HostInterfaceVersion = "1"
+	SNMPv2c HostInterfaceVersion = "2"
+	SNMPv3  HostInterfaceVersion = "3"
+
 	noAuthNoPriv HostInterfaceSecurityLevel = "0"
 	authNoPriv   HostInterfaceSecurityLevel = "1"
 	authPriv     HostInterfaceSecurityLevel = "3"
-	MD5          HostInterfaceAuthProtocol  = "0"
-	SHA1         HostInterfaceAuthProtocol  = "1"
-	SHA224       HostInterfaceAuthProtocol  = "2"
-	SHA256       HostInterfaceAuthProtocol  = "3"
-	SHA384       HostInterfaceAuthProtocol  = "4"
-	SHA512       HostInterfaceAuthProtocol  = "5"
-	DES          HostInterfacePrivProtocol  = "0"
-	AES128       HostInterfacePrivProtocol  = "1"
-	AES192       HostInterfacePrivProtocol  = "2"
-	AES256       HostInterfacePrivProtocol  = "3"
-	AES192C      HostInterfacePrivProtocol  = "4"
-	AES256C      HostInterfacePrivProtocol  = "5"
+
+	MD5     HostInterfaceAuthProtocol = "0"
+	SHA1    HostInterfaceAuthProtocol = "1"
+	SHA224  HostInterfaceAuthProtocol = "2"
+	SHA256  HostInterfaceAuthProtocol = "3"
+	SHA384  HostInterfaceAuthProtocol = "4"
+	SHA512  HostInterfaceAuthProtocol = "5"
+	DES     HostInterfacePrivProtocol = "0"
+	AES128  HostInterfacePrivProtocol = "1"
+	AES192  HostInterfacePrivProtocol = "2"
+	AES256  HostInterfacePrivProtocol = "3"
+	AES192C HostInterfacePrivProtocol = "4"
+	AES256C HostInterfacePrivProtocol = "5"
 )
 
 type HostInterfaceDetail struct {
@@ -57,7 +61,7 @@ type HostInterfaceDetail struct {
 }
 
 type HostInterface struct {
-	Hostid        string               `json:"hostid"`
+	Hostid        string               `json:"hostid,omitempty"`
 	Ip            string               `json:"ip"`
 	Dns           string               `json:"dns"`
 	Main          HostInterfaceMain    `json:"main"`
@@ -227,12 +231,8 @@ type HostInterfaceMassProperties struct {
 	Details *HostInterfaceDetail `json:"details,omitempty"`
 }
 
-type HostInterfaceHostId struct {
-	Id string `json:"hostid"`
-}
-
 type HostInterfaceMassAddParameters struct {
-	Hosts      []*HostInterfaceHostId         `json:"hosts"`
+	Hosts      []*HostId                      `json:"hosts"`
 	Interfaces []*HostInterfaceMassProperties `json:"interfaces"`
 }
 

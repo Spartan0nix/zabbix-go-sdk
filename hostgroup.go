@@ -12,6 +12,10 @@ type HostGroup struct {
 	Uuid     string `json:"uuid"`
 }
 
+type HostGroupId struct {
+	Groupid string `json:"groupid"`
+}
+
 type HostGroupResponse struct {
 	Groupids []string `json:"groupids"`
 }
@@ -133,9 +137,9 @@ func (h *HostGroupService) Get(p *HostGroupGetParameters) ([]*HostGroup, error) 
 	return r, nil
 }
 
-type HostGroupMassGroup struct {
-	Groupid string `json:"groupid"`
-}
+// type HostGroupMassGroup struct {
+// 	Groupid string `json:"groupid"`
+// }
 
 type HostGroupMassHost struct {
 	Hostid string `json:"hostid"`
@@ -146,7 +150,7 @@ type HostGroupMassTemplate struct {
 }
 
 type HostGroupMassAddParameters struct {
-	Groups    []*HostGroupMassGroup    `json:"groups"`
+	Groups    []*HostGroupId           `json:"groups"`
 	Hosts     []*HostGroupMassHost     `json:"hosts,omitempty"`
 	Templates []*HostGroupMassTemplate `json:"templates,omitempty"`
 }
@@ -192,7 +196,7 @@ func (h *HostGroupService) MassRemove(p *HostGroupMassRemoveParameters) (*HostGr
 }
 
 type HostGroupMassUpdateParameters struct {
-	Groups    []*HostGroupMassGroup    `json:"groups"`
+	Groups    []*HostGroupId           `json:"groups"`
 	Hosts     []*HostGroupMassHost     `json:"hosts"`
 	Templates []*HostGroupMassTemplate `json:"templates"`
 }
