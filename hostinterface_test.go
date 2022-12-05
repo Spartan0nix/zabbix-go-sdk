@@ -7,10 +7,10 @@ import (
 const (
 	interfaceName        = "test-interface"
 	updatedInterfaceName = "test-interface-update"
-	hostId               = "10084"
 )
 
 var InterfaceId string
+var TemplateHostId = "10084"
 
 func TestHostInterfaceCreate(t *testing.T) {
 	client, err := NewTestingService()
@@ -19,7 +19,7 @@ func TestHostInterfaceCreate(t *testing.T) {
 	}
 
 	i, err := client.HostInterface.Create(&HostInterface{
-		Hostid: hostId,
+		Hostid: TemplateHostId,
 		Ip:     "127.0.0.2",
 		Dns:    "localhost",
 		Main:   NotDefault,
@@ -29,7 +29,7 @@ func TestHostInterfaceCreate(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when creating hostInterface '%s' for host '%s'.\nReason : %v", interfaceName, hostId, err)
+		t.Fatalf("Error when creating hostInterface '%s' for host '%s'.\nReason : %v", interfaceName, TemplateHostId, err)
 	}
 
 	if i == nil {
@@ -47,7 +47,7 @@ func TestHostInterfaceGet(t *testing.T) {
 
 	i, err := client.HostInterface.Get(&HostInterfaceGetParameters{
 		Hostids: []string{
-			hostId,
+			TemplateHostId,
 		},
 		Filter: map[string]string{
 			"name": interfaceName,
@@ -55,7 +55,7 @@ func TestHostInterfaceGet(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when getting hostInterface '%s' for host '%s'.\nReason : %v", interfaceName, hostId, err)
+		t.Fatalf("Error when getting hostInterface '%s' for host '%s'.\nReason : %v", interfaceName, TemplateHostId, err)
 	}
 
 	if i == nil {
@@ -81,9 +81,9 @@ func TestHostInterfaceMassAdd(t *testing.T) {
 	}
 
 	i, err := client.HostInterface.MassAdd(&HostInterfaceMassAddParameters{
-		Hosts: []*HostInterfaceHostId{
+		Hosts: []*HostId{
 			{
-				Id: hostId,
+				Hostid: TemplateHostId,
 			},
 		},
 		Interfaces: []*HostInterfaceMassProperties{
@@ -103,7 +103,7 @@ func TestHostInterfaceMassAdd(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass interface to host '%s'.\nReason : %v", hostId, err)
+		t.Fatalf("Error when mass interface to host '%s'.\nReason : %v", TemplateHostId, err)
 	}
 
 	if i == nil {
@@ -119,7 +119,7 @@ func TestHostInterfaceMassRemove(t *testing.T) {
 
 	i, err := client.HostInterface.MassRemove(&HostInterfaceMassRemoveParameters{
 		HostIds: []string{
-			hostId,
+			TemplateHostId,
 		},
 		Interfaces: []*HostInterfaceMassProperties{
 			{
@@ -131,7 +131,7 @@ func TestHostInterfaceMassRemove(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass removing interface from host '%s'.\nReason : %v", hostId, err)
+		t.Fatalf("Error when mass removing interface from host '%s'.\nReason : %v", TemplateHostId, err)
 	}
 
 	if i == nil {
@@ -151,7 +151,7 @@ func TestHostInterfaceMassRemove(t *testing.T) {
 // 	}
 
 // 	i, err := client.HostInterface.ReplaceHostInterfaces(&HostInterfaceReplaceParameters{
-// 		Host: hostId,
+// 		Host: TemplateHostId,
 // 		Interfaces: []*HostInterfaceMassProperties{
 // 			{
 // 				Ip:    "127.0.0.1",
@@ -165,7 +165,7 @@ func TestHostInterfaceMassRemove(t *testing.T) {
 // 	})
 
 // 	if err != nil {
-// 		t.Fatalf("Error when replacing interfaces on host '%s'.\nReason : %v", hostId, err)
+// 		t.Fatalf("Error when replacing interfaces on host '%s'.\nReason : %v", TemplateHostId, err)
 // 	}
 
 // 	if i == nil {
@@ -186,7 +186,7 @@ func TestHostInterfaceUpdate(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Fatalf("Error when updating interface '%s' for host '%s'.\nReason : %v", InterfaceId, hostId, err)
+		t.Fatalf("Error when updating interface '%s' for host '%s'.\nReason : %v", InterfaceId, TemplateHostId, err)
 	}
 
 	if i == nil {

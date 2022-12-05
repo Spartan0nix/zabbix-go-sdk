@@ -79,7 +79,7 @@ func TestHostGroupMassAdd(t *testing.T) {
 	}
 
 	mass_add_g, err := client.HostGroup.MassAdd(&HostGroupMassAddParameters{
-		Groups: []*HostGroupMassGroup{
+		Groups: []*HostGroupId{
 			{
 				Groupid: g[0].Id,
 			},
@@ -151,7 +151,7 @@ func TestHostGroupMassUpdate(t *testing.T) {
 	}
 
 	mass_rm_g, err := client.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
-		Groups: []*HostGroupMassGroup{
+		Groups: []*HostGroupId{
 			{
 				Groupid: g[0].Id,
 			},

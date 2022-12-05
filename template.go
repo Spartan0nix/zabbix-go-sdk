@@ -23,10 +23,6 @@ type TemplateId struct {
 	Id string `json:"templateid"`
 }
 
-type TemplateGroup struct {
-	Id string `json:"groupid"`
-}
-
 type TemplateGetParameters struct {
 	Templateids            []string    `json:"templateids,omitempty"`
 	Groupids               []string    `json:"groupids,omitempty"`
@@ -117,13 +113,13 @@ type TemplateGetResponse struct {
 }
 
 type TemplateCreateParameters struct {
-	Host        string           `json:"host"`
-	Groups      []*TemplateGroup `json:"groups"`
-	Name        string           `json:"name,omitempty"`
-	Description string           `json:"description,omitempty"`
-	Tags        []*TemplateTag   `json:"tags,omitempty"`
-	Templates   []*TemplateId    `json:"templates,omitempty"`
-	Macros      []*HostMacro     `json:"macros,omitempty"`
+	Host        string         `json:"host"`
+	Groups      []*HostGroupId `json:"groups"`
+	Name        string         `json:"name,omitempty"`
+	Description string         `json:"description,omitempty"`
+	Tags        []*TemplateTag `json:"tags,omitempty"`
+	Templates   []*TemplateId  `json:"templates,omitempty"`
+	Macros      []*HostMacro   `json:"macros,omitempty"`
 }
 
 func (t *TemplateService) Create(p *TemplateCreateParameters) (*TemplateResponse, error) {
@@ -203,10 +199,10 @@ func (t *TemplateService) Get(p *TemplateGetParameters) ([]*TemplateGetResponse,
 }
 
 type TemplateMassAddParameters struct {
-	Templates     []*TemplateId    `json:"templates"`
-	Groups        []*TemplateGroup `json:"groups,omitempty"`
-	Macros        []*HostMacro     `json:"macros,omitempty"`
-	TemplatesLink []*TemplateId    `json:"templates_link,omitempty"`
+	Templates     []*TemplateId  `json:"templates"`
+	Groups        []*HostGroupId `json:"groups,omitempty"`
+	Macros        []*HostMacro   `json:"macros,omitempty"`
+	TemplatesLink []*TemplateId  `json:"templates_link,omitempty"`
 }
 
 func (t *TemplateService) MassAdd(p *TemplateMassAddParameters) (*TemplateResponse, error) {
@@ -252,11 +248,11 @@ func (t *TemplateService) MassRemove(p *TemplateMassRemoveParameters) (*Template
 }
 
 type TemplateMassUpdateParameters struct {
-	Templates      []*TemplateId    `json:"templates"`
-	Groups         []*TemplateGroup `json:"groups,omitempty"`
-	Macros         []*HostMacro     `json:"macros,omitempty"`
-	TemplateClear  []*TemplateId    `json:"templates_clear,omitempty"`
-	TemplateUnlink []*TemplateId    `json:"templates_link,omitempty"`
+	Templates      []*TemplateId  `json:"templates"`
+	Groups         []*HostGroupId `json:"groups,omitempty"`
+	Macros         []*HostMacro   `json:"macros,omitempty"`
+	TemplateClear  []*TemplateId  `json:"templates_clear,omitempty"`
+	TemplateUnlink []*TemplateId  `json:"templates_link,omitempty"`
 }
 
 func (t *TemplateService) MassUpdate(p *TemplateMassUpdateParameters) (*TemplateResponse, error) {
@@ -277,15 +273,15 @@ func (t *TemplateService) MassUpdate(p *TemplateMassUpdateParameters) (*Template
 }
 
 type TemplateUpdateParameters struct {
-	Id            string           `json:"templateid"`
-	Host          string           `json:"host,omitempty"`
-	Name          string           `json:"name,omitempty"`
-	Description   string           `json:"description,omitempty"`
-	Groups        []*TemplateGroup `json:"groups,omitempty"`
-	Tags          []*TemplateTag   `json:"tags,omitempty"`
-	Macros        []*HostMacro     `json:"macros,omitempty"`
-	TemplateLink  []*TemplateId    `json:"templates,omitempty"`
-	TemplateClear []*TemplateId    `json:"templates_clear,omitempty"`
+	Id            string         `json:"templateid"`
+	Host          string         `json:"host,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Description   string         `json:"description,omitempty"`
+	Groups        []*HostGroupId `json:"groups,omitempty"`
+	Tags          []*TemplateTag `json:"tags,omitempty"`
+	Macros        []*HostMacro   `json:"macros,omitempty"`
+	TemplateLink  []*TemplateId  `json:"templates,omitempty"`
+	TemplateClear []*TemplateId  `json:"templates_clear,omitempty"`
 }
 
 func (t *TemplateService) Update(p *TemplateUpdateParameters) (*TemplateResponse, error) {
