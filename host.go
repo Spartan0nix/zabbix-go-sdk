@@ -1,4 +1,4 @@
-package main
+package zabbixgosdk
 
 // HostService create a new service to access host related methods and functions.
 type HostService struct {

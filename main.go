@@ -1,4 +1,4 @@
-package main
+package zabbixgosdk
 
 import (
 	"fmt"
@@ -9,7 +9,6 @@ const (
 	URL      = "http://localhost:8080/api_jsonrpc.php"
 	USER     = "Admin"
 	USER_PWD = "zabbix"
-	// USER_PWD = "zabb"
 )
 
 func main() {
@@ -26,6 +25,4 @@ func main() {
 	}
 
 	fmt.Println(client.Auth.Client.Token)
-	// fmt.Println(client.UserGroup.Client.Token)
-
 }

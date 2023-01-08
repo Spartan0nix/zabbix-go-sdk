@@ -1,4 +1,4 @@
-package main
+package zabbixgosdk
 
 import (
 	"encoding/json"

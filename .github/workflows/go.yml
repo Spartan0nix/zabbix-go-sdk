@@ -20,4 +20,3 @@ jobs:
     - name: Run test
       run: ./run.sh --test --coverage
       shell: bash
-   
