@@ -84,7 +84,7 @@ func TestHostGroupMassAdd(t *testing.T) {
 				Groupid: g[0].Id,
 			},
 		},
-		Hosts: []*HostGroupMassHost{
+		Hosts: []*HostId{
 			{
 				Hostid: "10084",
 			},
@@ -156,12 +156,12 @@ func TestHostGroupMassUpdate(t *testing.T) {
 				Groupid: g[0].Id,
 			},
 		},
-		Hosts: []*HostGroupMassHost{
+		Hosts: []*HostId{
 			{
 				Hostid: "10084",
 			},
 		},
-		Templates: []*HostGroupMassTemplate{},
+		Templates: []*TemplateId{},
 	})
 
 	if err != nil {

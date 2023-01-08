@@ -2,27 +2,94 @@ package main
 
 import "fmt"
 
+// TemplateService create a new service to access template related methods and functions.
 type TemplateService struct {
 	Client *ApiClient
 }
 
+// Template properties.
+// Some properties are read-only, which means they are only accessible after creation
+// and should not be passed as arguments in other methods.
 type Template struct {
+	// ReadOnly
 	Id          string `json:"templateid"`
 	Host        string `json:"host"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Uuid        string `json:"uuid"`
+	// ReadOnly
+	Uuid string `json:"uuid"`
 }
 
+// TemplateId define a representation for certain methods that only requires the 'templateid' property.
+type TemplateId struct {
+	Id string `json:"templateid"`
+}
+
+// TemplateTag define a tag assignable to a Template
 type TemplateTag struct {
 	Name  string `json:"tag"`
 	Value string `json:"value,omitempty"`
 }
 
-type TemplateId struct {
-	Id string `json:"templateid"`
+// TemplateResponse define the server response format for Template methods.
+type TemplateResponse struct {
+	Templateids []string `json:"templateids"`
 }
 
+// TemplateCreateParameters define the properties needed to create a new Template
+// Properties using the 'omitempty' json parameters are optional
+type TemplateCreateParameters struct {
+	Host        string         `json:"host"`
+	Groups      []*HostGroupId `json:"groups"`
+	Name        string         `json:"name,omitempty"`
+	Description string         `json:"description,omitempty"`
+	Tags        []*TemplateTag `json:"tags,omitempty"`
+	Templates   []*TemplateId  `json:"templates,omitempty"`
+	Macros      []*HostMacro   `json:"macros,omitempty"`
+}
+
+// Create is used to create a new Template.
+func (t *TemplateService) Create(p *TemplateCreateParameters) (*TemplateResponse, error) {
+	req := t.Client.NewRequest("template.create", p)
+
+	res, err := t.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := TemplateResponse{}
+	err = t.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		if t.Client.ResourceAlreadyExist("Template with host name", p.Host, res.Error) {
+			fmt.Println(res.Error.Data)
+		} else {
+			return nil, err
+		}
+	}
+
+	return &r, nil
+}
+
+// Delete is used to delete one or multiples Templates.
+func (t *TemplateService) Delete(ids []string) (*TemplateResponse, error) {
+	req := t.Client.NewRequest("template.delete", ids)
+
+	res, err := t.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := TemplateResponse{}
+	err = t.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+// TemplateGetParameters define the properties used to search Template(s)
+// Properties using the 'omitempty' json parameters are optional
 type TemplateGetParameters struct {
 	Templateids            []string    `json:"templateids,omitempty"`
 	Groupids               []string    `json:"groupids,omitempty"`
@@ -66,10 +133,7 @@ type TemplateGetParameters struct {
 	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
-type TemplateResponse struct {
-	Templateids []string `json:"templateids"`
-}
-
+// TemplateGetResponse define the server response format for Get method.
 type TemplateGetResponse struct {
 	Id                 string `json:"templateid,omitempty"`
 	Host               string `json:"host"`
@@ -112,54 +176,7 @@ type TemplateGetResponse struct {
 	Uuid               string `json:"uuid"`
 }
 
-type TemplateCreateParameters struct {
-	Host        string         `json:"host"`
-	Groups      []*HostGroupId `json:"groups"`
-	Name        string         `json:"name,omitempty"`
-	Description string         `json:"description,omitempty"`
-	Tags        []*TemplateTag `json:"tags,omitempty"`
-	Templates   []*TemplateId  `json:"templates,omitempty"`
-	Macros      []*HostMacro   `json:"macros,omitempty"`
-}
-
-func (t *TemplateService) Create(p *TemplateCreateParameters) (*TemplateResponse, error) {
-	req := t.Client.NewRequest("template.create", p)
-
-	res, err := t.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
-
-	r := TemplateResponse{}
-	err = t.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		if t.Client.ResourceAlreadyExist("Template with host name", p.Host, res.Error) {
-			fmt.Println(res.Error.Data)
-		} else {
-			return nil, err
-		}
-	}
-
-	return &r, nil
-}
-
-func (t *TemplateService) Delete(ids []string) (*TemplateResponse, error) {
-	req := t.Client.NewRequest("template.delete", ids)
-
-	res, err := t.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
-
-	r := TemplateResponse{}
-	err = t.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	return &r, nil
-}
-
+// List is used to retrieve all Templates.
 func (t *TemplateService) List() ([]*TemplateGetResponse, error) {
 	p := &TemplateGetParameters{
 		Filter: map[string]string{},
@@ -181,6 +198,7 @@ func (t *TemplateService) List() ([]*TemplateGetResponse, error) {
 	return r, nil
 }
 
+// Get is used to retrieve one or multiples Templates matching the given criteria(s).
 func (t *TemplateService) Get(p *TemplateGetParameters) ([]*TemplateGetResponse, error) {
 	req := t.Client.NewRequest("template.get", p)
 
@@ -198,6 +216,8 @@ func (t *TemplateService) Get(p *TemplateGetParameters) ([]*TemplateGetResponse,
 	return r, nil
 }
 
+// TemplateMassAddParameters define the properties used for the MassAdd method.
+// Properties using the 'omitempty' json parameters are optional.
 type TemplateMassAddParameters struct {
 	Templates     []*TemplateId  `json:"templates"`
 	Groups        []*HostGroupId `json:"groups,omitempty"`
@@ -205,6 +225,7 @@ type TemplateMassAddParameters struct {
 	TemplatesLink []*TemplateId  `json:"templates_link,omitempty"`
 }
 
+// MassAdd is used to massively add properties to existing Templates.
 func (t *TemplateService) MassAdd(p *TemplateMassAddParameters) (*TemplateResponse, error) {
 	req := t.Client.NewRequest("template.massadd", p)
 
@@ -222,6 +243,8 @@ func (t *TemplateService) MassAdd(p *TemplateMassAddParameters) (*TemplateRespon
 	return &r, nil
 }
 
+// TemplateMassRemoveParameters define the properties used for the MassRemove method.
+// Properties using the 'omitempty' json parameters are optional.
 type TemplateMassRemoveParameters struct {
 	TemplateIds       []string `json:"templateids"`
 	GroupIds          []string `json:"groupids,omitempty"`
@@ -230,6 +253,7 @@ type TemplateMassRemoveParameters struct {
 	TemplateIdsUnlink []string `json:"templateids_link,omitempty"`
 }
 
+// MassRemove is used to massively remove properties from existing Templates.
 func (t *TemplateService) MassRemove(p *TemplateMassRemoveParameters) (*TemplateResponse, error) {
 	req := t.Client.NewRequest("template.massremove", p)
 
@@ -247,6 +271,8 @@ func (t *TemplateService) MassRemove(p *TemplateMassRemoveParameters) (*Template
 	return &r, nil
 }
 
+// TemplateMassUpdateParameters define the properties used for the MassUpdate method.
+// Properties using the 'omitempty' json parameters are optional.
 type TemplateMassUpdateParameters struct {
 	Templates      []*TemplateId  `json:"templates"`
 	Groups         []*HostGroupId `json:"groups,omitempty"`
@@ -255,6 +281,7 @@ type TemplateMassUpdateParameters struct {
 	TemplateUnlink []*TemplateId  `json:"templates_link,omitempty"`
 }
 
+// MassUpdate is used to massively update or overwrite properties from existing Templates.
 func (t *TemplateService) MassUpdate(p *TemplateMassUpdateParameters) (*TemplateResponse, error) {
 	req := t.Client.NewRequest("template.massupdate", p)
 
@@ -272,6 +299,8 @@ func (t *TemplateService) MassUpdate(p *TemplateMassUpdateParameters) (*Template
 	return &r, nil
 }
 
+// TemplateUpdateParameters define the properties needed for the Update method.
+// Properties using the 'omitempty' json parameters are optional.
 type TemplateUpdateParameters struct {
 	Id            string         `json:"templateid"`
 	Host          string         `json:"host,omitempty"`
@@ -284,6 +313,7 @@ type TemplateUpdateParameters struct {
 	TemplateClear []*TemplateId  `json:"templates_clear,omitempty"`
 }
 
+// Update is used to update or overwrite properties from an existing Template.
 func (t *TemplateService) Update(p *TemplateUpdateParameters) (*TemplateResponse, error) {
 	req := t.Client.NewRequest("template.update", p)
 

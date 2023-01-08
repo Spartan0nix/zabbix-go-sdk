@@ -1,25 +1,75 @@
 package main
 
+// HostGroupService create a new service to access host related methods and functions.
 type HostGroupService struct {
 	Client *ApiClient
 }
 
+// HostGroup properties.
 type HostGroup struct {
-	Id       string `json:"groupid"`
-	Name     string `json:"name"`
-	Flags    string `json:"flags"`
+	Id   string `json:"groupid"`
+	Name string `json:"name"`
+	// ReadOnly
+	Flags string `json:"flags"`
+	// ReadOnly
 	Internal string `json:"internal"`
-	Uuid     string `json:"uuid"`
+	// ReadOnly
+	Uuid string `json:"uuid"`
 }
 
+// HostGroupId define a representation for certain methods that only requires the 'groupid' property.
 type HostGroupId struct {
 	Groupid string `json:"groupid"`
 }
 
+// HostGroupResponse define the server response format for HostGroup methods.
 type HostGroupResponse struct {
 	Groupids []string `json:"groupids"`
 }
 
+// Create is used to create a new HostGroup.
+func (h *HostGroupService) Create(name string) (*HostGroupResponse, error) {
+	// Zabbix only need the name of the Hostgroup.
+	params := map[string]string{
+		"name": name,
+	}
+
+	req := h.Client.NewRequest("hostgroup.create", params)
+
+	res, err := h.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := HostGroupResponse{}
+	err = h.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+// Delete is used to delete one or multiples HostGroups.
+func (h *HostGroupService) Delete(ids []string) (*HostGroupResponse, error) {
+	req := h.Client.NewRequest("hostgroup.delete", ids)
+
+	res, err := h.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := HostGroupResponse{}
+	err = h.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+// HostGroupGetParameters define the properties used to search HostGroup(s).
+// Properties using the 'omitempty' json parameters are optional
 type HostGroupGetParameters struct {
 	Graphids                          []string    `json:"graphids,omitempty"`
 	Groupids                          []string    `json:"groupids,omitempty"`
@@ -61,44 +111,7 @@ type HostGroupGetParameters struct {
 	StartSearch                       bool        `json:"startSearch,omitempty"`
 }
 
-func (h *HostGroupService) Create(name string) (*HostGroupResponse, error) {
-	params := map[string]string{
-		"name": name,
-	}
-
-	req := h.Client.NewRequest("hostgroup.create", params)
-
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
-
-	r := HostGroupResponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	return &r, nil
-}
-
-func (h *HostGroupService) Delete(ids []string) (*HostGroupResponse, error) {
-	req := h.Client.NewRequest("hostgroup.delete", ids)
-
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
-
-	r := HostGroupResponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	return &r, nil
-}
-
+// List is used to retrieve all HostGroups for the server.
 func (h *HostGroupService) List() ([]*HostGroup, error) {
 	p := &HostGroupGetParameters{
 		Filter: map[string]string{},
@@ -120,6 +133,7 @@ func (h *HostGroupService) List() ([]*HostGroup, error) {
 	return r, nil
 }
 
+// Get is used to retrieve one or multiples HostGroups matching the given criteria(s).
 func (h *HostGroupService) Get(p *HostGroupGetParameters) ([]*HostGroup, error) {
 	req := h.Client.NewRequest("hostgroup.get", p)
 
@@ -137,24 +151,15 @@ func (h *HostGroupService) Get(p *HostGroupGetParameters) ([]*HostGroup, error) 
 	return r, nil
 }
 
-// type HostGroupMassGroup struct {
-// 	Groupid string `json:"groupid"`
-// }
-
-type HostGroupMassHost struct {
-	Hostid string `json:"hostid"`
-}
-
-type HostGroupMassTemplate struct {
-	Templateid string `json:"templateid "`
-}
-
+// HostGroupMassAddParameters define the properties used for the MassAdd method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostGroupMassAddParameters struct {
-	Groups    []*HostGroupId           `json:"groups"`
-	Hosts     []*HostGroupMassHost     `json:"hosts,omitempty"`
-	Templates []*HostGroupMassTemplate `json:"templates,omitempty"`
+	Groups    []*HostGroupId `json:"groups"`
+	Hosts     []*HostId      `json:"hosts,omitempty"`
+	Templates []*TemplateId  `json:"templates,omitempty"`
 }
 
+// MassAdd is used to massively add properties to existing HostGroups.
 func (h *HostGroupService) MassAdd(p *HostGroupMassAddParameters) (*HostGroupResponse, error) {
 	req := h.Client.NewRequest("hostgroup.massadd", p)
 
@@ -172,12 +177,15 @@ func (h *HostGroupService) MassAdd(p *HostGroupMassAddParameters) (*HostGroupRes
 	return &r, nil
 }
 
+// HostGroupMassRemoveParameters define the properties used for the MassRemove method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostGroupMassRemoveParameters struct {
 	GroupsIds   []string `json:"groupids"`
 	HostIds     []string `json:"hostids,omitempty"`
 	TemplateIds []string `json:"templateids,omitempty"`
 }
 
+// MassRemove is used to massively remove properties from existing HostGroups.
 func (h *HostGroupService) MassRemove(p *HostGroupMassRemoveParameters) (*HostGroupResponse, error) {
 	req := h.Client.NewRequest("hostgroup.massremove", p)
 
@@ -195,12 +203,15 @@ func (h *HostGroupService) MassRemove(p *HostGroupMassRemoveParameters) (*HostGr
 	return &r, nil
 }
 
+// HostGroupMassUpdateParameters define the properties used for the MassUpdate method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostGroupMassUpdateParameters struct {
-	Groups    []*HostGroupId           `json:"groups"`
-	Hosts     []*HostGroupMassHost     `json:"hosts"`
-	Templates []*HostGroupMassTemplate `json:"templates"`
+	Groups    []*HostGroupId `json:"groups"`
+	Hosts     []*HostId      `json:"hosts"`
+	Templates []*TemplateId  `json:"templates"`
 }
 
+// MassUpdate is used to massively update or overwrite properties from existing HostGroups.
 func (h *HostGroupService) MassUpdate(p *HostGroupMassUpdateParameters) (*HostGroupResponse, error) {
 	req := h.Client.NewRequest("hostgroup.massupdate", p)
 
@@ -218,6 +229,7 @@ func (h *HostGroupService) MassUpdate(p *HostGroupMassUpdateParameters) (*HostGr
 	return &r, nil
 }
 
+// Update is used to update the name of an existing HostGroup.
 func (h *HostGroupService) Update(id string, name string) (*HostGroupResponse, error) {
 	params := map[string]string{
 		"groupid": id,
