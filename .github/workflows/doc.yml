@@ -17,14 +17,6 @@ jobs:
     - name: Install godoc
       run: go install golang.org/x/tools/cmd/godoc@latest
 
-    - name: Generate doc
-      run: |
-        # Start the godoc server in the background
-        godoc -http=localhost:6060 &
-
-        # Retrieve the index.html for the package
-        wget http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk/ -O docs/index.html
-
-        # Kill the godoc server
-        godoc_pid=$(ps -C godoc | awk '{ print $1 }' | sed 's/PID//g;/^$/d')
-        kill -9 $godoc_pid
+    - run: godoc -http=localhost:6060 &
+    - run: wget http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk/ -O docs/index.html
+    - run: kill -9 $(ps -C godoc | awk '{ print $1 }' | sed 's/PID//g;/^$/d')
