@@ -1,16 +1,32 @@
-package main
+package zabbixgosdk
 
+// HostService create a new service to access host related methods and functions.
 type HostService struct {
 	Client *ApiClient
 }
 
+// HostInventoryMode define the available inventory modes.
 type HostInventoryMode string
+
+// HostIpmiAuthType define the available ipmi auth modes.
 type HostIpmiAuthType string
+
+// HostIpmiPrivilege define the available ipmi privilege modes.
 type HostIpmiPrivilege string
+
+// HostStatus define the available host status.
 type HostStatus string
+
+// HostTlsMode define the available TLS modes.
 type HostTlsMode string
+
+// HostInventory define the available inventory modes.
 type HostInventory string
+
+// HostEvalType define the available evaluation operators.
 type HostEvalType string
+
+// HostTags define the available evaluation operators when searching hosts with tags.
 type HostTags string
 
 const (
@@ -121,6 +137,9 @@ const (
 	Not_exists HostTags = "5"
 )
 
+// Host properties.
+// Some properties are read-only, which means they are only accessible after creation
+// and should not be passed as arguments in other methods.
 type Host struct {
 	// ReadOnly
 	Hostid      string `json:"hostid"`
@@ -152,15 +171,24 @@ type Host struct {
 	Tls_psk          string      `json:"tls_psk"`
 }
 
+// HostId define a representation for certain methods that only requires the 'hostid' property.
 type HostId struct {
 	Hostid string `json:"hostid"`
 }
 
+// HostTag define a tag assignable to an Host
 type HostTag struct {
 	Tag   string `json:"tag"`
 	Value string `json:"value"`
 }
 
+// HostReponse define the server response format for Host methods.
+type HostReponse struct {
+	HostIds []string `json:"hostids"`
+}
+
+// HostCreateParameters define the properties needed to create a new Host
+// Properties using the 'omitempty' json parameters are optional
 type HostCreateParameters struct {
 	Host             string                   `json:"host"`
 	Groups           []*HostGroupId           `json:"groups"`
@@ -186,6 +214,44 @@ type HostCreateParameters struct {
 	Inventory        map[HostInventory]string `json:"invetory,omitempty"`
 }
 
+// Create is used to create a new Host.
+func (h *HostService) Create(p *HostCreateParameters) (*HostReponse, error) {
+	req := h.Client.NewRequest("host.create", p)
+
+	res, err := h.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := HostReponse{}
+	err = h.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+// Delete is used to delete one or multiples Hosts.
+func (h *HostService) Delete(ids []string) (*HostReponse, error) {
+	req := h.Client.NewRequest("host.delete", ids)
+
+	res, err := h.Client.Post(req)
+	if err != nil {
+		return nil, err
+	}
+
+	r := HostReponse{}
+	err = h.Client.ConvertResponse(*res, &r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
+// HostGetParameters define the properties used to search Host(s)
+// Properties using the 'omitempty' json parameters are optional
 type HostGetParameters struct {
 	Groupids                          []string     `json:"groupids,omitempty"`
 	Dserviceids                       []string     `json:"dserviceids,omitempty"`
@@ -249,44 +315,7 @@ type HostGetParameters struct {
 	StartSearch                       bool         `json:"startSearch,omitempty"`
 }
 
-type HostReponse struct {
-	HostIds []string `json:"hostids"`
-}
-
-func (h *HostService) Create(p *HostCreateParameters) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.create", p)
-
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
-
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	return &r, nil
-}
-
-func (h *HostService) Delete(ids []string) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.delete", ids)
-
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
-
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	return &r, nil
-}
-
+// Get is used to retrieve one or multiples Hosts matching the given criteria(s).
 func (h *HostService) Get(p *HostGetParameters) ([]*Host, error) {
 	req := h.Client.NewRequest("host.get", p)
 
@@ -304,6 +333,8 @@ func (h *HostService) Get(p *HostGetParameters) ([]*Host, error) {
 	return r, nil
 }
 
+// HostMassAddParameters define the properties used for the MassAdd method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostMassAddParameters struct {
 	Hosts      []*HostId        `json:"hosts"`
 	Groups     []*HostGroupId   `json:"groups,omitempty"`
@@ -312,6 +343,7 @@ type HostMassAddParameters struct {
 	Templates  []*TemplateId    `json:"templates,omitempty"`
 }
 
+// MassAdd is used to massively add properties to existing Hosts.
 func (h *HostService) MassAdd(p *HostMassAddParameters) (*HostReponse, error) {
 	req := h.Client.NewRequest("host.massadd", p)
 
@@ -329,6 +361,8 @@ func (h *HostService) MassAdd(p *HostMassAddParameters) (*HostReponse, error) {
 	return &r, nil
 }
 
+// HostMassRemoveParameters define the properties used for the MassRemove method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostMassRemoveParameters struct {
 	HostIds          []string         `json:"hostids"`
 	GroupIds         []string         `json:"groupids,omitempty"`
@@ -338,6 +372,7 @@ type HostMassRemoveParameters struct {
 	TemplateIdsClear []string         `json:"templateids_clear,omitempty"`
 }
 
+// MassRemove is used to massively remove properties from existing Hosts.
 func (h *HostService) MassRemove(p *HostMassRemoveParameters) (*HostReponse, error) {
 	req := h.Client.NewRequest("host.massremove", p)
 
@@ -355,6 +390,8 @@ func (h *HostService) MassRemove(p *HostMassRemoveParameters) (*HostReponse, err
 	return &r, nil
 }
 
+// HostMassUpdateParameters define the properties used for the MassUpdate method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostMassUpdateParameters struct {
 	Hosts            []*HostId                `json:"hosts"`
 	Host             string                   `json:"host,omitempty"`
@@ -381,6 +418,7 @@ type HostMassUpdateParameters struct {
 	TemplatesClear   []*TemplateId            `json:"templates_clear,omitempty"`
 }
 
+// MassUpdate is used to massively update or overwrite properties from existing Hosts.
 func (h *HostService) MassUpdate(p *HostMassUpdateParameters) (*HostReponse, error) {
 	req := h.Client.NewRequest("host.massupdate", p)
 
@@ -398,6 +436,8 @@ func (h *HostService) MassUpdate(p *HostMassUpdateParameters) (*HostReponse, err
 	return &r, nil
 }
 
+// HostUpdateParameters define the properties needed for the Update method.
+// Properties using the 'omitempty' json parameters are optional.
 type HostUpdateParameters struct {
 	Hostid           string                   `json:"hostid"`
 	Host             string                   `json:"host,omitempty"`
@@ -425,6 +465,7 @@ type HostUpdateParameters struct {
 	TemplatesClear   []*TemplateId            `json:"templates_clear,omitempty"`
 }
 
+// Update is used to update or overwrite properties from an existing Host.
 func (h *HostService) Update(p *HostUpdateParameters) (*HostReponse, error) {
 	req := h.Client.NewRequest("host.update", p)
 
