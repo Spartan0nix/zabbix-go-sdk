@@ -18,6 +18,5 @@ jobs:
       run: go install golang.org/x/tools/cmd/godoc@latest
 
     - run: godoc -http=localhost:6060 &
-    - run: wget http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk/
-    - run: mv index.html docs/
+    - run: wget http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk/ -O docs/index.html
     - run: kill -9 $(ps -C godoc | awk '{ print $1 }' | sed 's/PID//g;/^$/d')
