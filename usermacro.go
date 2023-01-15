@@ -59,7 +59,7 @@ type GlobalMacroResponse struct {
 func (h *HostMacro) ValidateMacro() error {
 	re := regexp.MustCompile(`^{\$[A-Z0-9_.]*}$`)
 	if !re.Match([]byte(h.Macro)) {
-		return fmt.Errorf("The following macro '%s' does not complies with the required format.\n- Start with : {$\n- End with : }\n- Contain only : A-Z // 0-9 // _ // .", h.Macro)
+		return fmt.Errorf("the following macro '%s' does not complies with the required format.\n- Start with : {$\n- End with : }\n- Contain only : A-Z // 0-9 // _ //", h.Macro)
 	}
 
 	return nil
@@ -69,7 +69,7 @@ func (h *HostMacro) ValidateMacro() error {
 func (g *GlobalMacro) ValidateMacro() error {
 	re := regexp.MustCompile(`^{\$[A-Z0-9_.]*}$`)
 	if !re.Match([]byte(g.Macro)) {
-		return fmt.Errorf("The following macro '%s' does not complies with the required format.\n- Start with : {$\n- End with : }\n- Contain only : A-Z // 0-9 // _ // .", g.Macro)
+		return fmt.Errorf("the following macro '%s' does not complies with the required format.\n- Start with : {$\n- End with : }\n- Contain only : A-Z // 0-9 // _ //", g.Macro)
 	}
 
 	return nil
@@ -78,7 +78,7 @@ func (g *GlobalMacro) ValidateMacro() error {
 // Create is used to create a new HostMacro.
 func (u *UserMacroService) Create(h *HostMacro) (*HostMacroResponse, error) {
 	if h.Hostid == "" {
-		return nil, fmt.Errorf("Missing required field 'HostId' in the given object.\nObject passed : %v", h)
+		return nil, fmt.Errorf("missing required field 'HostId' in the given object.\nObject passed : %v", h)
 	}
 
 	if err := h.ValidateMacro(); err != nil {
@@ -240,7 +240,7 @@ func (u *UserMacroService) GetGlobal(p *UserMacroGetParameters) ([]*GlobalMacro,
 // Update is used to update or overwrite properties from an existing HostMacro.
 func (u *UserMacroService) Update(h *HostMacro) (*HostMacroResponse, error) {
 	if h.Id == "" {
-		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", h)
+		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", h)
 	}
 
 	h.Hostid = ""
@@ -264,7 +264,7 @@ func (u *UserMacroService) Update(h *HostMacro) (*HostMacroResponse, error) {
 // UpdateGlobal is used to update or overwrite properties from an existing GlobalMacro.
 func (u *UserMacroService) UpdateGlobal(m *GlobalMacro) (*GlobalMacroResponse, error) {
 	if m.Id == "" {
-		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", m)
+		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", m)
 	}
 
 	req := u.Client.NewRequest("usermacro.updateglobal", m)

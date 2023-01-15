@@ -41,9 +41,9 @@ const (
 	SNMPv2c HostInterfaceVersion = "2"
 	SNMPv3  HostInterfaceVersion = "3"
 
-	noAuthNoPriv HostInterfaceSecurityLevel = "0"
-	authNoPriv   HostInterfaceSecurityLevel = "1"
-	authPriv     HostInterfaceSecurityLevel = "3"
+	NoAuthNoPriv HostInterfaceSecurityLevel = "0"
+	AuthNoPriv   HostInterfaceSecurityLevel = "1"
+	AuthPriv     HostInterfaceSecurityLevel = "3"
 
 	MD5     HostInterfaceAuthProtocol = "0"
 	SHA1    HostInterfaceAuthProtocol = "1"
@@ -141,7 +141,7 @@ func (h *hostInterfaceGetResponse) convertToHostInterface() (*HostInterface, err
 func (h *HostInterface) ValidateSNMP() error {
 	if h.Type == SNMP {
 		if h.Details == nil {
-			return fmt.Errorf("Missing required field 'details' for hostInterface of type SNMP.\nObject passed : %v", h)
+			return fmt.Errorf("missing required field 'details' for hostInterface of type SNMP.\nObject passed : %v", h)
 		}
 	}
 	return nil
@@ -363,7 +363,7 @@ type HostInterfaceUpdateParameters struct {
 // Update is used to update or overwrite HostInterfaces from an existing Hosts.
 func (h *HostInterfaceService) Update(p *HostInterfaceUpdateParameters) (*HostInterfaceResponse, error) {
 	if p.Interfaceid == "" {
-		return nil, fmt.Errorf("Property 'Interfaceid' must be set in order to update an host interface.\nObject passed : %v", p)
+		return nil, fmt.Errorf("property 'Interfaceid' must be set in order to update an host interface.\nObject passed : %v", p)
 	}
 
 	req := h.Client.NewRequest("hostinterface.update", p)

@@ -57,7 +57,7 @@ type UserGroupExtendedParameters struct {
 // Create is used to create a new UserGroup.
 func (u *UserGroupService) Create(params *UserGroupExtendedParameters) (*UserGroupResponse, error) {
 	if params.Name == "" {
-		return nil, fmt.Errorf("Missing required field 'Name' in the given object.\nObject passed : %v", params)
+		return nil, fmt.Errorf("missing required field 'Name' in the given object.\nObject passed : %v", params)
 	}
 
 	req := u.Client.NewRequest("usergroup.create", params)
@@ -166,7 +166,7 @@ func (u *UserGroupService) Get(params *UserGroupGetParameters) ([]*UserGroup, er
 // Update is used to update or overwrite properties from an existing UserGroup.
 func (u *UserGroupService) Update(params *UserGroupExtendedParameters) (*UserGroupResponse, error) {
 	if params.Id == "" {
-		return nil, fmt.Errorf("Missing required field 'Id' in the given object.\nObject passed : %v", params)
+		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", params)
 	}
 
 	req := u.Client.NewRequest("usergroup.update", params)
