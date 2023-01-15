@@ -58,11 +58,11 @@ func (s *AuthService) GetCredentials(user string, password string) (*Response, e
 // When updating the Token, all subservices while see their Token property updated as well.
 func (s *ZabbixService) Authenticate() error {
 	if s.Auth.User == nil {
-		return fmt.Errorf("Missing authentification informations :\n- user\n- password")
+		return fmt.Errorf("missing authentification informations :\n- user\n- password")
 	}
 
 	if s.Auth.User.User == "" || s.Auth.User.Pwd == "" {
-		return fmt.Errorf("Missing authentification informations :\n- user\n- password")
+		return fmt.Errorf("missing authentification informations :\n- user\n- password")
 	}
 
 	res, err := s.Auth.GetCredentials(s.Auth.User.User, s.Auth.User.Pwd)

@@ -40,7 +40,8 @@ case $arg_1 in
     docker compose -f ./build/container-compose.yml down
 ;;
 --run)
-    go run  $(go list ./... | grep -v _test)
+    # go run  $(go list ./... | grep -v _test)
+    go run ./test/main.go
 ;;
 *)
     echo "Unknown option(s) : $*"

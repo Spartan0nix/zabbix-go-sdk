@@ -175,3 +175,49 @@ func TestResourceAlreadyExistFail(t *testing.T) {
 		t.Fatalf("Resource do not match the exist.\nString : %s\nResource : %s\nValue : %s", err.Data, resource, value)
 	}
 }
+
+func TestCheckConnectivitySuccess(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	err = client.Auth.Client.CheckConnectivity()
+	if err != nil {
+		t.Fatalf("Error when executing CheckConnectivity.\nReason : %v", err)
+	}
+}
+
+func TestCheckConnectivityFail(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	client.Auth.Client.Url = "http://localhost:7777"
+	err = client.Auth.Client.CheckConnectivity()
+	if err == nil {
+		t.Fatalf("CheckConnectivity should returned an error when Zabbix server is unreachable.")
+
+	}
+
+	expected_err := fmt.Sprintf("connectivity check failed for Zabbix server : %s", client.Auth.Client.Url)
+	if err.Error() != expected_err {
+		t.Fatalf("Expected error : %s\nError returned : %s", expected_err, err.Error())
+	}
+}
+
+func TestCheckConnectivityMissingUrl(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	client.Auth.Client.Url = ""
+	err = client.Auth.Client.CheckConnectivity()
+	if err != nil {
+		t.Fatalf("CheckConnectivity should not returned an error when Url property is missing.\nError : %v", err)
+	}
+
+	fmt.Println("The previous log entry is not an error. This is the intended purpose of the function.")
+}

@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"log"
 	"net/http"
 	"regexp"
 )
@@ -79,7 +80,7 @@ func (a *ApiClient) ExecuteRequest(r *http.Request) ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func (a *ApiClient) ConvertResponse(r Response, v interface{}) error {
 
 // Error return a more user-friendly error using the Error property in the given Response.
 func (a *ApiClient) Error(r Response) error {
-	return fmt.Errorf("Code : %d\nMessage : %s\nData : %s", r.Error.Code, r.Error.Message, r.Error.Data)
+	return fmt.Errorf("code : %d\nmessage : %s\ndata : %s", r.Error.Code, r.Error.Message, r.Error.Data)
 }
 
 // ResourceAlreadyExist check it the Data field in the given ResponseError indicate a 'resource already exists' type error.
@@ -159,4 +160,45 @@ func (a *ApiClient) ResourceAlreadyExist(resource string, value string, err Resp
 	} else {
 		return false
 	}
+}
+
+// connectivityRequest define the body format used to interact with the API only for the 'apiinfo.version' method
+type connectivityRequest struct {
+	Jsonrpc string      `json:"jsonrpc"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params"`
+	Id      int         `json:"id"`
+	Auth    *string     `json:"auth"`
+}
+
+// CheckConnectivity is used to validate connectivity against the current ApiClient Zabbix server.
+// If the connection cannot be established, an error is returned.
+func (a *ApiClient) CheckConnectivity() error {
+	// If the Url property is not set, do not throw an error.
+	if a.Url == "" {
+		log.Println("Missing 'Url' property from the current *ApiClient. CheckConnectivity function will not be executed.")
+		return nil
+	}
+
+	req := connectivityRequest{
+		Jsonrpc: "2.0",
+		Method:  "apiinfo.version",
+		Params:  map[string]string{},
+		Id:      1,
+		Auth:    nil,
+	}
+
+	_, err := a.Post(req)
+	if err != nil {
+		// Check the format of the error.
+		re := regexp.MustCompile(fmt.Sprintf("Post \"%s\": dial tcp ", a.Url) + `\[[0-9:]+\]:[0-9]{1,5}: connect: connection refused`)
+		if re.Match([]byte(err.Error())) {
+			return fmt.Errorf("connectivity check failed for Zabbix server : %s", a.Url)
+		} else {
+			// If the 'connection refused' is not returned, throw the raw error
+			return err
+		}
+	}
+
+	return nil
 }
