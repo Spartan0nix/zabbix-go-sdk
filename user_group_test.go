@@ -28,7 +28,7 @@ func TestUserGroupCreate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	group, err := client.UserGroup.Create(&UserGroupExtendedParameters{
+	group, err := client.UserGroup.Create(&UserGroupCreateParameters{
 		Name: userGroupName,
 	})
 
@@ -83,10 +83,10 @@ func TestUserGroupUpdate(t *testing.T) {
 		t.Fatalf("Failed to get user group '%s'.", userGroupName)
 	}
 
-	updated_group, err := client.UserGroup.Update(&UserGroupExtendedParameters{
+	updated_group, err := client.UserGroup.Update(&UserGroupUpdateParameters{
 		Id:         group[0].Id,
-		Debug_mode: 1,
-		Gui_access: 0,
+		Debug_mode: UserGroupDebugEnabled,
+		Gui_access: UserGroupSystemDefault,
 	})
 
 	if err != nil {
