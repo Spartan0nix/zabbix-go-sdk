@@ -4,6 +4,38 @@ import (
 	"fmt"
 )
 
+// UserGroupDebugMode define whether debug mode should be enabled or not
+type UserGroupDebugMode string
+
+// UserGroupGuiAccess define the type of frontend authentification for users in the group
+type UserGroupGuiAccess string
+
+// UserGroupStatus define if the group should be enabled or not
+type UserGroupStatus string
+
+// UserGroupPermissionType define if the available type of permission level
+type UserGroupPermissionType string
+
+const (
+	// Default
+	UserGroupDebugDisabled UserGroupDebugMode = "0"
+	UserGroupDebugEnabled  UserGroupDebugMode = "1"
+
+	// Default
+	UserGroupSystemDefault UserGroupGuiAccess = "0"
+	UserGroupInternal      UserGroupGuiAccess = "1"
+	UserGroupLDAP          UserGroupGuiAccess = "2"
+	UserGroupDisable       UserGroupGuiAccess = "3"
+
+	// Default
+	UserGroupStatusEnabled  UserGroupStatus = "0"
+	UserGroupStatusDisabled UserGroupStatus = "1"
+
+	UserGroupAccessDenied    UserGroupPermissionType = "0"
+	UserGroupAccessReadOnly  UserGroupPermissionType = "2"
+	UserGroupAccessReadWrite UserGroupPermissionType = "3"
+)
+
 // UserGroupService create a new service to access userGroup related methods and functions.
 type UserGroupService struct {
 	Client *ApiClient
@@ -14,18 +46,18 @@ type UserGroupService struct {
 // and should not be passed as arguments in other methods.
 type UserGroup struct {
 	// ReadOnly
-	Id              string `json:"usrgrpid,omitempty"`
-	Name            string `json:"name"`
-	Debug_mode      string `json:"debug_mode,omitempty"`
-	Gui_access      string `json:"gui_access,omitempty"`
-	Users_status    string `json:"users_status,omitempty"`
-	Userdirectoryid string `json:"userdirectoryid,omitempty"`
+	Id              string             `json:"usrgrpid,omitempty"`
+	Name            string             `json:"name"`
+	Debug_mode      UserGroupDebugMode `json:"debug_mode,omitempty"`
+	Gui_access      UserGroupGuiAccess `json:"gui_access,omitempty"`
+	Users_status    UserGroupStatus    `json:"users_status,omitempty"`
+	Userdirectoryid string             `json:"userdirectoryid,omitempty"`
 }
 
 // UserGroupPermission define a permission assignable to a UserGroup
 type UserGroupPermission struct {
-	Id         int `json:"id"`
-	Permission int `json:"permission"`
+	Id         string                  `json:"id"`
+	Permission UserGroupPermissionType `json:"permission"`
 }
 
 // UserGroupPermission define a tag assignable to a UserGroup
@@ -40,26 +72,20 @@ type UserGroupResponse struct {
 	Usrgrpids []string `json:"usrgrpids"`
 }
 
-// TODO : Refactor for Create and Update methods
-type UserGroupExtendedParameters struct {
-	Id              string                   `json:"usrgrpid,omitempty"`
-	Name            string                   `json:"name,omitempty"`
-	Debug_mode      int                      `json:"debug_mode,omitempty"`
-	Gui_access      int                      `json:"gui_access,omitempty"`
-	Users_status    int                      `json:"users_status,omitempty"`
-	Userdirectoryid string                   `json:"userdirectoryid,omitempty"`
-	Rights          []UserGroupPermission    `json:"rights,omitempty"`
-	Tag_filters     []UserGroupTagPermission `json:"tag_filters,omitempty"`
+type UserGroupCreateParameters struct {
+	Name            string                    `json:"name"`
+	Debug_mode      UserGroupDebugMode        `json:"debug_mode,omitempty"`
+	Gui_access      UserGroupGuiAccess        `json:"gui_access,omitempty"`
+	Users_status    UserGroupStatus           `json:"users_status,omitempty"`
+	Userdirectoryid string                    `json:"userdirectoryid,omitempty"`
+	Rights          []*UserGroupPermission    `json:"rights,omitempty"`
+	Tag_filters     []*UserGroupTagPermission `json:"tag_filters,omitempty"`
 	// TODO - Waiting for implemenation of Users
 	// Users                []map[string]string      `json:"users,omitempty"`
 }
 
 // Create is used to create a new UserGroup.
-func (u *UserGroupService) Create(params *UserGroupExtendedParameters) (*UserGroupResponse, error) {
-	if params.Name == "" {
-		return nil, fmt.Errorf("missing required field 'Name' in the given object.\nObject passed : %v", params)
-	}
-
+func (u *UserGroupService) Create(params *UserGroupCreateParameters) (*UserGroupResponse, error) {
 	req := u.Client.NewRequest("usergroup.create", params)
 
 	res, err := u.Client.Post(req)
@@ -163,8 +189,21 @@ func (u *UserGroupService) Get(params *UserGroupGetParameters) ([]*UserGroup, er
 	return g, nil
 }
 
+type UserGroupUpdateParameters struct {
+	Id              string                    `json:"usrgrpid"`
+	Name            string                    `json:"name,omitempty"`
+	Debug_mode      UserGroupDebugMode        `json:"debug_mode,omitempty"`
+	Gui_access      UserGroupGuiAccess        `json:"gui_access,omitempty"`
+	Users_status    UserGroupStatus           `json:"users_status,omitempty"`
+	Userdirectoryid string                    `json:"userdirectoryid,omitempty"`
+	Rights          []*UserGroupPermission    `json:"rights,omitempty"`
+	Tag_filters     []*UserGroupTagPermission `json:"tag_filters,omitempty"`
+	// TODO - Waiting for implemenation of Users
+	// Users                []map[string]string      `json:"users,omitempty"`
+}
+
 // Update is used to update or overwrite properties from an existing UserGroup.
-func (u *UserGroupService) Update(params *UserGroupExtendedParameters) (*UserGroupResponse, error) {
+func (u *UserGroupService) Update(params *UserGroupUpdateParameters) (*UserGroupResponse, error) {
 	if params.Id == "" {
 		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", params)
 	}
