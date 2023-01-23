@@ -35,11 +35,11 @@ func TestNewRequest(t *testing.T) {
 	})
 
 	if req.Method != "method.test" {
-		t.Fatalf("Wrong method returned.\nValue returned : %s\nValue expected : 'method.test'", req.Method)
+		t.Fatalf("Wrong method returned.\nValue expected : 'method.test'\nValue returned : %s", req.Method)
 	}
 
 	if req.Params.([]string)[0] != "test-params" {
-		t.Fatalf("Wrong params returned.\nValue returned : %v\nValue expected : 'test-params'", req.Params)
+		t.Fatalf("Wrong params returned.\nValue expected : 'test-params'\nValue returned : %v", req.Params)
 	}
 }
 
@@ -120,7 +120,7 @@ func TestConvertResponse(t *testing.T) {
 		t.Fatalf("Error when converting the response.\nReason : %v", err)
 	}
 
-	if groups[0].Id == "" {
+	if groups[0].UsrGrpId == "" {
 		t.Fatalf("Converted response is empty.\nResponse : %v", res)
 	}
 }
@@ -215,9 +215,8 @@ func TestCheckConnectivityMissingUrl(t *testing.T) {
 
 	client.Auth.Client.Url = ""
 	err = client.Auth.Client.CheckConnectivity()
-	if err != nil {
-		t.Fatalf("CheckConnectivity should not returned an error when Url property is missing.\nError : %v", err)
-	}
+	if err == nil {
+		t.Fatalf("CheckConnectivity should returned an error when the 'Url' property is not set.")
 
-	fmt.Println("The previous log entry is not an error. This is the intended purpose of the function.")
+	}
 }

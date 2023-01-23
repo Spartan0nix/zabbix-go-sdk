@@ -20,7 +20,7 @@ func TestTemplateCreate(t *testing.T) {
 		Host: templateName,
 		Groups: []*HostGroupId{
 			{
-				Groupid: "1",
+				GroupId: "1",
 			},
 		},
 	})
@@ -30,10 +30,10 @@ func TestTemplateCreate(t *testing.T) {
 	}
 
 	if template == nil {
-		t.Fatalf("Create method should returned a list with the Id of the new template.\nAn empty list was returned.")
+		t.Fatalf("Create method should returned a list with the id of the new templates.\nAn empty list was returned.")
 	}
 
-	templateId = template.Templateids[0]
+	templateId = template.TemplateIds[0]
 }
 
 func TestTemplateList(t *testing.T) {
@@ -73,12 +73,8 @@ func TestTemplateGet(t *testing.T) {
 		t.Fatalf("Get method should returned a list of templates matching the given criteria.\nAn empty list was returned.")
 	}
 
-	if template[0].Host != templateName {
-		t.Fatalf("Wrong host returned.\nExpected name : %s\nName returned : %s", templateName, template[0].Host)
-	}
-
-	if template[0].Id != templateId {
-		t.Fatalf("Wrong host returned.\nExpected Id : %s\nId returned : %s", templateId, template[0].Id)
+	if template[0].TemplateId != templateId {
+		t.Fatalf("Wrong template returned.\nExpected Id : %s\nId returned : %s", templateId, template[0].TemplateId)
 	}
 }
 
@@ -88,23 +84,23 @@ func TestTemplateMassAdd(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	template, err := client.Template.Get(&TemplateGetParameters{
+	apacheTemplate, err := client.Template.Get(&TemplateGetParameters{
 		Filter: map[string]string{
 			"name": "Apache by HTTP",
 		},
 	})
 
-	if template == nil {
-		t.Fatalf("Error when getting template 'Apache by HTTP'.\nAn empty list was returned.")
-	}
-
-	apacheTemplateId = template[0].Id
-
 	if err != nil {
 		t.Fatalf("Error when getting template 'Apache by HTTP'.\nReason : %v", err)
 	}
 
-	mass_add_t, err := client.Template.MassAdd(&TemplateMassAddParameters{
+	if apacheTemplate == nil {
+		t.Fatalf("Error when getting template 'Apache by HTTP'.\nAn empty list was returned.")
+	}
+
+	apacheTemplateId = apacheTemplate[0].TemplateId
+
+	template, err := client.Template.MassAdd(&TemplateMassAddParameters{
 		Templates: []*TemplateId{
 			{
 				Id: templateId,
@@ -127,8 +123,12 @@ func TestTemplateMassAdd(t *testing.T) {
 		t.Fatalf("Error when mass adding template.\nReason : %v", err)
 	}
 
-	if mass_add_t == nil {
+	if template == nil {
 		t.Fatal("MassAdd method should returned a list of the updated templates.\nAn empty list was returned.")
+	}
+
+	if template.TemplateIds[0] != templateId {
+		t.Fatalf("Wrong template returned.\nExpected Id : %s\nId returned : %s", templateId, template.TemplateIds[0])
 	}
 }
 
@@ -138,7 +138,7 @@ func TestTemplateMassRemove(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	mass_rm_t, err := client.Template.MassRemove(&TemplateMassRemoveParameters{
+	template, err := client.Template.MassRemove(&TemplateMassRemoveParameters{
 		TemplateIds: []string{
 			templateId,
 		},
@@ -151,8 +151,12 @@ func TestTemplateMassRemove(t *testing.T) {
 		t.Fatalf("Error when mass removing template.\nTemplate : %s\nTemplate to unlink : %s \nReason : %v", templateId, apacheTemplateId, err)
 	}
 
-	if mass_rm_t == nil {
+	if template == nil {
 		t.Fatal("MassRemove method should returned a list of the updated templates.\nAn empty list was returned.")
+	}
+
+	if template.TemplateIds[0] != templateId {
+		t.Fatalf("Wrong template returned.\nExpected Id : %s\nId returned : %s", templateId, template.TemplateIds[0])
 	}
 }
 
@@ -162,7 +166,7 @@ func TestTemplateMassUpdate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	mass_rm_t, err := client.Template.MassUpdate(&TemplateMassUpdateParameters{
+	template, err := client.Template.MassUpdate(&TemplateMassUpdateParameters{
 		Templates: []*TemplateId{
 			{
 				Id: templateId,
@@ -172,6 +176,7 @@ func TestTemplateMassUpdate(t *testing.T) {
 			{
 				Macro: "{$MASS_UPDATE_TEMPLATE_MACRO}",
 				Value: "massUpdate-test-template-value",
+				Type:  Text,
 			},
 		},
 	})
@@ -180,8 +185,12 @@ func TestTemplateMassUpdate(t *testing.T) {
 		t.Fatalf("Error when mass updating template.\nReason : %v", err)
 	}
 
-	if mass_rm_t == nil {
+	if template == nil {
 		t.Fatal("MassUpdate method should returned a list of the updated templates.\nAn empty list was returned.")
+	}
+
+	if template.TemplateIds[0] != templateId {
+		t.Fatalf("Wrong template returned.\nExpected Id : %s\nId returned : %s", templateId, template.TemplateIds[0])
 	}
 }
 
@@ -191,7 +200,7 @@ func TestTemplateUpdate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	updated_t, err := client.Template.Update(&TemplateUpdateParameters{
+	template, err := client.Template.Update(&TemplateUpdateParameters{
 		Id: templateId,
 		TemplateLink: []*TemplateId{
 			{
@@ -202,6 +211,7 @@ func TestTemplateUpdate(t *testing.T) {
 			{
 				Macro: "{$UPDATED_TEMPLATE_MACRO}",
 				Value: "updated-test-template-value",
+				Type:  Secret,
 			},
 		},
 	})
@@ -210,8 +220,12 @@ func TestTemplateUpdate(t *testing.T) {
 		t.Fatalf("Error when updating template '%s'.\nReason : %v", templateId, err)
 	}
 
-	if updated_t == nil {
-		t.Fatal("Update method should returned a list of with the updated templates id.\nAn empty list was returned.")
+	if template == nil {
+		t.Fatal("Update method should returned a list of the updated templates.\nAn empty list was returned.")
+	}
+
+	if template.TemplateIds[0] != templateId {
+		t.Fatalf("Wrong template returned.\nExpected Id : %s\nId returned : %s", templateId, template.TemplateIds[0])
 	}
 }
 
@@ -221,7 +235,7 @@ func TestTemplateDelete(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	deleted_t, err := client.Template.Delete([]string{
+	template, err := client.Template.Delete([]string{
 		templateId,
 	})
 
@@ -229,7 +243,11 @@ func TestTemplateDelete(t *testing.T) {
 		t.Fatalf("Error when deleting template '%s'.\nReason : %v", templateId, err)
 	}
 
-	if deleted_t == nil {
-		t.Fatalf("Delete method should returned a list with the Ids of the deleted templates.\nAn empty list was returned.")
+	if template == nil {
+		t.Fatalf("Delete method should returned a list with the id of the deleted templates.\nAn empty list was returned.")
+	}
+
+	if template.TemplateIds[0] != templateId {
+		t.Fatalf("Wrong template returned.\nExpected Id : %s\nId returned : %s", templateId, template.TemplateIds[0])
 	}
 }

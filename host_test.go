@@ -16,24 +16,24 @@ func TestHostCreate(t *testing.T) {
 	}
 
 	h, err := client.Host.Create(&HostCreateParameters{
-		Host:           hostName,
-		Name:           hostName,
-		Description:    "Testing description",
-		Inventory_mode: Host_Manual,
-		Status:         Unmonitored,
+		Host:          hostName,
+		Name:          hostName,
+		Description:   "Testing description",
+		InventoryMode: HostManual,
+		Status:        HostUnmonitored,
 		Groups: []*HostGroupId{
 			{
-				Groupid: "1",
+				GroupId: "1",
 			},
 		},
 		Interfaces: []*HostInterface{
 			{
 				Ip:    "127.0.0.1",
 				Dns:   "localhost",
-				Main:  Default,
+				Main:  HostInterfaceDefault,
 				Port:  "10050",
-				Type:  Agent,
-				Useip: "0",
+				Type:  HostInterfaceAgent,
+				UseIp: HostInterfaceDns,
 			},
 		},
 		Tags: []*HostTag{
@@ -43,8 +43,8 @@ func TestHostCreate(t *testing.T) {
 			},
 		},
 		Inventory: map[HostInventory]string{
-			name:  hostName,
-			alias: "testing-host-alias",
+			Name:  hostName,
+			Alias: "testing-host-alias",
 		},
 	})
 
@@ -53,7 +53,7 @@ func TestHostCreate(t *testing.T) {
 	}
 
 	if h == nil {
-		t.Fatalf("Create method should returned a list with the Id of the new hosts.\nAn empty list was returned.")
+		t.Fatalf("Create method should returned a list with the id of the new hosts.\nAn empty list was returned.")
 	}
 
 	hostId = h.HostIds[0]
@@ -79,12 +79,8 @@ func TestHostGet(t *testing.T) {
 		t.Fatalf("Get method should returned a list of hosts matching the given criteria.\nAn empty list was returned.")
 	}
 
-	if h[0].Host != hostName {
-		t.Fatalf("Wrong host returned.\nExpected name : %s\nName returned : %s", hostName, h[0].Host)
-	}
-
-	if h[0].Hostid != hostId {
-		t.Fatalf("Wrong host returned.\nExpected Id : %s\nId returned : %s", hostId, h[0].Hostid)
+	if h[0].HostId != hostId {
+		t.Fatalf("Wrong host returned.\nExpected Id : %s\nId returned : %s", hostId, h[0].HostId)
 	}
 }
 
@@ -97,23 +93,24 @@ func TestHostMassAdd(t *testing.T) {
 	h, err := client.Host.MassAdd(&HostMassAddParameters{
 		Hosts: []*HostId{
 			{
-				Hostid: hostId,
+				HostId: hostId,
 			},
 		},
 		Interfaces: []*HostInterface{
 			{
 				Ip:    "127.0.0.2",
 				Dns:   "",
-				Main:  NotDefault,
+				Main:  HostInterfaceNotDefault,
 				Port:  "10893",
-				Type:  Agent,
-				Useip: "1",
+				Type:  HostInterfaceAgent,
+				UseIp: HostInterfaceIp,
 			},
 		},
 		Macros: []*HostMacro{
 			{
 				Macro: "{$TEST_MACRO}",
 				Value: "test-host-macro-value",
+				Type:  Text,
 			},
 		},
 	})
@@ -138,7 +135,7 @@ func TestHostMassRemove(t *testing.T) {
 	}
 
 	m, err := client.UserMacro.Get(&UserMacroGetParameters{
-		Hostids: []string{
+		HostIds: []string{
 			hostId,
 		},
 	})
@@ -159,7 +156,7 @@ func TestHostMassRemove(t *testing.T) {
 			},
 		},
 		Macros: []string{
-			m[0].Id,
+			m[0].HostId,
 		},
 	})
 
@@ -185,10 +182,10 @@ func TestHostMassUpdate(t *testing.T) {
 	h, err := client.Host.MassUpdate(&HostMassUpdateParameters{
 		Hosts: []*HostId{
 			{
-				Hostid: hostId,
+				HostId: hostId,
 			},
 		},
-		Status: Unmonitored,
+		Status: HostUnmonitored,
 	})
 
 	if err != nil {
@@ -211,14 +208,14 @@ func TestHostUpdate(t *testing.T) {
 	}
 
 	h, err := client.Host.Update(&HostUpdateParameters{
-		Hostid:         hostId,
-		Status:         Monitored,
-		Host:           updatedHostName,
-		Name:           updatedHostName,
-		Inventory_mode: Host_Manual,
+		HostId:        hostId,
+		Status:        HostMonitored,
+		Host:          updatedHostName,
+		Name:          updatedHostName,
+		InventoryMode: HostManual,
 		Inventory: map[HostInventory]string{
-			alias:   updatedHostName,
-			contact: "random@localhost",
+			Alias:   updatedHostName,
+			Contact: "random@localhost",
 		},
 	})
 
@@ -250,7 +247,7 @@ func TestHostDelete(t *testing.T) {
 	}
 
 	if h == nil {
-		t.Fatalf("Delete method should returned a list with the Ids of the deleted host.\nAn empty list was returned.")
+		t.Fatalf("Delete method should returned a list with the id of the deleted host.\nAn empty list was returned.")
 	}
 
 	if h.HostIds[0] != hostId {

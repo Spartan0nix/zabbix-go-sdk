@@ -4,9 +4,20 @@ import (
 	"testing"
 )
 
+const (
+	HostMacroName   = "{$TEST}"
+	GlobalMacroName = "{$TEST_GLOBAL}"
+)
+
+var HostMacroId string
+var GlobalMacroId string
+
+// --------------------------------------
+// HostMacro
+// --------------------------------------
 func TestUserMacroValidateHostMacro(t *testing.T) {
 	m := &HostMacro{
-		Macro: "{$GOOD_FORMAT}",
+		Macro: HostMacroName,
 		Value: "value",
 	}
 
@@ -33,25 +44,28 @@ func TestUserMacroCreate(t *testing.T) {
 	}
 
 	h, err := client.UserMacro.Create(&HostMacro{
-		Hostid: "10084",
-		Macro:  "{$TEST}",
+		HostId: "10084",
+		Macro:  HostMacroName,
 		Value:  "test",
+		Type:   Text,
 	})
 
 	if err != nil {
 		t.Fatalf("Error when creating user macro.\nReason : %v", err)
 	}
 
-	if h.Hostmacroids[0] == "" {
-		t.Fatalf("Create request returned an empty response.")
+	if h == nil {
+		t.Fatalf("Create method should returned a list with the id of the new host macros.\nAn empty list was returned.")
 	}
+
+	HostMacroId = h.HostMacroIds[0]
 }
 
 func TestUserMacroCreateWrongFormat(t *testing.T) {
 	client := NewZabbixService()
 
 	_, err := client.UserMacro.Create(&HostMacro{
-		Hostid: "10084",
+		HostId: "10084",
 		Macro:  "TEST",
 		Value:  "test",
 	})
@@ -81,8 +95,8 @@ func TestUserMacroGet(t *testing.T) {
 	}
 
 	m, err := client.UserMacro.Get(&UserMacroGetParameters{
-		Hostids: []string{
-			"10084",
+		HostMacroIds: []string{
+			HostMacroId,
 		},
 	})
 
@@ -91,7 +105,11 @@ func TestUserMacroGet(t *testing.T) {
 	}
 
 	if m == nil {
-		t.Fatalf("An empty response was returned when retrieving macros for host '%s'.", "10084")
+		t.Fatalf("Get method should returned a list of host macros matching the given criteria.\nAn empty list was returned.")
+	}
+
+	if m[0].HostMacroId != HostMacroId {
+		t.Fatalf("Wrong host macro returned.\nExpected Id : %s\nId returned : %s", HostMacroId, m[0].HostMacroId)
 	}
 }
 
@@ -101,30 +119,22 @@ func TestUserMacroUpdate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.Get(&UserMacroGetParameters{
-		Hostids: []string{
-			"10084",
-		},
+	m, err := client.UserMacro.Update(&HostMacroUpdateParameters{
+		HostMacroId: HostMacroId,
+		Type:        Secret,
+		Value:       "new-secret-value",
 	})
 
-	if err != nil {
-		t.Fatalf("Error when retrieving host macros.\nReason : %v", err)
-	}
-
-	if m == nil {
-		t.Fatalf("An empty response was returned when retrieving macros for host '%s'.", "10084")
-	}
-
-	m[0].Type = Secret
-	m[0].Value = "new-secret-value"
-
-	updated_m, err := client.UserMacro.Update(m[0])
 	if err != nil {
 		t.Fatalf("Error when updating host macro.\nReason : %v", err)
 	}
 
-	if updated_m == nil {
-		t.Fatalf("An empty response was returned when updating host macro.\nDesired state : %v", m[0])
+	if m == nil {
+		t.Fatal("Update method should returned a list of the updated host macros.\nAn empty list was returned.")
+	}
+
+	if m.HostMacroIds[0] != HostMacroId {
+		t.Fatalf("Wrong host macro returned.\nExpected Id : %s\nId returned : %s", HostMacroId, m.HostMacroIds[0])
 	}
 }
 
@@ -134,41 +144,29 @@ func TestUserMacroDelete(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.Get(&UserMacroGetParameters{
-		Hostids: []string{
-			"10084",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when retrieving host macros.\nReason : %v", err)
-	}
-
-	if m == nil {
-		t.Fatalf("An empty response was returned when retrieving macros for host '%s'.", "10084")
-	}
-
-	d, err := client.UserMacro.Delete([]string{
-		m[0].Id,
+	m, err := client.UserMacro.Delete([]string{
+		HostMacroId,
 	})
 
 	if err != nil {
 		t.Fatalf("Error when deleting user macro.\nReason : %v", err)
 	}
 
-	if d.Hostmacroids[0] == "" {
-		t.Fatalf("Delete request returned an empty response.")
+	if m == nil {
+		t.Fatalf("Delete method should returned a list with the id of the deleted host macros.\nAn empty list was returned.")
 	}
 
-	if d.Hostmacroids[0] != m[0].Id {
-		t.Fatalf("Error during delete request.\nId of the deleted host macro is '%s'.\nHost macro with id '%s' was requested for deletion.", d.Hostmacroids[0], m[0].Id)
+	if m.HostMacroIds[0] != HostMacroId {
+		t.Fatalf("Wrong host macro returned.\nExpected Id : %s\nId returned : %s", HostMacroId, m.HostMacroIds[0])
 	}
 }
 
-// -----------------------------------
+// --------------------------------------
+// HostMacro
+// --------------------------------------
 func TestUserMacroValidateGlobalMacro(t *testing.T) {
 	m := &GlobalMacro{
-		Macro: "{$GOOD_FORMAT}",
+		Macro: GlobalMacroName,
 		Value: "value",
 	}
 
@@ -194,8 +192,8 @@ func TestUserMacroCreateGlobal(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	h, err := client.UserMacro.CreateGlobal(&GlobalMacro{
-		Macro: "{$TEST}",
+	m, err := client.UserMacro.CreateGlobal(&GlobalMacro{
+		Macro: GlobalMacroName,
 		Value: "test",
 	})
 
@@ -203,9 +201,11 @@ func TestUserMacroCreateGlobal(t *testing.T) {
 		t.Fatalf("Error when creating global macro.\nReason : %v", err)
 	}
 
-	if h.Globalmacroids[0] == "" {
-		t.Fatalf("Create request returned an empty response.")
+	if m == nil {
+		t.Fatalf("Create method should returned a list with the id of the new global macros.\nAn empty list was returned.")
 	}
+
+	GlobalMacroId = m.GlobalMacroIds[0]
 }
 
 func TestUserMacroCreateGlobalWrongFormat(t *testing.T) {
@@ -227,14 +227,22 @@ func TestUserMacroGetGlobal(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{})
+	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{
+		GlobalMacroIds: []string{
+			GlobalMacroId,
+		},
+	})
 
 	if err != nil {
 		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
 	}
 
 	if m == nil {
-		t.Fatal("An empty response was returned when retrieving server global macros.")
+		t.Fatal("Get method should returned a list of global macros matching the given criteria.\nAn empty list was returned.")
+	}
+
+	if m[0].GlobalMacroId != GlobalMacroId {
+		t.Fatalf("Wrong global macro returned.\nExpected Id : %s\nId returned : %s", HostMacroId, m[0].GlobalMacroId)
 	}
 }
 
@@ -244,26 +252,22 @@ func TestUserMacroUpdateGlobal(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{})
+	m, err := client.UserMacro.UpdateGlobal(&GlobalMacroUpdateParameters{
+		GlobalMacroId: GlobalMacroId,
+		Type:          Secret,
+		Value:         "new-secret-value",
+	})
 
-	if err != nil {
-		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
-	}
-
-	if m == nil {
-		t.Fatal("An empty response was returned when retrieving server global macros.")
-	}
-
-	m[0].Type = Secret
-	m[0].Value = "new-secret-value"
-
-	updated_m, err := client.UserMacro.UpdateGlobal(m[0])
 	if err != nil {
 		t.Fatalf("Error when updating global macro.\nReason : %v", err)
 	}
 
-	if updated_m == nil {
-		t.Fatalf("An empty response was returned when updating global macro.\nDesired state : %v", m[0])
+	if m == nil {
+		t.Fatal("MassUpdate method should returned a list of the updated global macros.\nAn empty list was returned.")
+	}
+
+	if m.GlobalMacroIds[0] != GlobalMacroId {
+		t.Fatalf("Wrong global macro returned.\nExpected Id : %s\nId returned : %s", HostMacroId, m.GlobalMacroIds[0])
 	}
 }
 
@@ -273,29 +277,19 @@ func TestUserMacroDeleteGlobal(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	m, err := client.UserMacro.GetGlobal(&UserMacroGetParameters{})
-
-	if err != nil {
-		t.Fatalf("Error when retrieving global macros.\nReason : %v", err)
-	}
-
-	if m == nil {
-		t.Fatal("An empty response was returned when retrieving server global macros.")
-	}
-
-	d, err := client.UserMacro.DeleteGlobal([]string{
-		m[0].Id,
+	m, err := client.UserMacro.DeleteGlobal([]string{
+		GlobalMacroId,
 	})
 
 	if err != nil {
 		t.Fatalf("Error when deleting global macro.\nReason : %v", err)
 	}
 
-	if d.Globalmacroids[0] == "" {
-		t.Fatalf("Delete request returned an empty response.")
+	if m.GlobalMacroIds[0] == "" {
+		t.Fatalf("Delete method should returned a list with the id of the deleted global macros.\nAn empty list was returned.")
 	}
 
-	if d.Globalmacroids[0] != m[0].Id {
-		t.Fatalf("Error during delete request.\nId of the deleted global macro is '%s'.\nGlobal macro with id '%s' was requested for deletion.", d.Globalmacroids[0], m[0].Id)
+	if m.GlobalMacroIds[0] != GlobalMacroId {
+		t.Fatalf("Wrong global macro returned.\nExpected Id : %s\nId returned : %s", HostMacroId, m.GlobalMacroIds[0])
 	}
 }

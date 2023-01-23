@@ -3,8 +3,11 @@ package zabbixgosdk
 import "testing"
 
 const (
-	userGroupName = "test-user-group"
+	userGroupName       = "test-user-group"
+	updateUserGroupName = "updated-test-user-group"
 )
+
+var userGroupId string
 
 func TestUserGroupList(t *testing.T) {
 	client, err := NewTestingService()
@@ -12,13 +15,13 @@ func TestUserGroupList(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	groups, err := client.UserGroup.List()
+	g, err := client.UserGroup.List()
 	if err != nil {
 		t.Fatalf("Error when listing user group.\nReason : %v", err)
 	}
 
-	if groups[0].Id == "" {
-		t.Fail()
+	if g == nil {
+		t.Fatalf("List method should returned a list of existing user groups.\nAn empty list was returned.")
 	}
 }
 
@@ -28,7 +31,7 @@ func TestUserGroupCreate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	group, err := client.UserGroup.Create(&UserGroupCreateParameters{
+	g, err := client.UserGroup.Create(&UserGroupCreateParameters{
 		Name: userGroupName,
 	})
 
@@ -36,9 +39,11 @@ func TestUserGroupCreate(t *testing.T) {
 		t.Fatalf("Error when creating user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if group.Usrgrpids[0] == "" {
-		t.Fail()
+	if g == nil {
+		t.Fatalf("Create method should returned a list with the id of the new user groups.\nAn empty list was returned.")
 	}
+
+	userGroupId = g.Usrgrpids[0]
 }
 
 func TestUserGroupGet(t *testing.T) {
@@ -47,7 +52,7 @@ func TestUserGroupGet(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	group, err := client.UserGroup.Get(&UserGroupGetParameters{
+	g, err := client.UserGroup.Get(&UserGroupGetParameters{
 		Filter: map[string]string{
 			"name": userGroupName,
 		},
@@ -57,8 +62,12 @@ func TestUserGroupGet(t *testing.T) {
 		t.Fatalf("Error when getting user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if group[0].Name != userGroupName {
-		t.Fail()
+	if g == nil {
+		t.Fatalf("Get method should returned a list of user groups matching the given criteria.\nAn empty list was returned.")
+	}
+
+	if g[0].UsrGrpId != userGroupId {
+		t.Fatalf("Wrong user group returned.\nExpected Id : %s\nId returned : %s", userGroupId, g[0].UsrGrpId)
 	}
 }
 
@@ -68,33 +77,22 @@ func TestUserGroupUpdate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	group, err := client.UserGroup.Get(&UserGroupGetParameters{
-		Filter: map[string]string{
-			"name": userGroupName,
-		},
-		Output: "extend",
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting user group '%s'.\nReason : %v", userGroupName, err)
-	}
-
-	if group[0].Name != userGroupName {
-		t.Fatalf("Failed to get user group '%s'.", userGroupName)
-	}
-
-	updated_group, err := client.UserGroup.Update(&UserGroupUpdateParameters{
-		Id:         group[0].Id,
-		Debug_mode: UserGroupDebugEnabled,
-		Gui_access: UserGroupSystemDefault,
+	g, err := client.UserGroup.Update(&UserGroupUpdateParameters{
+		UsrGrpId:  userGroupId,
+		DebugMode: UserGroupDebugEnabled,
+		GuiAccess: UserGroupInternal,
 	})
 
 	if err != nil {
 		t.Fatalf("Error when updating user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if updated_group.Usrgrpids[0] == "" {
-		t.Fail()
+	if g == nil {
+		t.Fatalf("Update method should returned a list of the updated user groups.\nAn empty list was returned.")
+	}
+
+	if g.Usrgrpids[0] != userGroupId {
+		t.Fatalf("Wrong user group returned.\nExpected Id : %s\nId returned : %s", userGroupId, g.Usrgrpids[0])
 	}
 }
 
@@ -104,30 +102,19 @@ func TestUserGroupDelete(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	group, err := client.UserGroup.Get(&UserGroupGetParameters{
-		Filter: map[string]string{
-			"name": userGroupName,
-		},
-		Output: "extend",
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting user group '%s'.\nReason : %v", userGroupName, err)
-	}
-
-	if group[0].Name != userGroupName {
-		t.Fatalf("Failed to get user group '%s'.", userGroupName)
-	}
-
-	deleted_group, err := client.UserGroup.Delete([]string{
-		group[0].Id,
+	g, err := client.UserGroup.Delete([]string{
+		userGroupId,
 	})
 
 	if err != nil {
 		t.Fatalf("Error when deleting user group '%s'.\nReason : %v", userGroupName, err)
 	}
 
-	if deleted_group.Usrgrpids[0] == "" {
-		t.Fail()
+	if g == nil {
+		t.Fatalf("Update method should returned a list of the removed user groups.\nAn empty list was returned.")
+	}
+
+	if g.Usrgrpids[0] != userGroupId {
+		t.Fatalf("Wrong user group returned.\nExpected Id : %s\nId returned : %s", userGroupId, g.Usrgrpids[0])
 	}
 }
