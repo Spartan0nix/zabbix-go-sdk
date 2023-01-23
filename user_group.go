@@ -46,12 +46,12 @@ type UserGroupService struct {
 // and should not be passed as arguments in other methods.
 type UserGroup struct {
 	// ReadOnly
-	Id              string             `json:"usrgrpid,omitempty"`
+	UsrGrpId        string             `json:"usrgrpid"`
 	Name            string             `json:"name"`
-	Debug_mode      UserGroupDebugMode `json:"debug_mode,omitempty"`
-	Gui_access      UserGroupGuiAccess `json:"gui_access,omitempty"`
-	Users_status    UserGroupStatus    `json:"users_status,omitempty"`
-	Userdirectoryid string             `json:"userdirectoryid,omitempty"`
+	DebugMode       UserGroupDebugMode `json:"debug_mode"`
+	GuiAccess       UserGroupGuiAccess `json:"gui_access"`
+	UsersStatus     UserGroupStatus    `json:"users_status"`
+	UserDirectoryId string             `json:"userdirectoryid"`
 }
 
 // UserGroupPermission define a permission assignable to a UserGroup
@@ -74,19 +74,19 @@ type UserGroupResponse struct {
 
 type UserGroupCreateParameters struct {
 	Name            string                    `json:"name"`
-	Debug_mode      UserGroupDebugMode        `json:"debug_mode,omitempty"`
-	Gui_access      UserGroupGuiAccess        `json:"gui_access,omitempty"`
-	Users_status    UserGroupStatus           `json:"users_status,omitempty"`
-	Userdirectoryid string                    `json:"userdirectoryid,omitempty"`
+	DebugMode       UserGroupDebugMode        `json:"debug_mode,omitempty"`
+	GuiAccess       UserGroupGuiAccess        `json:"gui_access,omitempty"`
+	UsersStatus     UserGroupStatus           `json:"users_status,omitempty"`
+	UserDirectoryId string                    `json:"userdirectoryid,omitempty"`
 	Rights          []*UserGroupPermission    `json:"rights,omitempty"`
-	Tag_filters     []*UserGroupTagPermission `json:"tag_filters,omitempty"`
+	TagFilters      []*UserGroupTagPermission `json:"tag_filters,omitempty"`
 	// TODO - Waiting for implemenation of Users
 	// Users                []map[string]string      `json:"users,omitempty"`
 }
 
 // Create is used to create a new UserGroup.
-func (u *UserGroupService) Create(params *UserGroupCreateParameters) (*UserGroupResponse, error) {
-	req := u.Client.NewRequest("usergroup.create", params)
+func (u *UserGroupService) Create(p *UserGroupCreateParameters) (*UserGroupResponse, error) {
+	req := u.Client.NewRequest("usergroup.create", p)
 
 	res, err := u.Client.Post(req)
 	if err != nil {
@@ -96,7 +96,7 @@ func (u *UserGroupService) Create(params *UserGroupCreateParameters) (*UserGroup
 	g := UserGroupResponse{}
 	err = u.Client.ConvertResponse(*res, &g)
 	if err != nil {
-		if u.Client.ResourceAlreadyExist("User group", params.Name, res.Error) {
+		if u.Client.ResourceAlreadyExist("User group", p.Name, res.Error) {
 			fmt.Println(res.Error.Data)
 		} else {
 			return nil, err
@@ -128,20 +128,20 @@ func (u *UserGroupService) Delete(ids []string) (*UserGroupResponse, error) {
 // Properties using the 'omitempty' json parameters are optional
 type UserGroupGetParameters struct {
 	Status                 int         `json:"status,omitempty"`
-	Userids                []string    `json:"userids,omitempty"`
-	Usrgrpids              []string    `json:"usrgrpids,omitempty"`
+	UserIds                []string    `json:"userids,omitempty"`
+	UsrGrpIds              []string    `json:"usrgrpids,omitempty"`
 	SelectTagFilters       interface{} `json:"selectTagFilters,omitempty"`
 	SelectUsers            interface{} `json:"selectUsers,omitempty"`
 	SelectRights           interface{} `json:"selectRights,omitempty"`
 	LimitSelects           int         `json:"limitSelects,omitempty"`
-	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortField              []string    `json:"sortfield,omitempty"`
 	CountOutput            bool        `json:"countOutput,omitempty"`
 	Editable               bool        `json:"editable,omitempty"`
 	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
 	Filter                 interface{} `json:"filter,omitempty"`
 	Limit                  int         `json:"limit,omitempty"`
 	Output                 interface{} `json:"output,omitempty"`
-	Preservekeys           bool        `json:"preservekeys,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
 	Search                 interface{} `json:"search,omitempty"`
 	SearchByAny            bool        `json:"searchByAny,omitempty"`
 	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
@@ -151,11 +151,11 @@ type UserGroupGetParameters struct {
 
 // List is used to retrieve all UserGroups.
 func (u *UserGroupService) List() ([]*UserGroup, error) {
-	params := UserGroupGetParameters{
+	p := UserGroupGetParameters{
 		Output: "extend",
 	}
 
-	req := u.Client.NewRequest("usergroup.get", params)
+	req := u.Client.NewRequest("usergroup.get", p)
 
 	res, err := u.Client.Post(req)
 	if err != nil {
@@ -172,8 +172,8 @@ func (u *UserGroupService) List() ([]*UserGroup, error) {
 }
 
 // Get is used to retrieve one or multiples UserGroups matching the given criteria(s).
-func (u *UserGroupService) Get(params *UserGroupGetParameters) ([]*UserGroup, error) {
-	req := u.Client.NewRequest("usergroup.get", params)
+func (u *UserGroupService) Get(p *UserGroupGetParameters) ([]*UserGroup, error) {
+	req := u.Client.NewRequest("usergroup.get", p)
 
 	res, err := u.Client.Post(req)
 	if err != nil {
@@ -190,25 +190,25 @@ func (u *UserGroupService) Get(params *UserGroupGetParameters) ([]*UserGroup, er
 }
 
 type UserGroupUpdateParameters struct {
-	Id              string                    `json:"usrgrpid"`
+	UsrGrpId        string                    `json:"usrgrpid"`
 	Name            string                    `json:"name,omitempty"`
-	Debug_mode      UserGroupDebugMode        `json:"debug_mode,omitempty"`
-	Gui_access      UserGroupGuiAccess        `json:"gui_access,omitempty"`
-	Users_status    UserGroupStatus           `json:"users_status,omitempty"`
-	Userdirectoryid string                    `json:"userdirectoryid,omitempty"`
+	DebugMode       UserGroupDebugMode        `json:"debug_mode,omitempty"`
+	GuiAccess       UserGroupGuiAccess        `json:"gui_access,omitempty"`
+	UsersStatus     UserGroupStatus           `json:"users_status,omitempty"`
+	UserDirectoryId string                    `json:"userdirectoryid,omitempty"`
 	Rights          []*UserGroupPermission    `json:"rights,omitempty"`
-	Tag_filters     []*UserGroupTagPermission `json:"tag_filters,omitempty"`
+	TagFilters      []*UserGroupTagPermission `json:"tag_filters,omitempty"`
 	// TODO - Waiting for implemenation of Users
 	// Users                []map[string]string      `json:"users,omitempty"`
 }
 
 // Update is used to update or overwrite properties from an existing UserGroup.
-func (u *UserGroupService) Update(params *UserGroupUpdateParameters) (*UserGroupResponse, error) {
-	if params.Id == "" {
-		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", params)
+func (u *UserGroupService) Update(p *UserGroupUpdateParameters) (*UserGroupResponse, error) {
+	if p.UsrGrpId == "" {
+		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", p)
 	}
 
-	req := u.Client.NewRequest("usergroup.update", params)
+	req := u.Client.NewRequest("usergroup.update", p)
 
 	res, err := u.Client.Post(req)
 	if err != nil {

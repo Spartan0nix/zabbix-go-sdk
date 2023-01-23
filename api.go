@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"regexp"
 )
@@ -176,8 +175,7 @@ type connectivityRequest struct {
 func (a *ApiClient) CheckConnectivity() error {
 	// If the Url property is not set, do not throw an error.
 	if a.Url == "" {
-		log.Println("Missing 'Url' property from the current *ApiClient. CheckConnectivity function will not be executed.")
-		return nil
+		return fmt.Errorf("missing 'Url' property from the current *ApiClient. CheckConnectivity function will not be executed")
 	}
 
 	req := connectivityRequest{

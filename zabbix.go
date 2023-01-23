@@ -69,7 +69,3 @@ func (s ZabbixService) SetToken(token string) {
 	s.HostInterface.Client.Token = token
 	s.Host.Client.Token = token
 }
-
-func (s ZabbixService) TestConnectivity() {
-
-}
