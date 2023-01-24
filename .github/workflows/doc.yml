@@ -2,7 +2,8 @@ name: Generate documentation
 
 on:
   push: 
-    branches: [ "main" ]
+    # branches: [ "main" ]
+    branches: [ "fix/gen-doc" ]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -17,7 +18,7 @@ concurrency:
 
 jobs:
   gen-doc:
-    if: contains(github.event.head_commit.message, 'Merge pull request')
+    # if: contains(github.event.head_commit.message, 'Merge pull request')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -38,7 +39,7 @@ jobs:
         run: godoc -http=localhost:6060 &
 
       - name: Retrieve godoc page
-        run: wget -E -H -k -p http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk
+        run: wget -E -H -k -p --reject png http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk
       # Move assets files
       - run: mv localhost:6060/lib/godoc/* docs
       - run: mv localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk.html docs/
