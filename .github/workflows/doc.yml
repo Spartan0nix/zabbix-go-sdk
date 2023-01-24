@@ -34,8 +34,20 @@ jobs:
       - name: Install godoc
         run: go install golang.org/x/tools/cmd/godoc@latest
 
-      - run: godoc -http=localhost:6060 &
-      - run: wget http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk/ -O docs/index.html
+      - name: Execute godoc server
+        run: godoc -http=localhost:6060 &
+
+      - name: Retrieve godoc page
+        run: wget -E -H -k -p http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk
+      # Move assets files
+      - run: mv localhost:6060/lib/godoc/* docs
+      - run: mv localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk.html docs/
+      # Update assets links
+      - run: sed -i 's/..\/..\/..\/lib\/godoc\/style.css/.\/style.css/g' docs/zabbix-go-sdk.html
+      - run: sed -i 's/..\/..\/..\/lib\/godoc\/jquery.js/.\/jquery.js/g' docs/zabbix-go-sdk.html
+      - run: sed -i 's/..\/..\/..\/lib\/godoc\/godocs.js/.\/godocs.js/g' docs/zabbix-go-sdk.html
+      # Clean up
+      - run: rm -r localhost:6060/
       # Sed remove PID && remove empty lines
       - run: kill -9 $(ps -C godoc | awk '{ print $1 }' | sed 's/PID//g;/^$/d')
 
