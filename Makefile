@@ -45,3 +45,9 @@ coverage:
 	go tool cover -html=coverage.out -o=coverage.html
 	@echo "Destroying container stack"
 	docker compose -f ./build/docker-compose-test.yml down
+
+down-test:
+	docker compose -f ./build/docker-compose-test.yml down
+
+run:
+	go run test/main.go

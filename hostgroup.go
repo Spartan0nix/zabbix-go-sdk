@@ -5,26 +5,34 @@ type HostGroupService struct {
 	Client *ApiClient
 }
 
+// HostGroupInternal define if the HostGroup is internal or not.
+type HostGroupInternal string
+
+const (
+	HostGroupNotInternal HostGroupInternal = "0"
+	HostGroupIsInternal  HostGroupInternal = "1"
+)
+
 // HostGroup properties.
 type HostGroup struct {
 	Id   string `json:"groupid"`
 	Name string `json:"name"`
 	// ReadOnly
-	Flags string `json:"flags"`
+	Flags HostFlag `json:"flags"`
 	// ReadOnly
-	Internal string `json:"internal"`
+	Internal HostGroupInternal `json:"internal"`
 	// ReadOnly
 	Uuid string `json:"uuid"`
 }
 
 // HostGroupId define a representation for certain methods that only requires the 'groupid' property.
 type HostGroupId struct {
-	Groupid string `json:"groupid"`
+	GroupId string `json:"groupid"`
 }
 
 // HostGroupResponse define the server response format for HostGroup methods.
 type HostGroupResponse struct {
-	Groupids []string `json:"groupids"`
+	GroupIds []string `json:"groupids"`
 }
 
 // Create is used to create a new HostGroup.
@@ -71,51 +79,39 @@ func (h *HostGroupService) Delete(ids []string) (*HostGroupResponse, error) {
 // HostGroupGetParameters define the properties used to search HostGroup(s).
 // Properties using the 'omitempty' json parameters are optional
 type HostGroupGetParameters struct {
-	Graphids                          []string    `json:"graphids,omitempty"`
-	Groupids                          []string    `json:"groupids,omitempty"`
-	Hostids                           []string    `json:"hostids,omitempty"`
-	Maintenanceids                    []string    `json:"maintenanceids,omitempty"`
-	Monitored_hosts                   bool        `json:"monitored_hosts,omitempty"`
-	Real_hosts                        bool        `json:"real_hosts,omitempty"`
-	Templated_hosts                   bool        `json:"templated_hosts,omitempty"`
-	Templateids                       []string    `json:"templateids,omitempty"`
-	Triggerids                        []string    `json:"triggerids,omitempty"`
-	With_graphs                       bool        `json:"with_graphs,omitempty"`
-	With_graph_prototypes             bool        `json:"with_graph_prototypes,omitempty"`
-	With_hosts_and_templates          bool        `json:"with_hosts_and_templates,omitempty"`
-	With_httptests                    bool        `json:"with_httptests,omitempty"`
-	With_item_prototypes              bool        `json:"with_item_prototypes,omitempty"`
-	With_simple_graph_item_prototypes bool        `json:"with_simple_graph_item_prototypes,omitempty"`
-	With_monitored_httptests          bool        `json:"with_monitored_httptests,omitempty"`
-	With_monitored_items              bool        `json:"with_monitored_items,omitempty"`
-	With_monitored_triggers           bool        `json:"with_monitored_triggers,omitempty"`
-	With_simple_graph_items           bool        `json:"with_simple_graph_items,omitempty"`
-	With_triggers                     bool        `json:"with_triggers,omitempty"`
-	SelectDiscoveryRule               interface{} `json:"selectDiscoveryRule,omitempty"`
-	SelectGroupDiscovery              interface{} `json:"selectGroupDiscovery,omitempty"`
-	SelectHosts                       interface{} `json:"selectHosts,omitempty"`
-	SelectTemplates                   interface{} `json:"selectTemplates,omitempty"`
-	LimitSelects                      int         `json:"limitSelects,omitempty"`
-	Sortfield                         []string    `json:"sortfield,omitempty"`
-	CountOutput                       bool        `json:"countOutput,omitempty"`
-	Editable                          bool        `json:"editable,omitempty"`
-	ExcludeSearch                     bool        `json:"excludeSearch,omitempty"`
-	Filter                            interface{} `json:"filter,omitempty"`
-	Limit                             int         `json:"limit,omitempty"`
-	Output                            interface{} `json:"output,omitempty"`
-	Preservekeys                      bool        `json:"preservekeys,omitempty"`
-	Search                            interface{} `json:"search,omitempty"`
-	SearchByAny                       bool        `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled            bool        `json:"searchWildcardsEnabled,omitempty"`
-	Sortorder                         []string    `json:"sortorder,omitempty"`
-	StartSearch                       bool        `json:"startSearch,omitempty"`
+	GraphIds                      []string    `json:"graphids,omitempty"`
+	GroupIds                      []string    `json:"groupids,omitempty"`
+	HostIds                       []string    `json:"hostids,omitempty"`
+	MaintenanceIds                []string    `json:"maintenanceids,omitempty"`
+	MonitoredHosts                bool        `json:"monitored_hosts,omitempty"`
+	RealHosts                     bool        `json:"real_hosts,omitempty"`
+	TemplatedHosts                bool        `json:"templated_hosts,omitempty"`
+	TemplateIds                   []string    `json:"templateids,omitempty"`
+	TriggerIds                    []string    `json:"triggerids,omitempty"`
+	WithGraphs                    bool        `json:"with_graphs,omitempty"`
+	WithGraphPrototypes           bool        `json:"with_graph_prototypes,omitempty"`
+	WithHostsAndTemplates         bool        `json:"with_hosts_and_templates,omitempty"`
+	WithHttpTests                 bool        `json:"with_httptests,omitempty"`
+	WithItemPrototypes            bool        `json:"with_item_prototypes,omitempty"`
+	WithSimpleGraphItemPrototypes bool        `json:"with_simple_graph_item_prototypes,omitempty"`
+	WithMonitoredHttpTests        bool        `json:"with_monitored_httptests,omitempty"`
+	WithMonitoredItems            bool        `json:"with_monitored_items,omitempty"`
+	WithMonitoredTriggers         bool        `json:"with_monitored_triggers,omitempty"`
+	WithSimpleGraphItems          bool        `json:"with_simple_graph_items,omitempty"`
+	WithTriggers                  bool        `json:"with_triggers,omitempty"`
+	SelectDiscoveryRule           interface{} `json:"selectDiscoveryRule,omitempty"`
+	SelectGroupDiscovery          interface{} `json:"selectGroupDiscovery,omitempty"`
+	SelectHosts                   interface{} `json:"selectHosts,omitempty"`
+	SelectTemplates               interface{} `json:"selectTemplates,omitempty"`
+	LimitSelects                  string      `json:"limitSelects,omitempty"`
+	Sortfield                     []string    `json:"sortfield,omitempty"`
+	CommonGetParameters
 }
 
 // List is used to retrieve all HostGroups for the server.
 func (h *HostGroupService) List() ([]*HostGroup, error) {
-	p := &HostGroupGetParameters{
-		Filter: map[string]string{},
-	}
+	p := &HostGroupGetParameters{}
+	p.Filter = map[string]string{}
 
 	req := h.Client.NewRequest("hostgroup.get", p)
 

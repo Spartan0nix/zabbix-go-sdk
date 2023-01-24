@@ -5,12 +5,10 @@ import (
 )
 
 const (
-	interfaceName        = "test-interface"
-	updatedInterfaceName = "test-interface-update"
+	TemplateHostId = "10084"
 )
 
-var InterfaceId string
-var TemplateHostId = "10084"
+var interfaceId string
 
 func TestHostInterfaceCreate(t *testing.T) {
 	client, err := NewTestingService()
@@ -18,25 +16,25 @@ func TestHostInterfaceCreate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	i, err := client.HostInterface.Create(&HostInterface{
-		Hostid: TemplateHostId,
+	i, err := client.HostInterface.Create(&HostInterfaceCreateParameters{
+		HostId: TemplateHostId,
 		Ip:     "127.0.0.2",
 		Dns:    "localhost",
-		Main:   NotDefault,
+		Main:   HostInterfaceNotDefault,
 		Port:   "1234",
-		Type:   Agent,
-		Useip:  "0",
+		Type:   HostInterfaceAgent,
+		UseIp:  HostInterfaceDns,
 	})
 
 	if err != nil {
-		t.Fatalf("Error when creating hostInterface '%s' for host '%s'.\nReason : %v", interfaceName, TemplateHostId, err)
+		t.Fatalf("Error when creating hostInterface for host '%s'.\nReason : %v", TemplateHostId, err)
 	}
 
 	if i == nil {
-		t.Fatalf("Create method should returned a list with the Id of the new host interfaces.\nAn empty list was returned.")
+		t.Fatalf("Create method should returned a list with the id of the new host interfaces.\nAn empty list was returned.")
 	}
 
-	InterfaceId = i.InterfaceIds[0].String()
+	interfaceId = i.InterfaceIds[0].String()
 }
 
 func TestHostInterfaceGet(t *testing.T) {
@@ -46,16 +44,13 @@ func TestHostInterfaceGet(t *testing.T) {
 	}
 
 	i, err := client.HostInterface.Get(&HostInterfaceGetParameters{
-		Hostids: []string{
+		HostIds: []string{
 			TemplateHostId,
-		},
-		Filter: map[string]string{
-			"name": interfaceName,
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("Error when getting hostInterface '%s' for host '%s'.\nReason : %v", interfaceName, TemplateHostId, err)
+		t.Fatalf("Error when getting hostInterface for host '%s'.\nReason : %v", TemplateHostId, err)
 	}
 
 	if i == nil {
@@ -65,12 +60,12 @@ func TestHostInterfaceGet(t *testing.T) {
 	var id string
 	for _, y := range i {
 		if y.Ip == "127.0.0.2" {
-			id = y.Interfaceid
+			id = y.InterfaceId
 		}
 	}
 
-	if id != InterfaceId {
-		t.Fatalf("Wrong interface returned.\nExpected Id : %s\nId returned : %s", InterfaceId, i[0].Interfaceid)
+	if id != interfaceId {
+		t.Fatalf("Wrong interface returned.\nExpected Id : %s\nId returned : %s", interfaceId, i[0].InterfaceId)
 	}
 }
 
@@ -83,27 +78,27 @@ func TestHostInterfaceMassAdd(t *testing.T) {
 	i, err := client.HostInterface.MassAdd(&HostInterfaceMassAddParameters{
 		Hosts: []*HostId{
 			{
-				Hostid: TemplateHostId,
+				HostId: TemplateHostId,
 			},
 		},
 		Interfaces: []*HostInterfaceMassProperties{
 			{
 				Ip:   "127.0.0.3",
 				Dns:  "zabbix-server",
-				Main: Default,
+				Main: HostInterfaceDefault,
 				Port: "2345",
-				Type: SNMP,
+				Type: HostInterfaceSNMP,
 				Details: &HostInterfaceDetail{
-					Version:   SNMPv2c,
+					Version:   HostInterfaceSNMPv2c,
 					Community: "test",
 				},
-				Useip: "1",
+				UseIp: HostInterfaceIp,
 			},
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass interface to host '%s'.\nReason : %v", TemplateHostId, err)
+		t.Fatalf("Error when mass adding interface to host '%s'.\nReason : %v", TemplateHostId, err)
 	}
 
 	if i == nil {
@@ -139,39 +134,67 @@ func TestHostInterfaceMassRemove(t *testing.T) {
 	}
 }
 
-// ---------------------------------
-// TODO
-// ---------------------------------
-// Wait for host.create support
-// ---------------------------------
-// func TestHostInterfaceReplace(t *testing.T) {
-// 	client, err := NewTestingService()
-// 	if err != nil {
-// 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-// 	}
+func TestHostInterfaceReplace(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
 
-// 	i, err := client.HostInterface.ReplaceHostInterfaces(&HostInterfaceReplaceParameters{
-// 		Host: TemplateHostId,
-// 		Interfaces: []*HostInterfaceMassProperties{
-// 			{
-// 				Ip:    "127.0.0.1",
-// 				Dns:   "localhost",
-// 				Main:  Default,
-// 				Port:  "10050",
-// 				Type:  Agent,
-// 				Useip: "0",
-// 			},
-// 		},
-// 	})
+	h, err := client.Host.Create(&HostCreateParameters{
+		Host:   "test-host-interface",
+		Status: HostUnmonitored,
+		Groups: []*HostGroupId{
+			{
+				GroupId: "1",
+			},
+		},
+		Interfaces: []*HostInterface{
+			{
+				Ip:    "127.0.0.1",
+				Dns:   "localhost",
+				Main:  HostInterfaceDefault,
+				Port:  "10050",
+				Type:  HostInterfaceAgent,
+				UseIp: HostInterfaceDns,
+			},
+		},
+	})
 
-// 	if err != nil {
-// 		t.Fatalf("Error when replacing interfaces on host '%s'.\nReason : %v", TemplateHostId, err)
-// 	}
+	if err != nil {
+		t.Fatalf("Error when ading host 'test-host-interface'.\nReason : %v", err)
+	}
 
-// 	if i == nil {
-// 		t.Fatal("MassUpdate method should returned a list of the updated interfaces.\nAn empty list was returned.")
-// 	}
-// }
+	if h == nil {
+		t.Fatalf("'host.create' method returned an empty list of host.")
+	}
+
+	i, err := client.HostInterface.ReplaceHostInterfaces(&HostInterfaceReplaceParameters{
+		Host: h.HostIds[0],
+		Interfaces: []*HostInterfaceMassProperties{
+			{
+				Ip:    "127.0.0.1",
+				Dns:   "localhost",
+				Main:  HostInterfaceDefault,
+				Port:  "161",
+				Type:  HostInterfaceSNMP,
+				UseIp: HostInterfaceIp,
+				Details: &HostInterfaceDetail{
+					Version:   HostInterfaceSNMPv2c,
+					Community: "public",
+					Bulk:      HostInterfaceBulkTrue,
+				},
+			},
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("Error when replacing interfaces on host '%s'.\nReason : %v", TemplateHostId, err)
+	}
+
+	if i == nil {
+		t.Fatal("MassUpdate method should returned a list of the updated interfaces.\nAn empty list was returned.")
+	}
+}
 
 func TestHostInterfaceUpdate(t *testing.T) {
 	client, err := NewTestingService()
@@ -180,17 +203,21 @@ func TestHostInterfaceUpdate(t *testing.T) {
 	}
 
 	i, err := client.HostInterface.Update(&HostInterfaceUpdateParameters{
-		Interfaceid: InterfaceId,
-		Ip:          "127.0.0.1",
+		InterfaceId: interfaceId,
+		Ip:          "127.0.0.4",
 	},
 	)
 
 	if err != nil {
-		t.Fatalf("Error when updating interface '%s' for host '%s'.\nReason : %v", InterfaceId, TemplateHostId, err)
+		t.Fatalf("Error when updating interface '%s' for host '%s'.\nReason : %v", interfaceId, TemplateHostId, err)
 	}
 
 	if i == nil {
-		t.Fatal("Update method should returned a list of with the updated interface.\nAn empty list was returned.")
+		t.Fatal("Update method should returned a list of the updated interfaces.\nAn empty list was returned.")
+	}
+
+	if string(i.InterfaceIds[0]) != interfaceId {
+		t.Fatalf("Wrong interface returned.\nExpected Id : %s\nId returned : %s", interfaceId, string(i.InterfaceIds[0]))
 	}
 }
 
@@ -201,14 +228,18 @@ func TestHostInterfaceDelete(t *testing.T) {
 	}
 
 	i, err := client.HostInterface.Delete([]string{
-		InterfaceId,
+		interfaceId,
 	})
 
 	if err != nil {
-		t.Fatalf("Error when deleting template '%s'.\nReason : %v", templateId, err)
+		t.Fatalf("Error when deleting interface '%s'.\nReason : %v", templateId, err)
 	}
 
 	if i == nil {
-		t.Fatalf("Delete method should returned a list of with the updated interface.\nAn empty list was returned.")
+		t.Fatalf("Delete method should returned a list with the id of the deleted host interfaces.\nAn empty list was returned.")
+	}
+
+	if string(i.InterfaceIds[0]) != interfaceId {
+		t.Fatalf("Wrong interface returned.\nExpected Id : %s\nId returned : %s", interfaceId, string(i.InterfaceIds[0]))
 	}
 }

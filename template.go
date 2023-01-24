@@ -33,7 +33,7 @@ type TemplateTag struct {
 
 // TemplateResponse define the server response format for Template methods.
 type TemplateResponse struct {
-	Templateids []string `json:"templateids"`
+	TemplateIds []string `json:"templateids"`
 }
 
 // TemplateCreateParameters define the properties needed to create a new Template
@@ -91,18 +91,18 @@ func (t *TemplateService) Delete(ids []string) (*TemplateResponse, error) {
 // TemplateGetParameters define the properties used to search Template(s)
 // Properties using the 'omitempty' json parameters are optional
 type TemplateGetParameters struct {
-	Templateids            []string    `json:"templateids,omitempty"`
-	Groupids               []string    `json:"groupids,omitempty"`
-	ParentTemplateids      []string    `json:"parentTemplateids,omitempty"`
-	Hostids                []string    `json:"hostids,omitempty"`
-	Graphids               []string    `json:"graphids,omitempty"`
-	Itemids                []string    `json:"itemids,omitempty"`
-	Triggerids             []string    `json:"triggerids,omitempty"`
-	With_items             bool        `json:"with_items,omitempty"`
-	With_triggers          bool        `json:"with_triggers,omitempty"`
-	With_graphs            bool        `json:"with_graphs,omitempty"`
-	With_httptests         bool        `json:"with_httptests,omitempty"`
-	Evaltype               string      `json:"evaltype,omitempty"`
+	TemplateIds            []string    `json:"templateids,omitempty"`
+	GroupIds               []string    `json:"groupids,omitempty"`
+	ParentTemplateIds      []string    `json:"parentTemplateids,omitempty"`
+	HostIds                []string    `json:"hostids,omitempty"`
+	GraphIds               []string    `json:"graphids,omitempty"`
+	ItemIds                []string    `json:"itemids,omitempty"`
+	TriggerIds             []string    `json:"triggerids,omitempty"`
+	WithItems              bool        `json:"with_items,omitempty"`
+	WithTriggers           bool        `json:"with_triggers,omitempty"`
+	WithGraphs             bool        `json:"with_graphs,omitempty"`
+	WithHttpTests          bool        `json:"with_httptests,omitempty"`
+	EvalType               string      `json:"evaltype,omitempty"`
 	Tags                   []string    `json:"tags,omitempty"`
 	SelectGroups           interface{} `json:"selectGroups,omitempty"`
 	SelectTags             interface{} `json:"selectTags,omitempty"`
@@ -118,62 +118,62 @@ type TemplateGetParameters struct {
 	SelectDashboards       interface{} `json:"selectDashboards,omitempty"`
 	SelectValueMaps        interface{} `json:"selectValueMaps,omitempty"`
 	LimitSelects           int         `json:"limitSelects,omitempty"`
-	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortField              []string    `json:"sortfield,omitempty"`
 	CountOutput            bool        `json:"countOutput,omitempty"`
 	Editable               bool        `json:"editable,omitempty"`
 	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
 	Filter                 interface{} `json:"filter,omitempty"`
 	Limit                  int         `json:"limit,omitempty"`
 	Output                 interface{} `json:"output,omitempty"`
-	Preservekeys           bool        `json:"preservekeys,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
 	Search                 interface{} `json:"search,omitempty"`
 	SearchByAny            bool        `json:"searchByAny,omitempty"`
 	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
-	Sortorder              []string    `json:"sortorder,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
 	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
 // TemplateGetResponse define the server response format for Get method.
 type TemplateGetResponse struct {
-	Id                 string `json:"templateid,omitempty"`
-	Host               string `json:"host"`
-	Name               string `json:"name"`
-	Description        string `json:"description"`
-	Proxy_hostid       string `json:"proxy_hostid"`
-	Status             string `json:"status"`
-	Available          string `json:"available"`
-	Disable_until      string `json:"disable_until"`
-	Error              string `json:"error"`
-	Errors_from        string `json:"errors_from"`
-	Lastaccess         string `json:"lastaccess"`
-	Flags              string `json:"flags"`
-	Snmp_disable_until string `json:"snmp_disable_until"`
-	Snmp_available     string `json:"snmp_available"`
-	Snmp_errors_from   string `json:"snmp_errors_from"`
-	Snmp_error         string `json:"snmp_error"`
-	Ipmi_authtype      string `json:"ipmi_authtype"`
-	Ipmi_privilege     string `json:"ipmi_privilege"`
-	Ipmi_username      string `json:"ipmi_username"`
-	Ipmi_password      string `json:"ipmi_password"`
-	Ipmi_available     string `json:"ipmi_available"`
-	Ipmi_disable_until string `json:"ipmi_disable_until"`
-	Ipmi_error         string `json:"Ipmi_error"`
-	Ipmi_errors_from   string `json:"ipmi_errors_from"`
-	Jmx_available      string `json:"jmx_available"`
-	Jmx_disable_until  string `json:"jmx_disable_until"`
-	Jmx_error          string `json:"jmx_error"`
-	Jmx_errors_from    string `json:"jmx_errors_from"`
-	Maintenanceid      string `json:"maintenanceid"`
-	Maintenance_status string `json:"maintenance_status"`
-	Maintenance_type   string `json:"maintenance_type"`
-	Maintenance_from   string `json:"maintenance_from"`
-	Tls_connect        string `json:"tls_connect"`
-	Tls_accept         string `json:"tls_accept"`
-	Tls_issuer         string `json:"tls_issuer"`
-	Tls_subject        string `json:"tls_subject"`
-	Tls_psk_identity   string `json:"tls_psk_identity"`
-	Tls_psk            string `json:"tls_psk"`
-	Uuid               string `json:"uuid"`
+	TemplateId        string            `json:"templateid,omitempty"`
+	Host              string            `json:"host"`
+	Name              string            `json:"name"`
+	Description       string            `json:"description"`
+	ProxyHostid       string            `json:"proxy_hostid"`
+	Status            HostStatus        `json:"status"`
+	Available         string            `json:"available"`
+	DisableUntil      string            `json:"disable_until"`
+	Error             string            `json:"error"`
+	ErrorsFrom        string            `json:"errors_from"`
+	LastAccess        string            `json:"lastaccess"`
+	Flags             string            `json:"flags"`
+	SnmpDisableUntil  string            `json:"snmp_disable_until"`
+	SnmpAvailable     string            `json:"snmp_available"`
+	SnmpErrorsFrom    string            `json:"snmp_errors_from"`
+	SnmpError         string            `json:"snmp_error"`
+	IpmiAuthtype      HostIpmiAuthType  `json:"ipmi_authtype"`
+	IpmiPrivilege     HostIpmiPrivilege `json:"ipmi_privilege"`
+	IpmiUsername      string            `json:"ipmi_username"`
+	IpmiPassword      string            `json:"ipmi_password"`
+	IpmiAvailable     string            `json:"ipmi_available"`
+	IpmiDisableUntil  string            `json:"ipmi_disable_until"`
+	IpmiError         string            `json:"Ipmi_error"`
+	IpmiErrorsFrom    string            `json:"ipmi_errors_from"`
+	JmxAvailable      string            `json:"jmx_available"`
+	JmxDisableUntil   string            `json:"jmx_disable_until"`
+	JmxError          string            `json:"jmx_error"`
+	JmxErrorsFrom     string            `json:"jmx_errors_from"`
+	MaintenanceId     string            `json:"maintenanceid"`
+	MaintenanceStatus string            `json:"maintenance_status"`
+	MaintenanceType   string            `json:"maintenance_type"`
+	MaintenanceFrom   string            `json:"maintenance_from"`
+	TlsConnect        HostTlsMode       `json:"tls_connect"`
+	TlsAccept         HostTlsMode       `json:"tls_accept"`
+	TlsIssuer         string            `json:"tls_issuer"`
+	TlsSubject        string            `json:"tls_subject"`
+	TlsPskIdentity    string            `json:"tls_psk_identity"`
+	TlsPsk            string            `json:"tls_psk"`
+	Uuid              string            `json:"uuid"`
 }
 
 // List is used to retrieve all Templates.

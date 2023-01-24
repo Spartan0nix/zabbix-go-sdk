@@ -11,13 +11,13 @@ type UserMacroService struct {
 	Client *ApiClient
 }
 
-// MacroType define the available macro types.
-type MacroType string
+// UserMacroType define the available macro types.
+type UserMacroType string
 
 const (
-	Text   MacroType = "0"
-	Secret MacroType = "1"
-	Vault  MacroType = "2"
+	Text   UserMacroType = "0"
+	Secret UserMacroType = "1"
+	Vault  UserMacroType = "2"
 )
 
 // HostMacro properties.
@@ -25,12 +25,12 @@ const (
 // and should not be passed as arguments in other methods.
 type HostMacro struct {
 	// ReadOnly
-	Id          string    `json:"hostmacroid,omitempty"`
-	Hostid      string    `json:"hostid,omitempty"`
-	Macro       string    `json:"macro"`
-	Value       string    `json:"value"`
-	Type        MacroType `json:"type,omitempty"`
-	Description string    `json:"description,omitempty"`
+	HostMacroId string        `json:"hostmacroid,omitempty"`
+	HostId      string        `json:"hostid,omitempty"`
+	Macro       string        `json:"macro"`
+	Value       string        `json:"value"`
+	Type        UserMacroType `json:"type,omitempty"`
+	Description string        `json:"description,omitempty"`
 }
 
 // GlobalMacro properties.
@@ -38,21 +38,21 @@ type HostMacro struct {
 // and should not be passed as arguments in other methods.
 type GlobalMacro struct {
 	// ReadOnly
-	Id          string    `json:"globalmacroid,omitempty"`
-	Macro       string    `json:"macro"`
-	Value       string    `json:"value"`
-	Type        MacroType `json:"type,omitempty"`
-	Description string    `json:"description,omitempty"`
+	GlobalMacroId string        `json:"globalmacroid,omitempty"`
+	Macro         string        `json:"macro"`
+	Value         string        `json:"value"`
+	Type          UserMacroType `json:"type,omitempty"`
+	Description   string        `json:"description,omitempty"`
 }
 
 // HostMacroResponse define the server response format for HostMacro methods.
 type HostMacroResponse struct {
-	Hostmacroids []string `json:"hostmacroids"`
+	HostMacroIds []string `json:"hostmacroids"`
 }
 
 // GlobalMacroResponse define the server response format for GlobalMacro methods.
 type GlobalMacroResponse struct {
-	Globalmacroids []string `json:"globalmacroids"`
+	GlobalMacroIds []string `json:"globalmacroids"`
 }
 
 // ValidateMacro is used to validate HostMacro format compliance.
@@ -77,9 +77,12 @@ func (g *GlobalMacro) ValidateMacro() error {
 
 // Create is used to create a new HostMacro.
 func (u *UserMacroService) Create(h *HostMacro) (*HostMacroResponse, error) {
-	if h.Hostid == "" {
+	if h.HostId == "" {
 		return nil, fmt.Errorf("missing required field 'HostId' in the given object.\nObject passed : %v", h)
 	}
+
+	// Prevent user from sending an Id when creating an HostMacro
+	h.HostMacroId = ""
 
 	if err := h.ValidateMacro(); err != nil {
 		return nil, err
@@ -111,6 +114,9 @@ func (u *UserMacroService) CreateGlobal(g *GlobalMacro) (*GlobalMacroResponse, e
 	if err := g.ValidateMacro(); err != nil {
 		return nil, err
 	}
+
+	// Prevent user from sending an Id when creating a GlobalMacro
+	g.GlobalMacroId = ""
 
 	req := u.Client.NewRequest("usermacro.createglobal", g)
 
@@ -172,34 +178,34 @@ func (u *UserMacroService) DeleteGlobal(ids []string) (*GlobalMacroResponse, err
 // UserMacroGetParameters define the properties used to search Macro(s)
 // Properties using the 'omitempty' json parameters are optional
 type UserMacroGetParameters struct {
-	Globalmacro            bool        `json:"globalmacro,omitempty"`
-	Globalmacroids         []string    `json:"globalmacroids,omitempty"`
-	Groupids               []string    `json:"groupids,omitempty"`
-	Hostids                []string    `json:"hostids,omitempty"`
-	Hostmacroids           []string    `json:"hostmacroids,omitempty"`
+	GlobalMacro            bool        `json:"globalmacro,omitempty"`
+	GlobalMacroIds         []string    `json:"globalmacroids,omitempty"`
+	GroupIds               []string    `json:"groupids,omitempty"`
+	HostIds                []string    `json:"hostids,omitempty"`
+	HostMacroIds           []string    `json:"hostmacroids,omitempty"`
 	Inherited              bool        `json:"inherited,omitempty"`
 	SelectHostGroups       interface{} `json:"selectHostGroups,omitempty"`
 	SelectHosts            interface{} `json:"selectHosts,omitempty"`
 	SelectTemplateGroups   interface{} `json:"selectTemplateGroups,omitempty"`
 	SelectTemplates        interface{} `json:"selectTemplates,omitempty"`
-	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortField              []string    `json:"sortfield,omitempty"`
 	CountOutput            bool        `json:"countOutput,omitempty"`
 	Editable               bool        `json:"editable,omitempty"`
 	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
 	Filter                 interface{} `json:"filter,omitempty"`
 	Limit                  int         `json:"limit,omitempty"`
 	Output                 interface{} `json:"output,omitempty"`
-	Preservekeys           bool        `json:"preservekeys,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
 	Search                 interface{} `json:"search,omitempty"`
 	SearchByAny            bool        `json:"searchByAny,omitempty"`
 	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
-	Sortorder              []string    `json:"sortorder,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
 	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
 // Get is used to retrieve one or multiples HostMacros matching the given criteria(s).
 func (u *UserMacroService) Get(p *UserMacroGetParameters) ([]*HostMacro, error) {
-	p.Globalmacro = false
+	p.GlobalMacro = false
 
 	req := u.Client.NewRequest("usermacro.get", p)
 
@@ -219,7 +225,7 @@ func (u *UserMacroService) Get(p *UserMacroGetParameters) ([]*HostMacro, error) 
 
 // GetGlobal is used to retrieve one or multiples GlobalMacros matching the given criteria(s).
 func (u *UserMacroService) GetGlobal(p *UserMacroGetParameters) ([]*GlobalMacro, error) {
-	p.Globalmacro = true
+	p.GlobalMacro = true
 
 	req := u.Client.NewRequest("usermacro.get", p)
 
@@ -237,15 +243,21 @@ func (u *UserMacroService) GetGlobal(p *UserMacroGetParameters) ([]*GlobalMacro,
 	return r, nil
 }
 
+type HostMacroUpdateParameters struct {
+	HostMacroId string        `json:"hostmacroid"`
+	Macro       string        `json:"macro,omitempty"`
+	Value       string        `json:"value,omitempty"`
+	Type        UserMacroType `json:"type,omitempty"`
+	Description string        `json:"description,omitempty"`
+}
+
 // Update is used to update or overwrite properties from an existing HostMacro.
-func (u *UserMacroService) Update(h *HostMacro) (*HostMacroResponse, error) {
-	if h.Id == "" {
-		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", h)
+func (u *UserMacroService) Update(p *HostMacroUpdateParameters) (*HostMacroResponse, error) {
+	if p.HostMacroId == "" {
+		return nil, fmt.Errorf("missing required field 'HostMacroId' in the given object.\nObject passed : %v", p)
 	}
 
-	h.Hostid = ""
-
-	req := u.Client.NewRequest("usermacro.update", h)
+	req := u.Client.NewRequest("usermacro.update", p)
 
 	res, err := u.Client.Post(req)
 	if err != nil {
@@ -261,13 +273,21 @@ func (u *UserMacroService) Update(h *HostMacro) (*HostMacroResponse, error) {
 	return &r, nil
 }
 
+type GlobalMacroUpdateParameters struct {
+	GlobalMacroId string        `json:"globalmacroid"`
+	Macro         string        `json:"macro,omitempty"`
+	Value         string        `json:"value,omitempty"`
+	Type          UserMacroType `json:"type,omitempty"`
+	Description   string        `json:"description,omitempty"`
+}
+
 // UpdateGlobal is used to update or overwrite properties from an existing GlobalMacro.
-func (u *UserMacroService) UpdateGlobal(m *GlobalMacro) (*GlobalMacroResponse, error) {
-	if m.Id == "" {
-		return nil, fmt.Errorf("missing required field 'Id' in the given object.\nObject passed : %v", m)
+func (u *UserMacroService) UpdateGlobal(p *GlobalMacroUpdateParameters) (*GlobalMacroResponse, error) {
+	if p.GlobalMacroId == "" {
+		return nil, fmt.Errorf("missing required field 'GlobalMacroId' in the given object.\nObject passed : %v", p)
 	}
 
-	req := u.Client.NewRequest("usermacro.updateglobal", m)
+	req := u.Client.NewRequest("usermacro.updateglobal", p)
 
 	res, err := u.Client.Post(req)
 	if err != nil {

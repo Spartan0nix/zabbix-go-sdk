@@ -1,11 +1,15 @@
 package zabbixgosdk
 
-import "testing"
+import (
+	"testing"
+)
 
 const (
 	hostGroupName        = "test-host-group"
 	updatedHostGroupName = "test-host-group-update"
 )
+
+var hostGroupId string
 
 func TestHostGroupCreate(t *testing.T) {
 	client, err := NewTestingService()
@@ -19,9 +23,11 @@ func TestHostGroupCreate(t *testing.T) {
 		t.Fatalf("Error when creating host group '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	if g.Groupids == nil {
-		t.Fatalf("Create method should returned a list with the Id of the new host group.\nAn empty list was returned.")
+	if g.GroupIds == nil {
+		t.Fatalf("Create method should returned a list with the id of the new host groups.\nAn empty list was returned.")
 	}
+
+	hostGroupId = g.GroupIds[0]
 }
 
 func TestHostGroupList(t *testing.T) {
@@ -48,8 +54,10 @@ func TestHostGroupGet(t *testing.T) {
 	}
 
 	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		Filter: map[string]string{
-			"name": hostGroupName,
+		CommonGetParameters: CommonGetParameters{
+			Filter: map[string]string{
+				"name": hostGroupName,
+			},
 		},
 	})
 
@@ -57,8 +65,12 @@ func TestHostGroupGet(t *testing.T) {
 		t.Fatalf("Error when getting host group '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	if g[0].Name != hostGroupName {
-		t.Fatalf("Wrong host returned.\nRequested name : %s\nName returned : %s", hostGroupName, g[0].Name)
+	if g == nil {
+		t.Fatalf("Get method should returned a list of host groups matching the given criteria.\nAn empty list was returned.")
+	}
+
+	if g[0].Id != hostGroupId {
+		t.Fatalf("Wrong host group returned.\nxpected Id : %s\nId returned : %s", hostGroupId, g[0].Id)
 	}
 }
 
@@ -68,35 +80,29 @@ func TestHostGroupMassAdd(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		Filter: map[string]string{
-			"name": "Templates",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting host group 'Templates'.\nReason : %v", err)
-	}
-
-	mass_add_g, err := client.HostGroup.MassAdd(&HostGroupMassAddParameters{
+	g, err := client.HostGroup.MassAdd(&HostGroupMassAddParameters{
 		Groups: []*HostGroupId{
 			{
-				Groupid: g[0].Id,
+				GroupId: hostGroupId,
 			},
 		},
 		Hosts: []*HostId{
 			{
-				Hostid: "10084",
+				HostId: "10084",
 			},
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass adding host group.\nHost group : %s\nHost : %s\nReason : %v", g[0].Name, "10084", err)
+		t.Fatalf("Error when mass adding host group.\nHost group : %s\nHost : %s\nReason : %v", hostGroupId, "10084", err)
 	}
 
-	if mass_add_g == nil {
-		t.Fatal("MassAdd method should returned a list of the updated host group(s).\nAn empty list was returned.")
+	if g == nil {
+		t.Fatal("MassAdd method should returned a list of the updated host groups.\nAn empty list was returned.")
+	}
+
+	if g.GroupIds[0] != hostGroupId {
+		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
@@ -106,19 +112,9 @@ func TestHostGroupMassRemove(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		Filter: map[string]string{
-			"name": "Templates",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting host group 'Templates'.\nReason : %v", err)
-	}
-
-	mass_rm_g, err := client.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
+	g, err := client.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
 		GroupsIds: []string{
-			g[0].Id,
+			hostGroupId,
 		},
 		HostIds: []string{
 			"10084",
@@ -126,11 +122,15 @@ func TestHostGroupMassRemove(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass removing host group.\nHost group : %s\nHosts : %s \nReason : %v", g[0].Name, "10084", err)
+		t.Fatalf("Error when mass removing host group.\nHost group : %s\nHosts : %s \nReason : %v", hostGroupId, "10084", err)
 	}
 
-	if mass_rm_g == nil {
-		t.Fatal("MassRemove method should returned a list of the removed host group(s).\nAn empty list was returned.")
+	if g == nil {
+		t.Fatal("MassRemove method should returned a list of the updated host groups.\nAn empty list was returned.")
+	}
+
+	if g.GroupIds[0] != hostGroupId {
+		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
@@ -140,36 +140,48 @@ func TestHostGroupMassUpdate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		Filter: map[string]string{
-			"name": "Templates",
-		},
-	})
-
 	if err != nil {
 		t.Fatalf("Error when getting host group 'Templates'.\nReason : %v", err)
 	}
 
-	mass_rm_g, err := client.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
+	template, err := client.Template.Get(&TemplateGetParameters{
+		Filter: map[string]string{
+			"name": "Zabbix server health",
+		},
+	})
+
+	if err != nil {
+		t.Fatalf("Error when retrieving template 'Zabbix server health'.\nReason : %v", err)
+	}
+
+	g, err := client.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
 		Groups: []*HostGroupId{
 			{
-				Groupid: g[0].Id,
+				GroupId: hostGroupId,
 			},
 		},
 		Hosts: []*HostId{
 			{
-				Hostid: "10084",
+				HostId: "10084",
 			},
 		},
-		Templates: []*TemplateId{},
+		Templates: []*TemplateId{
+			{
+				Id: template[0].TemplateId,
+			},
+		},
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass updating host group.\nHost group : %s\nHosts : %s \nReason : %v", g[0].Name, "10084", err)
+		t.Fatalf("Error when mass updating host group.\nHost group : %s\nHosts : %s\nTemplate : %s\nReason : %v", hostGroupId, "10084", template[0].TemplateId, err)
 	}
 
-	if mass_rm_g == nil {
+	if g == nil {
 		t.Fatal("MassUpdate method should returned a list of the updated host group(s).\nAn empty list was returned.")
+	}
+
+	if g.GroupIds[0] != hostGroupId {
+		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
@@ -179,29 +191,18 @@ func TestHostGroupUpdate(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		Filter: map[string]string{
-			"name": hostGroupName,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting host group '%s'.\nReason : %v", hostGroupName, err)
-	}
-
-	if g[0].Name != hostGroupName {
-		t.Fatalf("Wrong host returned.\nRequested name : %s\nName returned : %s", hostGroupName, g[0].Name)
-	}
-
-	updated_g, err := client.HostGroup.Update(g[0].Id, updatedHostGroupName)
+	g, err := client.HostGroup.Update(hostGroupId, updatedHostGroupName)
 	if err != nil {
 		t.Fatalf("Error when updating host group '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	if updated_g.Groupids == nil {
-		t.Fatal("Update method should returned a list of with the updated host group id.\nAn empty list was returned.")
+	if g == nil {
+		t.Fatal("Update method should returned a list of the updated host group.\nAn empty list was returned.")
 	}
 
+	if g.GroupIds[0] != hostGroupId {
+		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
+	}
 }
 
 func TestHostGroupDelete(t *testing.T) {
@@ -210,29 +211,19 @@ func TestHostGroupDelete(t *testing.T) {
 		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		Filter: map[string]string{
-			"name": updatedHostGroupName,
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting host group '%s'.\nReason : %v", hostGroupName, err)
-	}
-
-	if g[0].Name != updatedHostGroupName {
-		t.Fatalf("Wrong host returned.\nRequested name : %s\nName returned : %s", updatedHostGroupName, g[0].Name)
-	}
-
-	deleted_g, err := client.HostGroup.Delete([]string{
-		g[0].Id,
+	g, err := client.HostGroup.Delete([]string{
+		hostGroupId,
 	})
 
 	if err != nil {
 		t.Fatalf("Error when deleting host group '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	if deleted_g.Groupids == nil {
-		t.Fatalf("Delete method should returned a list with the Ids of the deleted host groups.\nAn empty list was returned.")
+	if g.GroupIds == nil {
+		t.Fatalf("Delete method should returned a list with the id of the deleted host groups.\nAn empty list was returned.")
+	}
+
+	if g.GroupIds[0] != hostGroupId {
+		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
 	}
 }

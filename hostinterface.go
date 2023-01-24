@@ -28,79 +28,94 @@ type HostInterfaceAuthProtocol string
 // HostInterfacePrivProtocol define the available SNMPv3 encryption (priv) protocols.
 type HostInterfacePrivProtocol string
 
+// HostInterfaceUseIp define the DNS or IP should be used to connect with the host
+type HostInterfaceUseIp string
+
+// HostInterfaceBulkRequest define if bulk request should be used or not
+type HostInterfaceBulkRequest string
+
+// HostInterfaceAvailability define if the interface is available or not
+type HostInterfaceAvailability string
+
 const (
-	NotDefault HostInterfaceMain = "0"
-	Default    HostInterfaceMain = "1"
+	HostInterfaceNotDefault HostInterfaceMain = "0"
+	HostInterfaceDefault    HostInterfaceMain = "1"
 
-	Agent HostInterfaceType = "1"
-	SNMP  HostInterfaceType = "2"
-	IPMI  HostInterfaceType = "3"
-	JMX   HostInterfaceType = "4"
+	HostInterfaceAgent HostInterfaceType = "1"
+	HostInterfaceSNMP  HostInterfaceType = "2"
+	HostInterfaceIPMI  HostInterfaceType = "3"
+	HostInterfaceJMX   HostInterfaceType = "4"
 
-	SNMPv1  HostInterfaceVersion = "1"
-	SNMPv2c HostInterfaceVersion = "2"
-	SNMPv3  HostInterfaceVersion = "3"
+	HostInterfaceSNMPv1  HostInterfaceVersion = "1"
+	HostInterfaceSNMPv2c HostInterfaceVersion = "2"
+	HostInterfaceSNMPv3  HostInterfaceVersion = "3"
 
-	NoAuthNoPriv HostInterfaceSecurityLevel = "0"
-	AuthNoPriv   HostInterfaceSecurityLevel = "1"
-	AuthPriv     HostInterfaceSecurityLevel = "3"
+	HostInterfaceNoAuthNoPriv HostInterfaceSecurityLevel = "0"
+	HostInterfaceAuthNoPriv   HostInterfaceSecurityLevel = "1"
+	HostInterfaceAuthPriv     HostInterfaceSecurityLevel = "3"
 
-	MD5     HostInterfaceAuthProtocol = "0"
-	SHA1    HostInterfaceAuthProtocol = "1"
-	SHA224  HostInterfaceAuthProtocol = "2"
-	SHA256  HostInterfaceAuthProtocol = "3"
-	SHA384  HostInterfaceAuthProtocol = "4"
-	SHA512  HostInterfaceAuthProtocol = "5"
-	DES     HostInterfacePrivProtocol = "0"
-	AES128  HostInterfacePrivProtocol = "1"
-	AES192  HostInterfacePrivProtocol = "2"
-	AES256  HostInterfacePrivProtocol = "3"
-	AES192C HostInterfacePrivProtocol = "4"
-	AES256C HostInterfacePrivProtocol = "5"
+	HostInterfaceMD5    HostInterfaceAuthProtocol = "0"
+	HostInterfaceSHA1   HostInterfaceAuthProtocol = "1"
+	HostInterfaceSHA224 HostInterfaceAuthProtocol = "2"
+	HostInterfaceSHA256 HostInterfaceAuthProtocol = "3"
+	HostInterfaceSHA384 HostInterfaceAuthProtocol = "4"
+	HostInterfaceSHA512 HostInterfaceAuthProtocol = "5"
+
+	HostInterfaceDES     HostInterfacePrivProtocol = "0"
+	HostInterfaceAES128  HostInterfacePrivProtocol = "1"
+	HostInterfaceAES192  HostInterfacePrivProtocol = "2"
+	HostInterfaceAES256  HostInterfacePrivProtocol = "3"
+	HostInterfaceAES192C HostInterfacePrivProtocol = "4"
+	HostInterfaceAES256C HostInterfacePrivProtocol = "5"
+
+	HostInterfaceDns HostInterfaceUseIp = "0"
+	HostInterfaceIp  HostInterfaceUseIp = "1"
+
+	HostInterfaceBulkFalse HostInterfaceBulkRequest = "0"
+	HostInterfaceBulkTrue  HostInterfaceBulkRequest = "1"
+
+	HostInterfaceUnknown     HostInterfaceAvailability = "0"
+	HostInterfaceAvailable   HostInterfaceAvailability = "1"
+	HostInterfaceUnavailable HostInterfaceAvailability = "2"
 )
 
 // HostInterface details properties for SNMP interface.
 // Properties using the 'omitempty' json parameters are optional
 type HostInterfaceDetail struct {
-	Version HostInterfaceVersion `json:"version"`
-	// Whether to use bulk SNMP requests.
-	//
-	// 0 = Don't use bulk requests.
-	//
-	// 1 = Use bulk requests (default).
-	Bulk           string                     `json:"bulk,omitempty"`
+	Version        HostInterfaceVersion       `json:"version,omitempty"`
+	Bulk           HostInterfaceBulkRequest   `json:"bulk,omitempty"`
 	Community      string                     `json:"community,omitempty"`
-	Securityname   string                     `json:"securityname,omitempty"`
-	Securitylevel  HostInterfaceSecurityLevel `json:"securitylevel,omitempty"`
-	Authpassphrase string                     `json:"authpassphrase,omitempty"`
-	Privpassphrase string                     `json:"privpassphrase,omitempty"`
-	Authprotocol   HostInterfaceAuthProtocol  `json:"authprotocol,omitempty"`
-	Privprotocol   HostInterfacePrivProtocol  `json:"privprotocol,omitempty"`
-	Contextname    string                     `json:"contextname,omitempty"`
+	SecurityName   string                     `json:"securityname,omitempty"`
+	SecurityLevel  HostInterfaceSecurityLevel `json:"securitylevel,omitempty"`
+	AuthPassPhrase string                     `json:"authpassphrase,omitempty"`
+	PrivPassPhrase string                     `json:"privpassphrase,omitempty"`
+	AuthProtocol   HostInterfaceAuthProtocol  `json:"authprotocol,omitempty"`
+	PrivProtocol   HostInterfacePrivProtocol  `json:"privprotocol,omitempty"`
+	ContextName    string                     `json:"contextname,omitempty"`
 }
 
 // HostInterface properties.
 // Some properties are read-only, which means they are only accessible after creation
 // and should not be passed as arguments in other methods.
 type HostInterface struct {
-	Hostid  string               `json:"hostid,omitempty"`
-	Ip      string               `json:"ip"`
-	Dns     string               `json:"dns"`
-	Main    HostInterfaceMain    `json:"main"`
-	Port    string               `json:"port"`
-	Type    HostInterfaceType    `json:"type"`
-	Useip   string               `json:"useip"`
-	Details *HostInterfaceDetail `json:"details,omitempty"`
 	// ReadOnly
-	Available string `json:"available,omitempty"`
+	InterfaceId string               `json:"interfaceid,omitempty"`
+	HostId      string               `json:"hostid,omitempty"`
+	Ip          string               `json:"ip"`
+	Dns         string               `json:"dns"`
+	Main        HostInterfaceMain    `json:"main"`
+	Port        string               `json:"port"`
+	Type        HostInterfaceType    `json:"type"`
+	UseIp       HostInterfaceUseIp   `json:"useip"`
+	Details     *HostInterfaceDetail `json:"details,omitempty"`
 	// ReadOnly
-	Disable_until string `json:"disable_until,omitempty"`
+	Available HostInterfaceAvailability `json:"available,omitempty"`
+	// ReadOnly
+	DisableUntil string `json:"disable_until,omitempty"`
 	// ReadOnly
 	Error string `json:"error,omitempty"`
 	// ReadOnly
-	Errors_from string `json:"errors_from,omitempty"`
-	// ReadOnly
-	Interfaceid string `json:"interfaceid,omitempty"`
+	ErrorsFrom string `json:"errors_from,omitempty"`
 }
 
 // HostInterfaceResponse define the server response format for HostInterface methods.
@@ -111,35 +126,35 @@ type HostInterfaceResponse struct {
 // convertToHostInterface is used to convert a hostInterfaceGetResponse in an HostInterface struc
 func (h *hostInterfaceGetResponse) convertToHostInterface() (*HostInterface, error) {
 	host := &HostInterface{
-		Hostid:        h.Hostid,
-		Ip:            h.Ip,
-		Dns:           h.Dns,
-		Main:          h.Main,
-		Port:          h.Port,
-		Type:          h.Type,
-		Useip:         h.Useip,
-		Available:     h.Available,
-		Disable_until: h.Disable_until,
-		Error:         h.Error,
-		Errors_from:   h.Errors_from,
-		Interfaceid:   h.Interfaceid,
+		HostId:       h.HostId,
+		Ip:           h.Ip,
+		Dns:          h.Dns,
+		Main:         h.Main,
+		Port:         h.Port,
+		Type:         h.Type,
+		UseIp:        h.UseIp,
+		Available:    h.Available,
+		DisableUntil: h.DisableUntil,
+		Error:        h.Error,
+		ErrorsFrom:   h.ErrorsFrom,
+		InterfaceId:  h.InterfaceId,
 	}
 
 	if string(h.Details) != "[]" {
-		detail := HostInterfaceDetail{}
-		if err := json.Unmarshal(h.Details, &detail); err != nil {
+		details := HostInterfaceDetail{}
+		if err := json.Unmarshal(h.Details, &details); err != nil {
 			return nil, err
 		}
 
-		host.Details = &detail
+		host.Details = &details
 	}
 
 	return host, nil
 }
 
 // ValidateSNMP help to verify that the 'Details' property is set when configuring SNMP interface.
-func (h *HostInterface) ValidateSNMP() error {
-	if h.Type == SNMP {
+func (h *HostInterfaceCreateParameters) ValidateSNMP() error {
+	if h.Type == HostInterfaceSNMP {
 		if h.Details == nil {
 			return fmt.Errorf("missing required field 'details' for hostInterface of type SNMP.\nObject passed : %v", h)
 		}
@@ -147,8 +162,19 @@ func (h *HostInterface) ValidateSNMP() error {
 	return nil
 }
 
+type HostInterfaceCreateParameters struct {
+	HostId  string               `json:"hostid"`
+	Ip      string               `json:"ip"`
+	Dns     string               `json:"dns"`
+	Main    HostInterfaceMain    `json:"main"`
+	Port    string               `json:"port"`
+	Type    HostInterfaceType    `json:"type"`
+	UseIp   HostInterfaceUseIp   `json:"useip"`
+	Details *HostInterfaceDetail `json:"details,omitempty"`
+}
+
 // Create is used to create a new HostInterface.
-func (h *HostInterfaceService) Create(p *HostInterface) (*HostInterfaceResponse, error) {
+func (h *HostInterfaceService) Create(p *HostInterfaceCreateParameters) (*HostInterfaceResponse, error) {
 	// Validate configuration when creating SNMP interface.
 	if err := p.ValidateSNMP(); err != nil {
 		return nil, err
@@ -191,43 +217,32 @@ func (h *HostInterfaceService) Delete(ids []string) (*HostInterfaceResponse, err
 // HostInterfaceGetParameters define the properties used to search HostInterface(s)
 // Properties using the 'omitempty' json parameters are optional
 type HostInterfaceGetParameters struct {
-	Hostids                []string    `json:"hostids,omitempty"`
-	Interfaceids           []string    `json:"interfaceids,omitempty"`
-	Itemids                []string    `json:"itemids,omitempty"`
-	Triggerids             []string    `json:"triggerids,omitempty"`
-	SelectItems            interface{} `json:"selectItems,omitempty"`
-	SelectHosts            interface{} `json:"selectHosts,omitempty"`
-	LimitSelects           int         `json:"limitSelects,omitempty"`
-	Sortfield              []string    `json:"sortfield,omitempty"`
-	CountOutput            bool        `json:"countOutput,omitempty"`
-	Editable               bool        `json:"editable,omitempty"`
-	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
-	Filter                 interface{} `json:"filter,omitempty"`
-	Limit                  int         `json:"limit,omitempty"`
-	Output                 interface{} `json:"output,omitempty"`
-	Preservekeys           bool        `json:"preservekeys,omitempty"`
-	Search                 interface{} `json:"search,omitempty"`
-	SearchByAny            bool        `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
-	Sortorder              []string    `json:"sortorder,omitempty"`
-	StartSearch            bool        `json:"startSearch,omitempty"`
+	HostIds      []string    `json:"hostids,omitempty"`
+	InterfaceIds []string    `json:"interfaceids,omitempty"`
+	ItemIds      []string    `json:"itemids,omitempty"`
+	TriggerIds   []string    `json:"triggerids,omitempty"`
+	SelectItems  interface{} `json:"selectItems,omitempty"`
+	SelectHosts  interface{} `json:"selectHosts,omitempty"`
+	LimitSelects string      `json:"limitSelects,omitempty"`
+	SortField    []string    `json:"sortfield,omitempty"`
+	CommonGetParameters
 }
 
 // hostInterfaceGetResponse define the server response format for the Get method.
 type hostInterfaceGetResponse struct {
-	Hostid        string            `json:"hostid"`
-	Ip            string            `json:"ip"`
-	Dns           string            `json:"dns"`
-	Main          HostInterfaceMain `json:"main"`
-	Port          string            `json:"port"`
-	Type          HostInterfaceType `json:"type"`
-	Useip         string            `json:"useip"`
-	Details       json.RawMessage   `json:"details,omitempty"`
-	Available     string            `json:"available,omitempty"`
-	Disable_until string            `json:"disable_until,omitempty"`
-	Error         string            `json:"error,omitempty"`
-	Errors_from   string            `json:"errors_from,omitempty"`
-	Interfaceid   string            `json:"interfaceid,omitempty"`
+	HostId       string                    `json:"hostid"`
+	Ip           string                    `json:"ip"`
+	Dns          string                    `json:"dns"`
+	Main         HostInterfaceMain         `json:"main"`
+	Port         string                    `json:"port"`
+	Type         HostInterfaceType         `json:"type"`
+	UseIp        HostInterfaceUseIp        `json:"useip"`
+	Details      json.RawMessage           `json:"details,omitempty"`
+	Available    HostInterfaceAvailability `json:"available,omitempty"`
+	DisableUntil string                    `json:"disable_until,omitempty"`
+	Error        string                    `json:"error,omitempty"`
+	ErrorsFrom   string                    `json:"errors_from,omitempty"`
+	InterfaceId  string                    `json:"interfaceid,omitempty"`
 }
 
 // Get is used to retrieve one or multiples HostInterfaces matching the given criteria(s).
@@ -266,7 +281,7 @@ type HostInterfaceMassProperties struct {
 	Main    HostInterfaceMain    `json:"main"`
 	Port    string               `json:"port"`
 	Type    HostInterfaceType    `json:"type"`
-	Useip   string               `json:"useip"`
+	UseIp   HostInterfaceUseIp   `json:"useip"`
 	Details *HostInterfaceDetail `json:"details,omitempty"`
 }
 
@@ -350,20 +365,20 @@ func (h *HostInterfaceService) ReplaceHostInterfaces(p *HostInterfaceReplacePara
 // HostInterfaceUpdateParameters define the properties needed for the Update method.
 // Properties using the 'omitempty' json parameters are optional.
 type HostInterfaceUpdateParameters struct {
-	Interfaceid string               `json:"interfaceid"`
+	InterfaceId string               `json:"interfaceid"`
 	Ip          string               `json:"ip,omitempty"`
 	Dns         string               `json:"dns,omitempty"`
 	Main        HostInterfaceMain    `json:"main,omitempty"`
 	Port        string               `json:"port,omitempty"`
 	Type        HostInterfaceType    `json:"type,omitempty"`
-	Useip       string               `json:"useip,omitempty"`
+	UseIp       HostInterfaceUseIp   `json:"useip,omitempty"`
 	Details     *HostInterfaceDetail `json:"details,omitempty"`
 }
 
 // Update is used to update or overwrite HostInterfaces from an existing Hosts.
 func (h *HostInterfaceService) Update(p *HostInterfaceUpdateParameters) (*HostInterfaceResponse, error) {
-	if p.Interfaceid == "" {
-		return nil, fmt.Errorf("property 'Interfaceid' must be set in order to update an host interface.\nObject passed : %v", p)
+	if p.InterfaceId == "" {
+		return nil, fmt.Errorf("property 'InterfaceId' must be set in order to update an host interface.\nObject passed : %v", p)
 	}
 
 	req := h.Client.NewRequest("hostinterface.update", p)
