@@ -5,6 +5,9 @@ type HostService struct {
 	Client *ApiClient
 }
 
+// HostFlag define the origin of the host.
+type HostFlag string
+
 // HostInventoryMode define the available inventory modes.
 type HostInventoryMode string
 
@@ -13,6 +16,12 @@ type HostIpmiAuthType string
 
 // HostIpmiPrivilege define the available ipmi privilege modes.
 type HostIpmiPrivilege string
+
+// HostMaintenanceStatus define the status of maintenance on the host.
+type HostMaintenanceStatus string
+
+// HostMaintenanceType define the type of maintenance of the host.
+type HostMaintenanceType string
 
 // HostStatus define the available host status.
 type HostStatus string
@@ -30,6 +39,9 @@ type HostEvalType string
 type HostTags string
 
 const (
+	HostPlain      HostFlag = "0"
+	HostDiscovered HostFlag = "4"
+
 	HostDisabled  HostInventoryMode = "-1"
 	HostManual    HostInventoryMode = "0"
 	HostAutomatic HostInventoryMode = "1"
@@ -47,6 +59,12 @@ const (
 	HostOperator HostIpmiPrivilege = "3"
 	HostAdmin    HostIpmiPrivilege = "4"
 	HostOEM      HostIpmiPrivilege = "5"
+
+	HostNoMaintenance       HostMaintenanceStatus = "0"
+	HostMaintenanceInEffect HostMaintenanceStatus = "1"
+
+	HostMaintenanceWithDataCollection    HostMaintenanceType = "0"
+	HostMaintenanceWithoutDataCollection HostMaintenanceType = "1"
 
 	HostMonitored   HostStatus = "0"
 	HostUnmonitored HostStatus = "1"
@@ -147,7 +165,7 @@ type Host struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	// ReadOnly
-	Flags         string            `json:"flags"`
+	Flags         HostFlag          `json:"flags"`
 	InventoryMode HostInventoryMode `json:"inventory_mode"`
 	IpmiAuthType  HostIpmiAuthType  `json:"ipmi_authtype"`
 	IpmiPassword  string            `json:"ipmi_password"`
@@ -156,9 +174,9 @@ type Host struct {
 	// ReadOnly
 	MaintenanceFrom string `json:"maintenance_from"`
 	// ReadOnly
-	MaintenanceStatus string `json:"maintenance_status"`
+	MaintenanceStatus HostMaintenanceStatus `json:"maintenance_status"`
 	// ReadOnly
-	MaintenanceType string `json:"maintenance_type"`
+	MaintenanceType HostMaintenanceType `json:"maintenance_type"`
 	// ReadOnly
 	MaintenanceId  string      `json:"maintenanceid"`
 	ProxyHostId    string      `json:"proxy_hostid"`
@@ -300,20 +318,11 @@ type HostGetParameters struct {
 	SelectTriggers                interface{}  `json:"selectTriggers,omitempty"`
 	SelectValueMaps               interface{}  `json:"selectValueMaps,omitempty"`
 	Filter                        interface{}  `json:"filter,omitempty"`
-	LimitSelects                  int          `json:"limitSelects,omitempty"`
+	LimitSelects                  string       `json:"limitSelects,omitempty"`
 	Search                        interface{}  `json:"search,omitempty"`
 	SearchInventory               interface{}  `json:"searchInventory,omitempty"`
 	Sortfield                     []string     `json:"sortfield,omitempty"`
-	CountOutput                   bool         `json:"countOutput,omitempty"`
-	Editable                      bool         `json:"editable,omitempty"`
-	ExcludeSearch                 bool         `json:"excludeSearch,omitempty"`
-	Limit                         int          `json:"limit,omitempty"`
-	Output                        interface{}  `json:"output,omitempty"`
-	PreserveKeys                  bool         `json:"preservekeys,omitempty"`
-	SearchByAny                   bool         `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled        bool         `json:"searchWildcardsEnabled,omitempty"`
-	SortOrder                     []string     `json:"sortorder,omitempty"`
-	StartSearch                   bool         `json:"startSearch,omitempty"`
+	CommonGetParameters
 }
 
 // Get is used to retrieve one or multiples Hosts matching the given criteria(s).
@@ -414,7 +423,7 @@ type HostMassUpdateParameters struct {
 	Groups         []*HostGroupId           `json:"groups,omitempty"`
 	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
 	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
-	Macros         []string                 `json:"macros,omitempty"`
+	Macros         []*HostMacro             `json:"macros,omitempty"`
 	Templates      []*TemplateId            `json:"templates,omitempty"`
 	TemplatesClear []*TemplateId            `json:"templates_clear,omitempty"`
 }
@@ -461,7 +470,7 @@ type HostUpdateParameters struct {
 	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
 	Tags           []*HostTag               `json:"tags,omitempty"`
 	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
-	Macros         []string                 `json:"macros,omitempty"`
+	Macros         []*HostMacro             `json:"macros,omitempty"`
 	Templates      []*TemplateId            `json:"templates,omitempty"`
 	TemplatesClear []*TemplateId            `json:"templates_clear,omitempty"`
 }

@@ -34,6 +34,9 @@ type HostInterfaceUseIp string
 // HostInterfaceBulkRequest define if bulk request should be used or not
 type HostInterfaceBulkRequest string
 
+// HostInterfaceAvailability define if the interface is available or not
+type HostInterfaceAvailability string
+
 const (
 	HostInterfaceNotDefault HostInterfaceMain = "0"
 	HostInterfaceDefault    HostInterfaceMain = "1"
@@ -51,12 +54,13 @@ const (
 	HostInterfaceAuthNoPriv   HostInterfaceSecurityLevel = "1"
 	HostInterfaceAuthPriv     HostInterfaceSecurityLevel = "3"
 
-	HostInterfaceMD5     HostInterfaceAuthProtocol = "0"
-	HostInterfaceSHA1    HostInterfaceAuthProtocol = "1"
-	HostInterfaceSHA224  HostInterfaceAuthProtocol = "2"
-	HostInterfaceSHA256  HostInterfaceAuthProtocol = "3"
-	HostInterfaceSHA384  HostInterfaceAuthProtocol = "4"
-	HostInterfaceSHA512  HostInterfaceAuthProtocol = "5"
+	HostInterfaceMD5    HostInterfaceAuthProtocol = "0"
+	HostInterfaceSHA1   HostInterfaceAuthProtocol = "1"
+	HostInterfaceSHA224 HostInterfaceAuthProtocol = "2"
+	HostInterfaceSHA256 HostInterfaceAuthProtocol = "3"
+	HostInterfaceSHA384 HostInterfaceAuthProtocol = "4"
+	HostInterfaceSHA512 HostInterfaceAuthProtocol = "5"
+
 	HostInterfaceDES     HostInterfacePrivProtocol = "0"
 	HostInterfaceAES128  HostInterfacePrivProtocol = "1"
 	HostInterfaceAES192  HostInterfacePrivProtocol = "2"
@@ -69,6 +73,10 @@ const (
 
 	HostInterfaceBulkFalse HostInterfaceBulkRequest = "0"
 	HostInterfaceBulkTrue  HostInterfaceBulkRequest = "1"
+
+	HostInterfaceUnknown     HostInterfaceAvailability = "0"
+	HostInterfaceAvailable   HostInterfaceAvailability = "1"
+	HostInterfaceUnavailable HostInterfaceAvailability = "2"
 )
 
 // HostInterface details properties for SNMP interface.
@@ -101,7 +109,7 @@ type HostInterface struct {
 	UseIp       HostInterfaceUseIp   `json:"useip"`
 	Details     *HostInterfaceDetail `json:"details,omitempty"`
 	// ReadOnly
-	Available string `json:"available,omitempty"`
+	Available HostInterfaceAvailability `json:"available,omitempty"`
 	// ReadOnly
 	DisableUntil string `json:"disable_until,omitempty"`
 	// ReadOnly
@@ -209,43 +217,32 @@ func (h *HostInterfaceService) Delete(ids []string) (*HostInterfaceResponse, err
 // HostInterfaceGetParameters define the properties used to search HostInterface(s)
 // Properties using the 'omitempty' json parameters are optional
 type HostInterfaceGetParameters struct {
-	HostIds                []string    `json:"hostids,omitempty"`
-	InterfaceIds           []string    `json:"interfaceids,omitempty"`
-	ItemIds                []string    `json:"itemids,omitempty"`
-	TriggerIds             []string    `json:"triggerids,omitempty"`
-	SelectItems            interface{} `json:"selectItems,omitempty"`
-	SelectHosts            interface{} `json:"selectHosts,omitempty"`
-	LimitSelects           int         `json:"limitSelects,omitempty"`
-	SortField              []string    `json:"sortfield,omitempty"`
-	CountOutput            bool        `json:"countOutput,omitempty"`
-	Editable               bool        `json:"editable,omitempty"`
-	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
-	Filter                 interface{} `json:"filter,omitempty"`
-	Limit                  int         `json:"limit,omitempty"`
-	Output                 interface{} `json:"output,omitempty"`
-	PreserveKeys           bool        `json:"preservekeys,omitempty"`
-	Search                 interface{} `json:"search,omitempty"`
-	SearchByAny            bool        `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
-	SortOrder              []string    `json:"sortorder,omitempty"`
-	StartSearch            bool        `json:"startSearch,omitempty"`
+	HostIds      []string    `json:"hostids,omitempty"`
+	InterfaceIds []string    `json:"interfaceids,omitempty"`
+	ItemIds      []string    `json:"itemids,omitempty"`
+	TriggerIds   []string    `json:"triggerids,omitempty"`
+	SelectItems  interface{} `json:"selectItems,omitempty"`
+	SelectHosts  interface{} `json:"selectHosts,omitempty"`
+	LimitSelects string      `json:"limitSelects,omitempty"`
+	SortField    []string    `json:"sortfield,omitempty"`
+	CommonGetParameters
 }
 
 // hostInterfaceGetResponse define the server response format for the Get method.
 type hostInterfaceGetResponse struct {
-	HostId       string             `json:"hostid"`
-	Ip           string             `json:"ip"`
-	Dns          string             `json:"dns"`
-	Main         HostInterfaceMain  `json:"main"`
-	Port         string             `json:"port"`
-	Type         HostInterfaceType  `json:"type"`
-	UseIp        HostInterfaceUseIp `json:"useip"`
-	Details      json.RawMessage    `json:"details,omitempty"`
-	Available    string             `json:"available,omitempty"`
-	DisableUntil string             `json:"disable_until,omitempty"`
-	Error        string             `json:"error,omitempty"`
-	ErrorsFrom   string             `json:"errors_from,omitempty"`
-	InterfaceId  string             `json:"interfaceid,omitempty"`
+	HostId       string                    `json:"hostid"`
+	Ip           string                    `json:"ip"`
+	Dns          string                    `json:"dns"`
+	Main         HostInterfaceMain         `json:"main"`
+	Port         string                    `json:"port"`
+	Type         HostInterfaceType         `json:"type"`
+	UseIp        HostInterfaceUseIp        `json:"useip"`
+	Details      json.RawMessage           `json:"details,omitempty"`
+	Available    HostInterfaceAvailability `json:"available,omitempty"`
+	DisableUntil string                    `json:"disable_until,omitempty"`
+	Error        string                    `json:"error,omitempty"`
+	ErrorsFrom   string                    `json:"errors_from,omitempty"`
+	InterfaceId  string                    `json:"interfaceid,omitempty"`
 }
 
 // Get is used to retrieve one or multiples HostInterfaces matching the given criteria(s).

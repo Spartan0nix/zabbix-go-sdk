@@ -5,14 +5,22 @@ type HostGroupService struct {
 	Client *ApiClient
 }
 
+// HostGroupInternal define if the HostGroup is internal or not.
+type HostGroupInternal string
+
+const (
+	HostGroupNotInternal HostGroupInternal = "0"
+	HostGroupIsInternal  HostGroupInternal = "1"
+)
+
 // HostGroup properties.
 type HostGroup struct {
 	Id   string `json:"groupid"`
 	Name string `json:"name"`
 	// ReadOnly
-	Flags string `json:"flags"`
+	Flags HostFlag `json:"flags"`
 	// ReadOnly
-	Internal string `json:"internal"`
+	Internal HostGroupInternal `json:"internal"`
 	// ReadOnly
 	Uuid string `json:"uuid"`
 }
@@ -95,27 +103,15 @@ type HostGroupGetParameters struct {
 	SelectGroupDiscovery          interface{} `json:"selectGroupDiscovery,omitempty"`
 	SelectHosts                   interface{} `json:"selectHosts,omitempty"`
 	SelectTemplates               interface{} `json:"selectTemplates,omitempty"`
-	LimitSelects                  int         `json:"limitSelects,omitempty"`
+	LimitSelects                  string      `json:"limitSelects,omitempty"`
 	Sortfield                     []string    `json:"sortfield,omitempty"`
-	CountOutput                   bool        `json:"countOutput,omitempty"`
-	Editable                      bool        `json:"editable,omitempty"`
-	ExcludeSearch                 bool        `json:"excludeSearch,omitempty"`
-	Filter                        interface{} `json:"filter,omitempty"`
-	Limit                         int         `json:"limit,omitempty"`
-	Output                        interface{} `json:"output,omitempty"`
-	Preservekeys                  bool        `json:"preservekeys,omitempty"`
-	Search                        interface{} `json:"search,omitempty"`
-	SearchByAny                   bool        `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled        bool        `json:"searchWildcardsEnabled,omitempty"`
-	Sortorder                     []string    `json:"sortorder,omitempty"`
-	StartSearch                   bool        `json:"startSearch,omitempty"`
+	CommonGetParameters
 }
 
 // List is used to retrieve all HostGroups for the server.
 func (h *HostGroupService) List() ([]*HostGroup, error) {
-	p := &HostGroupGetParameters{
-		Filter: map[string]string{},
-	}
+	p := &HostGroupGetParameters{}
+	p.Filter = map[string]string{}
 
 	req := h.Client.NewRequest("hostgroup.get", p)
 
