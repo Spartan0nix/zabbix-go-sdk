@@ -42,11 +42,14 @@ jobs:
         run: wget -E -H -k -p --reject png http://localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk
       # Move assets files
       - run: mv localhost:6060/lib/godoc/* docs
-      - run: mv localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk.html docs/
+      - run: mv localhost:6060/pkg/github.com/Spartan0nix/zabbix-go-sdk.html docs/index.html
       # Update assets links
-      - run: sed -i 's/..\/..\/..\/lib\/godoc\/style.css/.\/style.css/g' docs/zabbix-go-sdk.html
-      - run: sed -i 's/..\/..\/..\/lib\/godoc\/jquery.js/.\/jquery.js/g' docs/zabbix-go-sdk.html
-      - run: sed -i 's/..\/..\/..\/lib\/godoc\/godocs.js/.\/godocs.js/g' docs/zabbix-go-sdk.html
+      - run: sed -i 's/..\/..\/..\/lib\/godoc\/style.css/.\/style.css/g' docs/index.html
+      - run: sed -i 's/..\/..\/..\/lib\/godoc\/jquery.js/.\/jquery.js/g' docs/index.html
+      - run: sed -i 's/..\/..\/..\/lib\/godoc\/godocs.js/.\/godocs.js/g' docs/index.html
+      - run: sed -i 's/zabbix-go-sdk.html#/#/g' docs/index.html
+      - run: sed -i 's/http:\/\/localhost:6060\/pkg\//#/g' docs/index.html
+      - run: sed -i 's/http:\/\/localhost:6060\/search/#/g' docs/index.html
       # Clean up
       - run: rm -r localhost:6060/
       # Sed remove PID && remove empty lines
