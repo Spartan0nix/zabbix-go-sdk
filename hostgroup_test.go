@@ -70,7 +70,7 @@ func TestHostGroupGet(t *testing.T) {
 	}
 
 	if g[0].Id != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nxpected Id : %s\nId returned : %s", hostGroupId, g[0].Id)
+		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g[0].Id)
 	}
 }
 
