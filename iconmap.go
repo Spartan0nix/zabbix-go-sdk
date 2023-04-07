@@ -118,7 +118,7 @@ type IconMapUpdateParameters struct {
 	Mappings      []IconMappingParameters `json:"mappings,omitempty"`
 }
 
-// Update is used to retrieve one or multiples IconMappings matching the given criteria(s).
+// Update is used to update one or multiples IconMap.
 func (i *IconMapService) Update(p *IconMapUpdateParameters) (*IconMapResponse, error) {
 	req := i.Client.NewRequest("iconmap.update", p)
 
