@@ -14,6 +14,7 @@ type ZabbixService struct {
 	Service       *ZbxService
 	IconMap       *IconMapService
 	Image         *ImageService
+	Trigger       *TriggerService
 }
 
 // NewZabbixService create a new ZabbixService.
@@ -54,6 +55,9 @@ func NewZabbixService() *ZabbixService {
 		Image: &ImageService{
 			Client: c,
 		},
+		Trigger: &TriggerService{
+			Client: c,
+		},
 	}
 }
 
@@ -68,6 +72,7 @@ func (s ZabbixService) SetUrl(url string) {
 	s.Service.Client.Url = url
 	s.IconMap.Client.Url = url
 	s.Image.Client.Url = url
+	s.Trigger.Client.Url = url
 }
 
 // SetUser is used to set the User property of the AuthService for the current ZabbixService.
@@ -86,4 +91,5 @@ func (s ZabbixService) SetToken(token string) {
 	s.Service.Client.Token = token
 	s.IconMap.Client.Token = token
 	s.Image.Client.Token = token
+	s.Trigger.Client.Token = token
 }
