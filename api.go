@@ -76,6 +76,14 @@ type CommonGetParameters struct {
 	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
+// EvalType define the available evaluation operators.
+type EvalType string
+
+const (
+	EvalAndOr EvalType = "0"
+	EvalOr    EvalType = "2"
+)
+
 // NewRequest build a new API Request with the given method and params
 func (a *ApiClient) NewRequest(method string, params interface{}) Request {
 	return Request{

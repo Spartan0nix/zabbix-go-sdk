@@ -35,9 +35,6 @@ type HostInventory string
 // HostInventory define Zabbix id associated with the available inventory modes.
 type HostInventoryId string
 
-// HostEvalType define the available evaluation operators.
-type HostEvalType string
-
 // HostTags define the available evaluation operators when searching hosts with tags.
 type HostTags string
 
@@ -146,9 +143,6 @@ const (
 	UrlB             HostInventory = "url_b"
 	UrlC             HostInventory = "url_c"
 	Vendor           HostInventory = "vendor"
-
-	HostEvalAndOr HostEvalType = "0"
-	HostEvalOr    HostEvalType = "2"
 
 	HostTagContains  HostTags = "0"
 	HostTagEquals    HostTags = "1"
@@ -275,56 +269,56 @@ func (h *HostService) Delete(ids []string) (*HostReponse, error) {
 // HostGetParameters define the properties used to search Host(s)
 // Properties using the 'omitempty' json parameters are optional
 type HostGetParameters struct {
-	GroupIds                      []string     `json:"groupids,omitempty"`
-	DserviceIds                   []string     `json:"dserviceids,omitempty"`
-	GraphIds                      []string     `json:"graphids,omitempty"`
-	HostIds                       []string     `json:"hostids,omitempty"`
-	HttpTestIds                   []string     `json:"httptestids,omitempty"`
-	InterfaceIds                  []string     `json:"interfaceids,omitempty"`
-	ItemIds                       []string     `json:"itemids,omitempty"`
-	MaintenanceIds                []string     `json:"maintenanceids,omitempty"`
-	MonitoredHosts                bool         `json:"monitored_hosts,omitempty"`
-	ProxyHosts                    bool         `json:"proxy_hosts,omitempty"`
-	ProxyIds                      []string     `json:"proxyids,omitempty"`
-	TemplatedHosts                bool         `json:"templated_hosts,omitempty"`
-	TemplateIds                   []string     `json:"templateids,omitempty"`
-	TriggerIds                    []string     `json:"triggerids,omitempty"`
-	WithItems                     bool         `json:"with_items,omitempty"`
-	WithItemPrototypes            bool         `json:"with_item_prototypes,omitempty"`
-	WithSimpleGraphItemPrototypes bool         `json:"with_simple_graph_item_prototypes,omitempty"`
-	WithGraphs                    bool         `json:"with_graphs,omitempty"`
-	WithGraphPrototypes           bool         `json:"with_graph_prototypes,omitempty"`
-	WithHttpTests                 bool         `json:"with_httptests,omitempty"`
-	WithMonitoredHttpTests        bool         `json:"with_monitored_httptests,omitempty"`
-	WithMonitoredItems            bool         `json:"with_monitored_items,omitempty"`
-	WithSimpleGraphItems          bool         `json:"with_simple_graph_items,omitempty"`
-	WithTriggers                  bool         `json:"with_triggers,omitempty"`
-	WithProblemsSuppressed        bool         `json:"withProblemsSuppressed,omitempty"`
-	EvalType                      HostEvalType `json:"evaltype,omitempty"`
-	Severities                    []string     `json:"severities,omitempty"`
-	Tags                          HostTags     `json:"tags,omitempty"`
-	InheritedTags                 bool         `json:"inheritedTags,omitempty"`
-	SelectDiscoveries             interface{}  `json:"selectDiscoveries,omitempty"`
-	SelectDiscoveryRule           interface{}  `json:"selectDiscoveryRule,omitempty"`
-	SelectGraphs                  interface{}  `json:"selectGraphs,omitempty"`
-	SelectGroups                  interface{}  `json:"selectGroups,omitempty"`
-	SelectHostDiscovery           interface{}  `json:"selectHostDiscovery,omitempty"`
-	SelectHttpTests               interface{}  `json:"selectHttpTests,omitempty"`
-	SelectInterfaces              interface{}  `json:"selectInterfaces,omitempty"`
-	SelectInventory               interface{}  `json:"selectInventory,omitempty"`
-	SelectItems                   interface{}  `json:"selectItems,omitempty"`
-	SelectMacros                  interface{}  `json:"selectMacros,omitempty"`
-	SelectParentTemplates         interface{}  `json:"selectParentTemplates,omitempty"`
-	SelectDashboards              interface{}  `json:"selectDashboards,omitempty"`
-	SelectTags                    interface{}  `json:"selectTags,omitempty"`
-	SelectInheritedTags           interface{}  `json:"selectInheritedTags,omitempty"`
-	SelectTriggers                interface{}  `json:"selectTriggers,omitempty"`
-	SelectValueMaps               interface{}  `json:"selectValueMaps,omitempty"`
-	Filter                        interface{}  `json:"filter,omitempty"`
-	LimitSelects                  string       `json:"limitSelects,omitempty"`
-	Search                        interface{}  `json:"search,omitempty"`
-	SearchInventory               interface{}  `json:"searchInventory,omitempty"`
-	Sortfield                     []string     `json:"sortfield,omitempty"`
+	GroupIds                      []string    `json:"groupids,omitempty"`
+	DserviceIds                   []string    `json:"dserviceids,omitempty"`
+	GraphIds                      []string    `json:"graphids,omitempty"`
+	HostIds                       []string    `json:"hostids,omitempty"`
+	HttpTestIds                   []string    `json:"httptestids,omitempty"`
+	InterfaceIds                  []string    `json:"interfaceids,omitempty"`
+	ItemIds                       []string    `json:"itemids,omitempty"`
+	MaintenanceIds                []string    `json:"maintenanceids,omitempty"`
+	MonitoredHosts                bool        `json:"monitored_hosts,omitempty"`
+	ProxyHosts                    bool        `json:"proxy_hosts,omitempty"`
+	ProxyIds                      []string    `json:"proxyids,omitempty"`
+	TemplatedHosts                bool        `json:"templated_hosts,omitempty"`
+	TemplateIds                   []string    `json:"templateids,omitempty"`
+	TriggerIds                    []string    `json:"triggerids,omitempty"`
+	WithItems                     bool        `json:"with_items,omitempty"`
+	WithItemPrototypes            bool        `json:"with_item_prototypes,omitempty"`
+	WithSimpleGraphItemPrototypes bool        `json:"with_simple_graph_item_prototypes,omitempty"`
+	WithGraphs                    bool        `json:"with_graphs,omitempty"`
+	WithGraphPrototypes           bool        `json:"with_graph_prototypes,omitempty"`
+	WithHttpTests                 bool        `json:"with_httptests,omitempty"`
+	WithMonitoredHttpTests        bool        `json:"with_monitored_httptests,omitempty"`
+	WithMonitoredItems            bool        `json:"with_monitored_items,omitempty"`
+	WithSimpleGraphItems          bool        `json:"with_simple_graph_items,omitempty"`
+	WithTriggers                  bool        `json:"with_triggers,omitempty"`
+	WithProblemsSuppressed        bool        `json:"withProblemsSuppressed,omitempty"`
+	EvalType                      EvalType    `json:"evaltype,omitempty"`
+	Severities                    []string    `json:"severities,omitempty"`
+	Tags                          HostTags    `json:"tags,omitempty"`
+	InheritedTags                 bool        `json:"inheritedTags,omitempty"`
+	SelectDiscoveries             interface{} `json:"selectDiscoveries,omitempty"`
+	SelectDiscoveryRule           interface{} `json:"selectDiscoveryRule,omitempty"`
+	SelectGraphs                  interface{} `json:"selectGraphs,omitempty"`
+	SelectGroups                  interface{} `json:"selectGroups,omitempty"`
+	SelectHostDiscovery           interface{} `json:"selectHostDiscovery,omitempty"`
+	SelectHttpTests               interface{} `json:"selectHttpTests,omitempty"`
+	SelectInterfaces              interface{} `json:"selectInterfaces,omitempty"`
+	SelectInventory               interface{} `json:"selectInventory,omitempty"`
+	SelectItems                   interface{} `json:"selectItems,omitempty"`
+	SelectMacros                  interface{} `json:"selectMacros,omitempty"`
+	SelectParentTemplates         interface{} `json:"selectParentTemplates,omitempty"`
+	SelectDashboards              interface{} `json:"selectDashboards,omitempty"`
+	SelectTags                    interface{} `json:"selectTags,omitempty"`
+	SelectInheritedTags           interface{} `json:"selectInheritedTags,omitempty"`
+	SelectTriggers                interface{} `json:"selectTriggers,omitempty"`
+	SelectValueMaps               interface{} `json:"selectValueMaps,omitempty"`
+	Filter                        interface{} `json:"filter,omitempty"`
+	LimitSelects                  string      `json:"limitSelects,omitempty"`
+	Search                        interface{} `json:"search,omitempty"`
+	SearchInventory               interface{} `json:"searchInventory,omitempty"`
+	Sortfield                     []string    `json:"sortfield,omitempty"`
 	CommonGetParameters
 }
 
