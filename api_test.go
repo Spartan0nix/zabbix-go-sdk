@@ -4,11 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"testing"
 )
 
-func NewTestingService() (*ZabbixService, error) {
+var testingClient *ZabbixService
+
+func init() {
+	testingClient = newTestingService()
+}
+
+func newTestingService() *ZabbixService {
 	client := NewZabbixService()
 	client.SetUrl("http://localhost:4444/api_jsonrpc.php")
 	client.SetUser(&ApiUser{
@@ -18,38 +25,28 @@ func NewTestingService() (*ZabbixService, error) {
 
 	err := client.Authenticate()
 	if err != nil {
-		return nil, err
+		log.Fatalf("Error when creating new testing service.\nReason : %v", err)
 	}
 
-	return client, nil
+	return client
 }
 
 func TestNewRequest(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	req := client.Auth.Client.NewRequest("method.test", []string{
+	req := testingClient.Auth.Client.NewRequest("method.test", []string{
 		"test-params",
 	})
 
 	if req.Method != "method.test" {
-		t.Fatalf("Wrong method returned.\nValue expected : 'method.test'\nValue returned : %s", req.Method)
+		t.Fatalf("Wrong method returned.\nExpected : 'method.test'\nReturned : %s", req.Method)
 	}
 
 	if req.Params.([]string)[0] != "test-params" {
-		t.Fatalf("Wrong params returned.\nValue expected : 'test-params'\nValue returned : %v", req.Params)
+		t.Fatalf("Wrong params returned.\nExpected : 'test-params'\nReturned : %v", req.Params)
 	}
 }
 
 func TestExecuteRequest(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	params := client.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
+	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
 		Filter: map[string]string{},
 	})
 
@@ -58,34 +55,29 @@ func TestExecuteRequest(t *testing.T) {
 		t.Fatalf("Error when convertig request to json.\nReason : %v", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, client.UserGroup.Client.Url, bytes.NewReader(b))
+	req, err := http.NewRequest(http.MethodPost, testingClient.UserGroup.Client.Url, bytes.NewReader(b))
 	if err != nil {
 		t.Fatalf("Error when creating a new POST request.\nReason : %v", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json-rpc")
 
-	res, err := client.UserGroup.Client.ExecuteRequest(req)
+	res, err := testingClient.UserGroup.Client.ExecuteRequest(req)
 	if err != nil {
 		t.Fatalf("Error when executing POST request.\nReason %v", err)
 	}
 
 	if res == nil {
-		t.Fatal("The POST request returned an empty []byte.")
+		t.Fatal("The POST request returned an empty slice of byte.")
 	}
 }
 
 func TestPost(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	params := client.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
+	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
 		Filter: map[string]string{},
 	})
 
-	res, err := client.UserGroup.Client.Post(params)
+	res, err := testingClient.UserGroup.Client.Post(params)
 	if err != nil {
 		t.Fatalf("Error when executing POST request.\nReason : %v", err)
 	}
@@ -96,16 +88,11 @@ func TestPost(t *testing.T) {
 }
 
 func TestConvertResponse(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	params := client.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
+	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
 		Filter: map[string]string{},
 	})
 
-	res, err := client.UserGroup.Client.Post(params)
+	res, err := testingClient.UserGroup.Client.Post(params)
 	if err != nil {
 		t.Fatalf("Error when executing POST request.\nReason : %v", err)
 	}
@@ -115,7 +102,7 @@ func TestConvertResponse(t *testing.T) {
 	}
 
 	groups := make([]UserGroup, 0)
-	err = client.UserGroup.Client.ConvertResponse(*res, &groups)
+	err = testingClient.UserGroup.Client.ConvertResponse(*res, &groups)
 	if err != nil {
 		t.Fatalf("Error when converting the response.\nReason : %v", err)
 	}
@@ -126,19 +113,14 @@ func TestConvertResponse(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
+	params := testingClient.UserGroup.Client.NewRequest("test.error", map[string]string{})
 
-	params := client.UserGroup.Client.NewRequest("test.error", map[string]string{})
-
-	res, err := client.UserGroup.Client.Post(params)
+	res, err := testingClient.UserGroup.Client.Post(params)
 	if err != nil {
 		t.Fatalf("Error when executing POST request.\nReason : %v", err)
 	}
 
-	err = client.Auth.Client.Error(*res)
+	err = testingClient.Auth.Client.Error(*res)
 	if err == nil {
 		t.Fatalf("Error when formatting error message.\nResponse : %v", res)
 	}
@@ -151,10 +133,7 @@ func TestResourceAlreadyExistSuccess(t *testing.T) {
 		Data: fmt.Sprintf("%s \"%s\" already exists", resource, value),
 	}
 
-	client := NewZabbixService()
-
-	exist := client.Auth.Client.ResourceAlreadyExist(resource, value, err)
-
+	exist := testingClient.Auth.Client.ResourceAlreadyExist(resource, value, err)
 	if !exist {
 		t.Fatalf("Resource do not match the exist.\nString : %s\nResource : %s\nValue : %s", err.Data, resource, value)
 	}
@@ -167,9 +146,7 @@ func TestResourceAlreadyExistFail(t *testing.T) {
 		Data: fmt.Sprintf("%s \"%s\" already exists", resource, value),
 	}
 
-	client := NewZabbixService()
-
-	exist := client.Auth.Client.ResourceAlreadyExist(resource, "WrongValue", err)
+	exist := testingClient.Auth.Client.ResourceAlreadyExist(resource, "WrongValue", err)
 
 	if exist {
 		t.Fatalf("Resource do not match the exist.\nString : %s\nResource : %s\nValue : %s", err.Data, resource, value)
@@ -177,25 +154,17 @@ func TestResourceAlreadyExistFail(t *testing.T) {
 }
 
 func TestCheckConnectivitySuccess(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	err = client.Auth.Client.CheckConnectivity()
+	err := testingClient.Auth.Client.CheckConnectivity()
 	if err != nil {
 		t.Fatalf("Error when executing CheckConnectivity.\nReason : %v", err)
 	}
 }
 
 func TestCheckConnectivityFail(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
+	client := newTestingService()
 	client.Auth.Client.Url = "http://localhost:7777"
-	err = client.Auth.Client.CheckConnectivity()
+
+	err := client.Auth.Client.CheckConnectivity()
 	if err == nil {
 		t.Fatalf("CheckConnectivity should returned an error when Zabbix server is unreachable.")
 
@@ -208,15 +177,11 @@ func TestCheckConnectivityFail(t *testing.T) {
 }
 
 func TestCheckConnectivityMissingUrl(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
+	client := newTestingService()
 	client.Auth.Client.Url = ""
-	err = client.Auth.Client.CheckConnectivity()
+
+	err := client.Auth.Client.CheckConnectivity()
 	if err == nil {
 		t.Fatalf("CheckConnectivity should returned an error when the 'Url' property is not set.")
-
 	}
 }

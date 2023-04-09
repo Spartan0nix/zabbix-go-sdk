@@ -12,12 +12,7 @@ const (
 var imageId string
 
 func TestImageCreate(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	i, err := client.Image.Create(&ImageCreateParameters{
+	i, err := testingClient.Image.Create(&ImageCreateParameters{
 		Name:      imageName,
 		ImageType: ImageIcon,
 		Base64:    base64Image,
@@ -28,19 +23,14 @@ func TestImageCreate(t *testing.T) {
 	}
 
 	if i == nil || len(i.ImageIds) == 0 {
-		t.Fatalf("Create method should returned a list with the id of the image.\nAn empty list was returned.")
+		t.Fatalf("Create method should return a list of the created images.\nAn empty list was returned.")
 	}
 
 	imageId = i.ImageIds[0]
 }
 
 func TestImageGet(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	i, err := client.Image.Get(&ImageGetParameters{
+	i, err := testingClient.Image.Get(&ImageGetParameters{
 		ImageIds: []string{
 			imageId,
 		},
@@ -51,7 +41,7 @@ func TestImageGet(t *testing.T) {
 	}
 
 	if len(i) == 0 {
-		t.Fatalf("Get method should returned a list of images matching the given criteria.\nAn empty list was returned.")
+		t.Fatalf("Get method should return a list of images matching the given criteria.\nAn empty list was returned.")
 	}
 
 	if i[0].ImageId != imageId {
@@ -60,12 +50,7 @@ func TestImageGet(t *testing.T) {
 }
 
 func TestImageUpdate(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	i, err := client.Image.Update(&ImageUpdateParameters{
+	i, err := testingClient.Image.Update(&ImageUpdateParameters{
 		ImageId: imageId,
 		Name:    updatedImageName,
 		Base64:  updatedBase64Image,
@@ -76,7 +61,7 @@ func TestImageUpdate(t *testing.T) {
 	}
 
 	if i == nil || len(i.ImageIds) == 0 {
-		t.Fatalf("Update method should returned a list of update images.\nAn empty list was returned.")
+		t.Fatalf("Update method should return a list of the updated images.\nAn empty list was returned.")
 	}
 
 	if i.ImageIds[0] != imageId {
@@ -85,12 +70,7 @@ func TestImageUpdate(t *testing.T) {
 }
 
 func TestImageDelete(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	i, err := client.Image.Delete([]string{
+	i, err := testingClient.Image.Delete([]string{
 		imageId,
 	})
 
@@ -99,7 +79,7 @@ func TestImageDelete(t *testing.T) {
 	}
 
 	if i.ImageIds == nil || len(i.ImageIds) == 0 {
-		t.Fatalf("Delete method should returned a list with the id of the deleted images.\nAn empty list was returned.")
+		t.Fatalf("Delete method should return a list of the deleted images.\nAn empty list was returned.")
 	}
 
 	if i.ImageIds[0] != imageId {

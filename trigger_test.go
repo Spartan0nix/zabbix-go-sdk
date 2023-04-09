@@ -16,12 +16,7 @@ var triggerId string
 var dependentTriggerId string
 
 func TestCreateTrigger(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	trigger, err := client.Trigger.Create(&TriggerCreateParameters{
+	trigger, err := testingClient.Trigger.Create(&TriggerCreateParameters{
 		Description: triggerDescription,
 		Expression:  triggerExpression,
 		EventName:   triggerDescription,
@@ -36,12 +31,12 @@ func TestCreateTrigger(t *testing.T) {
 	}
 
 	if trigger == nil || len(trigger.TriggerIds) == 0 {
-		t.Fatalf("Create method should returned a list with the id of the new trigger.\nAn empty list was returned.")
+		t.Fatalf("Create method should return a list of the created triggers.\nAn empty list was returned.")
 	}
 
 	triggerId = trigger.TriggerIds[0]
 
-	trigger, err = client.Trigger.Create(&TriggerCreateParameters{
+	trigger, err = testingClient.Trigger.Create(&TriggerCreateParameters{
 		Description: dependentTriggerDescription,
 		Expression:  dependentTriggerExpression,
 	})
@@ -51,19 +46,14 @@ func TestCreateTrigger(t *testing.T) {
 	}
 
 	if trigger == nil || len(trigger.TriggerIds) == 0 {
-		t.Fatalf("Create method should returned a list with the id of the new trigger.\nAn empty list was returned.")
+		t.Fatalf("Create method should return a list of the created triggers.\nAn empty list was returned.")
 	}
 
 	dependentTriggerId = trigger.TriggerIds[0]
 }
 
 func TestTriggerGet(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	trigger, err := client.Trigger.Get(&TriggerGetParameters{
+	trigger, err := testingClient.Trigger.Get(&TriggerGetParameters{
 		TriggerIds: []string{
 			triggerId,
 		},
@@ -75,7 +65,7 @@ func TestTriggerGet(t *testing.T) {
 	}
 
 	if len(trigger) == 0 {
-		t.Fatalf("Get method should returned a list of trigger matching the given criteria.\nAn empty list was returned.")
+		t.Fatalf("Get method should return a list of triggers matching the given criteria.\nAn empty list was returned.")
 	}
 
 	if trigger[0].Id != triggerId {
@@ -84,12 +74,7 @@ func TestTriggerGet(t *testing.T) {
 }
 
 func TestTriggerUpdate(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	trigger, err := client.Trigger.Update(&TriggerUpdateParameters{
+	trigger, err := testingClient.Trigger.Update(&TriggerUpdateParameters{
 		Id:          triggerId,
 		Description: updatedTriggerDescription,
 		Priority:    TriggerAverage,
@@ -100,7 +85,7 @@ func TestTriggerUpdate(t *testing.T) {
 	}
 
 	if trigger == nil || len(trigger.TriggerIds) == 0 {
-		t.Fatalf("Update method should returned a list with the id of the updated trigger.\nAn empty list was returned.")
+		t.Fatalf("Update method should return a list of the updated triggers.\nAn empty list was returned.")
 	}
 
 	if trigger.TriggerIds[0] != triggerId {
@@ -109,12 +94,7 @@ func TestTriggerUpdate(t *testing.T) {
 }
 
 func TestTriggerDelete(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	trigger, err := client.Trigger.Delete([]string{
+	trigger, err := testingClient.Trigger.Delete([]string{
 		triggerId,
 	})
 
@@ -123,7 +103,7 @@ func TestTriggerDelete(t *testing.T) {
 	}
 
 	if trigger == nil || len(trigger.TriggerIds) == 0 {
-		t.Fatalf("Delete method should returned a list with the id of the deleted trigger.\nAn empty list was returned.")
+		t.Fatalf("Delete method should return a list of the deleted triggers.\nAn empty list was returned.")
 	}
 
 	if trigger.TriggerIds[0] != triggerId {
