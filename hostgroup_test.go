@@ -12,52 +12,33 @@ const (
 var hostGroupId string
 
 func TestHostGroupCreate(t *testing.T) {
-	client, err := NewTestingService()
+	g, err := testingClient.HostGroup.Create(hostGroupName)
 	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+		t.Fatalf("Error when creating hostgroup '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	g, err := client.HostGroup.Create(hostGroupName)
-
-	if err != nil {
-		t.Fatalf("Error when creating host group '%s'.\nReason : %v", hostGroupName, err)
-	}
-
-	if g.GroupIds == nil {
-		t.Fatalf("Create method should returned a list with the id of the new host groups.\nAn empty list was returned.")
+	if g == nil || len(g.GroupIds) == 0 {
+		t.Fatalf("Create method should return a list of the created hostgroups.\nAn empty list was returned.")
 	}
 
 	hostGroupId = g.GroupIds[0]
 }
 
 func TestHostGroupList(t *testing.T) {
-	client, err := NewTestingService()
+	g, err := testingClient.HostGroup.List()
 	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+		t.Fatalf("Error when listing hostgroups.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.List()
-
-	if err != nil {
-		t.Fatalf("Error when listing host groups.\nReason : %v", err)
-	}
-
-	if g == nil {
-		t.Fatalf("List method should returned a list of existing host group.\nAn empty list was returned.")
+	if len(g) == 0 {
+		t.Fatalf("List method should return a list with all the existing hostgroups on the server.\nAn empty list was returned.")
 	}
 }
 
 func TestHostGroupGet(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		CommonGetParameters: CommonGetParameters{
-			Filter: map[string]string{
-				"name": hostGroupName,
-			},
+	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+		GroupIds: []string{
+			hostGroupId,
 		},
 	})
 
@@ -65,22 +46,17 @@ func TestHostGroupGet(t *testing.T) {
 		t.Fatalf("Error when getting host group '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	if g == nil {
-		t.Fatalf("Get method should returned a list of host groups matching the given criteria.\nAn empty list was returned.")
+	if len(g) == 0 {
+		t.Fatalf("Get method should return a list of hostgroups matching the given criteria.\nAn empty list was returned.")
 	}
 
 	if g[0].Id != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g[0].Id)
+		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g[0].Id)
 	}
 }
 
 func TestHostGroupMassAdd(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	g, err := client.HostGroup.MassAdd(&HostGroupMassAddParameters{
+	g, err := testingClient.HostGroup.MassAdd(&HostGroupMassAddParameters{
 		Groups: []*HostGroupId{
 			{
 				GroupId: hostGroupId,
@@ -94,25 +70,20 @@ func TestHostGroupMassAdd(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass adding host group.\nHost group : %s\nHost : %s\nReason : %v", hostGroupId, "10084", err)
+		t.Fatalf("Error when massadding hosts to the hostgroup '%s'.\nReason : %v", hostGroupId, err)
 	}
 
-	if g == nil {
-		t.Fatal("MassAdd method should returned a list of the updated host groups.\nAn empty list was returned.")
+	if g == nil || len(g.GroupIds) == 0 {
+		t.Fatal("MassAdd method should return a list of the updated hostgroups.\nAn empty list was returned.")
 	}
 
 	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
+		t.Fatalf("Wrong hostgroup returned.\nExpected : %s\nRreturned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
 func TestHostGroupMassRemove(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	g, err := client.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
+	g, err := testingClient.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
 		GroupsIds: []string{
 			hostGroupId,
 		},
@@ -122,39 +93,34 @@ func TestHostGroupMassRemove(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass removing host group.\nHost group : %s\nHosts : %s \nReason : %v", hostGroupId, "10084", err)
+		t.Fatalf("Error when massremoving hosts from the hostgroup '%s'.\nReason : %v", hostGroupId, err)
 	}
 
-	if g == nil {
-		t.Fatal("MassRemove method should returned a list of the updated host groups.\nAn empty list was returned.")
+	if g == nil || len(g.GroupIds) == 0 {
+		t.Fatal("MassRemove method should return a list of the updated hostgroups.\nAn empty list was returned.")
 	}
 
 	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
+		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
 func TestHostGroupMassUpdate(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	if err != nil {
-		t.Fatalf("Error when getting host group 'Templates'.\nReason : %v", err)
-	}
-
-	template, err := client.Template.Get(&TemplateGetParameters{
+	template, err := testingClient.Template.Get(&TemplateGetParameters{
 		Filter: map[string]string{
 			"name": "Zabbix server health",
 		},
 	})
 
 	if err != nil {
-		t.Fatalf("Error when retrieving template 'Zabbix server health'.\nReason : %v", err)
+		t.Fatalf("Error when getting template 'Zabbix server health'.\nReason : %v", err)
 	}
 
-	g, err := client.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
+	if len(template) == 0 {
+		t.Fatalf("An empty list was returned when getting the template 'Zabbix server health'")
+	}
+
+	g, err := testingClient.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
 		Groups: []*HostGroupId{
 			{
 				GroupId: hostGroupId,
@@ -173,57 +139,47 @@ func TestHostGroupMassUpdate(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Fatalf("Error when mass updating host group.\nHost group : %s\nHosts : %s\nTemplate : %s\nReason : %v", hostGroupId, "10084", template[0].TemplateId, err)
+		t.Fatalf("Error when mass updating hostgroup '%s'.\nReason : %v", hostGroupId, err)
 	}
 
-	if g == nil {
-		t.Fatal("MassUpdate method should returned a list of the updated host group(s).\nAn empty list was returned.")
+	if g == nil || len(g.GroupIds) == 0 {
+		t.Fatal("MassUpdate method should return a list of the updated hostgroups.\nAn empty list was returned.")
 	}
 
 	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
+		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
 func TestHostGroupUpdate(t *testing.T) {
-	client, err := NewTestingService()
+	g, err := testingClient.HostGroup.Update(hostGroupId, updatedHostGroupName)
 	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+		t.Fatalf("Error when updating name of the hostgroup '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	g, err := client.HostGroup.Update(hostGroupId, updatedHostGroupName)
-	if err != nil {
-		t.Fatalf("Error when updating host group '%s'.\nReason : %v", hostGroupName, err)
-	}
-
-	if g == nil {
-		t.Fatal("Update method should returned a list of the updated host group.\nAn empty list was returned.")
+	if g == nil || len(g.GroupIds) == 0 {
+		t.Fatal("Update method should return a list of the updated hostgroups.\nAn empty list was returned.")
 	}
 
 	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
+		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
 
 func TestHostGroupDelete(t *testing.T) {
-	client, err := NewTestingService()
-	if err != nil {
-		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
-	}
-
-	g, err := client.HostGroup.Delete([]string{
+	g, err := testingClient.HostGroup.Delete([]string{
 		hostGroupId,
 	})
 
 	if err != nil {
-		t.Fatalf("Error when deleting host group '%s'.\nReason : %v", hostGroupName, err)
+		t.Fatalf("Error when deleting hostgroup '%s'.\nReason : %v", hostGroupName, err)
 	}
 
-	if g.GroupIds == nil {
-		t.Fatalf("Delete method should returned a list with the id of the deleted host groups.\nAn empty list was returned.")
+	if g.GroupIds == nil || len(g.GroupIds) == 0 {
+		t.Fatalf("Delete method should return a list with the id of the deleted hostgroups.\nAn empty list was returned.")
 	}
 
 	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected Id : %s\nId returned : %s", hostGroupId, g.GroupIds[0])
+		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
 	}
 }
