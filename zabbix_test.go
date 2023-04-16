@@ -59,6 +59,10 @@ func TestSetUrl(t *testing.T) {
 	if client.Trigger.Client.Url != url {
 		t.Fatalf("Trigger client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Trigger.Client.Url)
 	}
+
+	if client.Map.Client.Url != url {
+		t.Fatalf("Map client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Map.Client.Url)
+	}
 }
 
 func TestSetUser(t *testing.T) {
@@ -128,5 +132,9 @@ func TestToken(t *testing.T) {
 
 	if client.Trigger.Client.Token != token {
 		t.Fatalf("Trigger client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Trigger.Client.Token)
+	}
+
+	if client.Map.Client.Token != token {
+		t.Fatalf("Map client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Trigger.Client.Token)
 	}
 }
