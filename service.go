@@ -25,9 +25,6 @@ type ServiceStatusRuleType string
 // ServiceOperator defined the available type of condition operator
 type ServiceOperator string
 
-// ServiceEvalType defined the available type rules for tag searching
-type ServiceEvalType string
-
 // ServiceTagOperator defined the available operator when using tag search
 type ServiceTagOperator string
 
@@ -251,7 +248,7 @@ type ServiceGetParameters struct {
 	ParentIds            []string                    `json:"parentids,omitempty"`
 	DeepParentIds        bool                        `json:"deep_parentids,omitempty"`
 	ChildIds             []string                    `json:"childids,omitempty"`
-	EvalType             ServiceEvalType             `json:"evaltype,omitempty"`
+	EvalType             EvalType                    `json:"evaltype,omitempty"`
 	Tags                 []*ServiceGetTags           `json:"tags,omitempty"`
 	ProblemTags          []*ServiceGetTags           `json:"problem_tags,omitempty"`
 	WithoutProblemTags   bool                        `json:"without_problem_tags,omitempty"`
