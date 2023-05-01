@@ -244,24 +244,35 @@ type ServiceGetStatusTimeline struct {
 }
 
 type ServiceGetParameters struct {
-	ServiceIds           []string                    `json:"serviceids,omitempty"`
-	ParentIds            []string                    `json:"parentids,omitempty"`
-	DeepParentIds        bool                        `json:"deep_parentids,omitempty"`
-	ChildIds             []string                    `json:"childids,omitempty"`
-	EvalType             EvalType                    `json:"evaltype,omitempty"`
-	Tags                 []*ServiceGetTags           `json:"tags,omitempty"`
-	ProblemTags          []*ServiceGetTags           `json:"problem_tags,omitempty"`
-	WithoutProblemTags   bool                        `json:"without_problem_tags,omitempty"`
-	SlaIds               []string                    `json:"slaids,omitempty"`
-	SelectChildren       interface{}                 `json:"selectChildren,omitempty"`
-	SelectParents        interface{}                 `json:"selectParents,omitempty"`
-	SelectTags           interface{}                 `json:"selectTags,omitempty"`
-	SelectProblemEvents  interface{}                 `json:"selectProblemEvents,omitempty"`
-	SelectProblemTags    interface{}                 `json:"selectProblemTags,omitempty"`
-	SelectStatusRules    interface{}                 `json:"selectStatusRules,omitempty"`
-	SelectStatusTimeline []*ServiceGetStatusTimeline `json:"selectStatusTimeline,omitempty"`
-	Sortfield            []string                    `json:"sortfield,omitempty"`
-	CommonGetParameters
+	ServiceIds             []string                    `json:"serviceids,omitempty"`
+	ParentIds              []string                    `json:"parentids,omitempty"`
+	DeepParentIds          bool                        `json:"deep_parentids,omitempty"`
+	ChildIds               []string                    `json:"childids,omitempty"`
+	EvalType               EvalType                    `json:"evaltype,omitempty"`
+	Tags                   []*ServiceGetTags           `json:"tags,omitempty"`
+	ProblemTags            []*ServiceGetTags           `json:"problem_tags,omitempty"`
+	WithoutProblemTags     bool                        `json:"without_problem_tags,omitempty"`
+	SlaIds                 []string                    `json:"slaids,omitempty"`
+	SelectChildren         interface{}                 `json:"selectChildren,omitempty"`
+	SelectParents          interface{}                 `json:"selectParents,omitempty"`
+	SelectTags             interface{}                 `json:"selectTags,omitempty"`
+	SelectProblemEvents    interface{}                 `json:"selectProblemEvents,omitempty"`
+	SelectProblemTags      interface{}                 `json:"selectProblemTags,omitempty"`
+	SelectStatusRules      interface{}                 `json:"selectStatusRules,omitempty"`
+	SelectStatusTimeline   []*ServiceGetStatusTimeline `json:"selectStatusTimeline,omitempty"`
+	CountOutput            bool                        `json:"countOutput,omitempty"`
+	Editable               bool                        `json:"editable,omitempty"`
+	ExcludeSearch          bool                        `json:"excludeSearch,omitempty"`
+	Filter                 interface{}                 `json:"filter,omitempty"`
+	Limit                  string                      `json:"limit,omitempty"`
+	Output                 interface{}                 `json:"output,omitempty"`
+	PreserveKeys           bool                        `json:"preservekeys,omitempty"`
+	Search                 interface{}                 `json:"search,omitempty"`
+	SearchByAny            bool                        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled bool                        `json:"searchWildcardsEnabled,omitempty"`
+	Sortfield              []string                    `json:"sortfield,omitempty"`
+	SortOrder              []string                    `json:"sortorder,omitempty"`
+	StartSearch            bool                        `json:"startSearch,omitempty"`
 }
 
 type ServiceGetResponse struct {

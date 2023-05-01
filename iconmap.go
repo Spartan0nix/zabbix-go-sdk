@@ -84,11 +84,22 @@ func (i *IconMapService) Delete(ids []string) (*IconMapResponse, error) {
 // IconMapGetParameters define the properties used to search IconMaps.
 // Properties using the 'omitempty' json parameters are optional
 type IconMapGetParameters struct {
-	Iconmapids     []string    `json:"iconmapids,omitempty"`
-	Sysmapids      []string    `json:"sysmapids,omitempty"`
-	SelectMappings interface{} `json:"selectMappings,omitempty"`
-	Sortfield      []string    `json:"sortfield,omitempty"`
-	CommonGetParameters
+	Iconmapids             []string    `json:"iconmapids,omitempty"`
+	Sysmapids              []string    `json:"sysmapids,omitempty"`
+	SelectMappings         interface{} `json:"selectMappings,omitempty"`
+	CountOutput            bool        `json:"countOutput,omitempty"`
+	Editable               bool        `json:"editable,omitempty"`
+	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
+	Filter                 interface{} `json:"filter,omitempty"`
+	Limit                  string      `json:"limit,omitempty"`
+	Output                 interface{} `json:"output,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
+	Search                 interface{} `json:"search,omitempty"`
+	SearchByAny            bool        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
+	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
+	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
 // Get is used to retrieve one or multiples IconMappings matching the given criteria(s).

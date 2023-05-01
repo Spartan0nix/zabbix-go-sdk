@@ -217,15 +217,27 @@ func (h *HostInterfaceService) Delete(ids []string) (*HostInterfaceResponse, err
 // HostInterfaceGetParameters define the properties used to search HostInterface(s)
 // Properties using the 'omitempty' json parameters are optional
 type HostInterfaceGetParameters struct {
-	HostIds      []string    `json:"hostids,omitempty"`
-	InterfaceIds []string    `json:"interfaceids,omitempty"`
-	ItemIds      []string    `json:"itemids,omitempty"`
-	TriggerIds   []string    `json:"triggerids,omitempty"`
-	SelectItems  interface{} `json:"selectItems,omitempty"`
-	SelectHosts  interface{} `json:"selectHosts,omitempty"`
-	LimitSelects string      `json:"limitSelects,omitempty"`
-	SortField    []string    `json:"sortfield,omitempty"`
-	CommonGetParameters
+	HostIds                []string    `json:"hostids,omitempty"`
+	InterfaceIds           []string    `json:"interfaceids,omitempty"`
+	ItemIds                []string    `json:"itemids,omitempty"`
+	TriggerIds             []string    `json:"triggerids,omitempty"`
+	SelectItems            interface{} `json:"selectItems,omitempty"`
+	SelectHosts            interface{} `json:"selectHosts,omitempty"`
+	LimitSelects           string      `json:"limitSelects,omitempty"`
+	SortField              []string    `json:"sortfield,omitempty"`
+	CountOutput            bool        `json:"countOutput,omitempty"`
+	Editable               bool        `json:"editable,omitempty"`
+	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
+	Filter                 interface{} `json:"filter,omitempty"`
+	Limit                  string      `json:"limit,omitempty"`
+	Output                 interface{} `json:"output,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
+	Search                 interface{} `json:"search,omitempty"`
+	SearchByAny            bool        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
+	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
+	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
 // hostInterfaceGetResponse define the server response format for the Get method.

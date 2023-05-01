@@ -76,11 +76,22 @@ func (i *ImageService) Delete(ids []string) (*ImageResponse, error) {
 // ImageGetParameters define the properties used to search Images.
 // Properties using the 'omitempty' json parameters are optional
 type ImageGetParameters struct {
-	ImageIds    []string    `json:"imageids,omitempty"`
-	Sysmapids   []string    `json:"sysmapids,omitempty"`
-	SelectImage interface{} `json:"select_image,omitempty"`
-	Sortfield   []string    `json:"sortfield,omitempty"`
-	CommonGetParameters
+	ImageIds               []string    `json:"imageids,omitempty"`
+	Sysmapids              []string    `json:"sysmapids,omitempty"`
+	SelectImage            interface{} `json:"select_image,omitempty"`
+	CountOutput            bool        `json:"countOutput,omitempty"`
+	Editable               bool        `json:"editable,omitempty"`
+	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
+	Filter                 interface{} `json:"filter,omitempty"`
+	Limit                  string      `json:"limit,omitempty"`
+	Output                 interface{} `json:"output,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
+	Search                 interface{} `json:"search,omitempty"`
+	SearchByAny            bool        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
+	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
+	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
 // Get is used to retrieve one or multiples Images matching the given criteria(s).
