@@ -224,7 +224,7 @@ type TriggerGetParameters struct {
 	Search                      interface{}     `json:"search,omitempty"`
 	SearchByAny                 bool            `json:"searchByAny,omitempty"`
 	SearchWildcardsEnabled      bool            `json:"searchWildcardsEnabled,omitempty"`
-	Sortfield                   []string        `json:"sortfield,omitempty"`
+	SortField                   []string        `json:"sortfield,omitempty"`
 	SortOrder                   []string        `json:"sortorder,omitempty"`
 	StartSearch                 bool            `json:"startSearch,omitempty"`
 }
