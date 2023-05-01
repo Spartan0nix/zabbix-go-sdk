@@ -104,8 +104,19 @@ type HostGroupGetParameters struct {
 	SelectHosts                   interface{} `json:"selectHosts,omitempty"`
 	SelectTemplates               interface{} `json:"selectTemplates,omitempty"`
 	LimitSelects                  string      `json:"limitSelects,omitempty"`
-	Sortfield                     []string    `json:"sortfield,omitempty"`
-	CommonGetParameters
+	CountOutput                   bool        `json:"countOutput,omitempty"`
+	Editable                      bool        `json:"editable,omitempty"`
+	ExcludeSearch                 bool        `json:"excludeSearch,omitempty"`
+	Filter                        interface{} `json:"filter,omitempty"`
+	Limit                         string      `json:"limit,omitempty"`
+	Output                        interface{} `json:"output,omitempty"`
+	PreserveKeys                  bool        `json:"preservekeys,omitempty"`
+	Search                        interface{} `json:"search,omitempty"`
+	SearchByAny                   bool        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled        bool        `json:"searchWildcardsEnabled,omitempty"`
+	SortField                     []string    `json:"sortfield,omitempty"`
+	SortOrder                     []string    `json:"sortorder,omitempty"`
+	StartSearch                   bool        `json:"startSearch,omitempty"`
 }
 
 // List is used to retrieve all HostGroups for the server.

@@ -54,10 +54,8 @@ func TestHostGroupGet(t *testing.T) {
 	}
 
 	g, err := client.HostGroup.Get(&HostGroupGetParameters{
-		CommonGetParameters: CommonGetParameters{
-			Filter: map[string]string{
-				"name": hostGroupName,
-			},
+		Filter: map[string]string{
+			"name": hostGroupName,
 		},
 	})
 
