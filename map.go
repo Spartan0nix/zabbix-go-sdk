@@ -482,19 +482,30 @@ func (i *MapService) Delete(ids []string) (*MapResponse, error) {
 // MapGetParameters define the properties used to search Maps.
 // Properties using the 'omitempty' json parameters are optional
 type MapGetParameters struct {
-	Sysmapids        []string    `json:"sysmapids,omitempty"`
-	UserIds          []string    `json:"userids,omitempty"`
-	ExpandUrls       bool        `json:"expandUrls,omitempty"`
-	SelectIconMap    interface{} `json:"selectIconMap,omitempty"`
-	SelectLinks      interface{} `json:"selectLinks,omitempty"`
-	SelectSelements  interface{} `json:"selectSelements,omitempty"`
-	SelectUrls       interface{} `json:"selectUrls,omitempty"`
-	SelectUsers      interface{} `json:"selectUsers,omitempty"`
-	SelectUserGroups interface{} `json:"selectUserGroups,omitempty"`
-	SelectShapes     interface{} `json:"selectShapes,omitempty"`
-	SelectLines      interface{} `json:"selectLines,omitempty"`
-	Sortfield        []string    `json:"sortfield,omitempty"`
-	CommonGetParameters
+	Sysmapids              []string    `json:"sysmapids,omitempty"`
+	UserIds                []string    `json:"userids,omitempty"`
+	ExpandUrls             bool        `json:"expandUrls,omitempty"`
+	SelectIconMap          interface{} `json:"selectIconMap,omitempty"`
+	SelectLinks            interface{} `json:"selectLinks,omitempty"`
+	SelectSelements        interface{} `json:"selectSelements,omitempty"`
+	SelectUrls             interface{} `json:"selectUrls,omitempty"`
+	SelectUsers            interface{} `json:"selectUsers,omitempty"`
+	SelectUserGroups       interface{} `json:"selectUserGroups,omitempty"`
+	SelectShapes           interface{} `json:"selectShapes,omitempty"`
+	SelectLines            interface{} `json:"selectLines,omitempty"`
+	CountOutput            bool        `json:"countOutput,omitempty"`
+	Editable               bool        `json:"editable,omitempty"`
+	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
+	Filter                 interface{} `json:"filter,omitempty"`
+	Limit                  string      `json:"limit,omitempty"`
+	Output                 interface{} `json:"output,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
+	Search                 interface{} `json:"search,omitempty"`
+	SearchByAny            bool        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
+	Sortfield              []string    `json:"sortfield,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
+	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
 // MapGetResponse define the server response format for the Map Get method.

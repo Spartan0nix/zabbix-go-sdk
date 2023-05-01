@@ -59,23 +59,6 @@ type Response struct {
 	Id int `json:"id"`
 }
 
-// BaseGetParameters define the common parameters between all the Get request
-type CommonGetParameters struct {
-	CountOutput            bool        `json:"countOutput,omitempty"`
-	Editable               bool        `json:"editable,omitempty"`
-	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
-	Filter                 interface{} `json:"filter,omitempty"`
-	Limit                  string      `json:"limit,omitempty"`
-	Output                 interface{} `json:"output,omitempty"`
-	PreserveKeys           bool        `json:"preservekeys,omitempty"`
-	Search                 interface{} `json:"search,omitempty"`
-	SearchByAny            bool        `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
-	Sortfield              []string    `json:"sortfield,omitempty"`
-	SortOrder              []string    `json:"sortorder,omitempty"`
-	StartSearch            bool        `json:"startSearch,omitempty"`
-}
-
 // EvalType define the available evaluation operators.
 type EvalType string
 

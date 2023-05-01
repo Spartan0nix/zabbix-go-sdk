@@ -214,7 +214,19 @@ type TriggerGetParameters struct {
 	SelectTags                  interface{}     `json:"selectTags,omitempty"`
 	SelectTriggerDiscovery      interface{}     `json:"selectTriggerDiscovery,omitempty"`
 	LimitSelects                string          `json:"limitSelects,omitempty"`
-	CommonGetParameters
+	CountOutput                 bool            `json:"countOutput,omitempty"`
+	Editable                    bool            `json:"editable,omitempty"`
+	ExcludeSearch               bool            `json:"excludeSearch,omitempty"`
+	Filter                      interface{}     `json:"filter,omitempty"`
+	Limit                       string          `json:"limit,omitempty"`
+	Output                      interface{}     `json:"output,omitempty"`
+	PreserveKeys                bool            `json:"preservekeys,omitempty"`
+	Search                      interface{}     `json:"search,omitempty"`
+	SearchByAny                 bool            `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled      bool            `json:"searchWildcardsEnabled,omitempty"`
+	Sortfield                   []string        `json:"sortfield,omitempty"`
+	SortOrder                   []string        `json:"sortorder,omitempty"`
+	StartSearch                 bool            `json:"startSearch,omitempty"`
 }
 
 type TriggerFunctions struct {
