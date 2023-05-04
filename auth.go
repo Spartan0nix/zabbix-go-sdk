@@ -1,6 +1,9 @@
 package zabbixgosdk
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // ApiUser defined the informations needed to authenticate against the Zabbix API
 // and retrieve a API Token.
@@ -87,6 +90,39 @@ func (s *ZabbixService) Authenticate() error {
 	}
 
 	s.SetToken(token)
+
+	return nil
+}
+
+// Logout is used to invalidates the authentication token retrieve during the authentication phase.
+func (s *ZabbixService) Logout() error {
+	if s.Auth.Client.Token == "" {
+		return nil
+	}
+
+	req := s.Auth.Client.NewRequest("user.logout", make([]string, 0))
+
+	res, err := s.Auth.Client.Post(req)
+	if err != nil {
+		return err
+	}
+
+	// Convert the json.RawMessage to []byte
+	b, err := res.Result.MarshalJSON()
+	if err != nil {
+		return err
+	}
+
+	// Retrieve the result field (true && false)
+	var logoutResult bool
+	err = json.Unmarshal(b, &logoutResult)
+	if err != nil {
+		return err
+	}
+
+	if !logoutResult {
+		return fmt.Errorf("error during logout phase.\nReason : %v", res.Error)
+	}
 
 	return nil
 }
