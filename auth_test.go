@@ -53,3 +53,22 @@ func TestAuthenticate(t *testing.T) {
 		t.Fatal("Api token for the Auth service is null.\nExpected a string")
 	}
 }
+
+func TestLogout(t *testing.T) {
+	client := newTestingService()
+
+	err := client.Logout()
+	if err != nil {
+		t.Fatalf("Error when executing Logout function.\nReason : %v", err)
+	}
+}
+
+func TestLogoutWithoutToken(t *testing.T) {
+	client := newTestingService()
+	client.Auth.Client.Token = ""
+
+	err := client.Logout()
+	if err != nil {
+		t.Fatalf("Logout function should not returned an error when the Token property of the ApiClient for the AuthService is empty.\nError returned : %v", err)
+	}
+}
