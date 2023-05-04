@@ -61,3 +61,28 @@ func TestAuthenticate(t *testing.T) {
 		t.Fatalf("Auth client 'token property was not set correctly\n.Value : %s", client.Auth.Client.Token)
 	}
 }
+
+func TestLogout(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+
+	err = client.Logout()
+	if err != nil {
+		t.Fatalf("Error when executing Logout function.\nReason : %v", err)
+	}
+}
+
+func TestLogoutWithoutToken(t *testing.T) {
+	client, err := NewTestingService()
+	if err != nil {
+		t.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	}
+	client.Auth.Client.Token = ""
+
+	err = client.Logout()
+	if err != nil {
+		t.Fatalf("Logout function should not returned an error when the Token property of the ApiClient for the AuthService is empty.\nError returned : %v", err)
+	}
+}
