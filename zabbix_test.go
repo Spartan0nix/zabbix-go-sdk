@@ -1,6 +1,7 @@
 package zabbixgosdk
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -8,6 +9,12 @@ func TestNewZabbixService(t *testing.T) {
 	client := NewZabbixService()
 	if client == nil {
 		t.Fatalf("A nol pointer was returned instead of *ZabbixService.")
+	}
+}
+
+func BenchmarkNewZabbixService(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewZabbixService()
 	}
 }
 
@@ -65,6 +72,16 @@ func TestSetUrl(t *testing.T) {
 	}
 }
 
+func BenchmarkSetUrl(b *testing.B) {
+	var url string
+	client := NewZabbixService()
+
+	for i := 0; i < b.N; i++ {
+		url = fmt.Sprintf("http://localhost:%d", generateId())
+		client.SetUrl(url)
+	}
+}
+
 func TestSetUser(t *testing.T) {
 	user := "testing-user"
 	pwd := "testing-password"
@@ -81,6 +98,20 @@ func TestSetUser(t *testing.T) {
 
 	if client.Auth.User.Pwd != pwd {
 		t.Fatalf("Auth client 'pwd' property was not set correctly.\n.Expected : %s\nReturned : %s", pwd, client.Auth.User.Pwd)
+	}
+}
+
+func BenchmarkSetUser(b *testing.B) {
+	var user *ApiUser
+	var id int
+	client := NewZabbixService()
+
+	for i := 0; i < b.N; i++ {
+		id = generateId()
+		user.User = fmt.Sprintf("testing-user-%d", id)
+		user.Pwd = fmt.Sprintf("testing-password-%d", id)
+
+		client.SetUser(user)
 	}
 }
 
@@ -136,5 +167,13 @@ func TestToken(t *testing.T) {
 
 	if client.Map.Client.Token != token {
 		t.Fatalf("Map client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Trigger.Client.Token)
+	}
+}
+
+func BenchmarkSetToken(b *testing.B) {
+	client := NewZabbixService()
+
+	for i := 0; i < b.N; i++ {
+		client.SetToken(fmt.Sprintf("testing-token-%d", generateId()))
 	}
 }
