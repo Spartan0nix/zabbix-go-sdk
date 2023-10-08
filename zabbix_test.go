@@ -5,15 +5,21 @@ import (
 )
 
 func TestNewZabbixService(t *testing.T) {
-	client := NewZabbixService()
+	client := NewZabbixService("http://localhost:2222")
 	if client == nil {
 		t.Fatalf("A nol pointer was returned instead of *ZabbixService.")
 	}
 }
 
+func BenchmarkNewZabbixService(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewZabbixService("http://localhost:2222")
+	}
+}
+
 func TestSetUrl(t *testing.T) {
+	client := NewZabbixService("http://localhost:2222")
 	url := "localhost:7777"
-	client := NewZabbixService()
 	client.SetUrl(url)
 
 	if client.Auth.Client.Url != url {
@@ -65,10 +71,19 @@ func TestSetUrl(t *testing.T) {
 	}
 }
 
+func BenchmarkSetUrl(b *testing.B) {
+	client := NewZabbixService("http://localhost:2222")
+	url := "http://localhost:4444"
+
+	for i := 0; i < b.N; i++ {
+		client.SetUrl(url)
+	}
+}
+
 func TestSetUser(t *testing.T) {
 	user := "testing-user"
 	pwd := "testing-password"
-	client := NewZabbixService()
+	client := NewZabbixService("http://localhost:2222")
 
 	client.SetUser(&ApiUser{
 		User: user,
@@ -84,9 +99,22 @@ func TestSetUser(t *testing.T) {
 	}
 }
 
+func BenchmarkSetUser(b *testing.B) {
+	user := &ApiUser{
+		User: "testing-user",
+		Pwd:  "testing-password",
+	}
+
+	client := NewZabbixService("http://localhost:2222")
+
+	for i := 0; i < b.N; i++ {
+		client.SetUser(user)
+	}
+}
+
 func TestToken(t *testing.T) {
 	token := "random-complex-token"
-	client := NewZabbixService()
+	client := NewZabbixService("http://localhost:2222")
 
 	client.SetToken(token)
 
@@ -136,5 +164,13 @@ func TestToken(t *testing.T) {
 
 	if client.Map.Client.Token != token {
 		t.Fatalf("Map client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Trigger.Client.Token)
+	}
+}
+
+func BenchmarkSetToken(b *testing.B) {
+	client := NewZabbixService("http://localhost:2222")
+
+	for i := 0; i < b.N; i++ {
+		client.SetToken("testing-token")
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"regexp"
+	"strings"
 )
 
 // ApiClient is the default client structure to interact with the Zabbix API
@@ -161,8 +161,9 @@ func (a *ApiClient) Error(r Response) error {
 
 // ResourceAlreadyExist check it the Data field in the given ResponseError indicate a 'resource already exists' type error.
 func (a *ApiClient) ResourceAlreadyExist(resource string, value string, err ResponseError) bool {
-	re := regexp.MustCompile(fmt.Sprintf("%s \"%s\" already exists", resource, value) + `.*`)
-	if re.Match([]byte(err.Data)) {
+	substring := fmt.Sprintf("%s \"%s\" already exists", resource, value)
+
+	if strings.Contains(err.Data, substring) {
 		return true
 	} else {
 		return false
@@ -196,12 +197,10 @@ func (a *ApiClient) CheckConnectivity() error {
 
 	_, err := a.Post(req)
 	if err != nil {
-		// Check the format of the error.
-		re := regexp.MustCompile(fmt.Sprintf("Post \"%s\": dial tcp ", a.Url) + `\[[0-9:]+\]:[0-9]{1,5}: connect: connection refused`)
-		if re.Match([]byte(err.Error())) {
-			return fmt.Errorf("connectivity check failed for Zabbix server : %s", a.Url)
+		// Check if the error contains 'connect: connection refused'.
+		if strings.Contains(err.Error(), "connect: connection refused") {
+			return fmt.Errorf("connectivity check failed for '%s'", a.Url)
 		} else {
-			// If the 'connection refused' is not returned, throw the raw error
 			return err
 		}
 	}

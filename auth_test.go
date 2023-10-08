@@ -7,7 +7,7 @@ import (
 func TestNewAuthRequest(t *testing.T) {
 	user := "testing-user"
 	pwd := "testing-pwd"
-	client := NewZabbixService()
+	client := NewZabbixService("http://localhost:2222")
 
 	body := client.Auth.NewAuthRequest(user, pwd)
 
@@ -17,6 +17,16 @@ func TestNewAuthRequest(t *testing.T) {
 
 	if body.Params["password"] != pwd {
 		t.Fatalf("Request param 'password' was not set correctly.\nExpected : %s\nReturned : %s", pwd, body.Params["password"])
+	}
+}
+
+func BenchmarkNewAuthRequest(b *testing.B) {
+	user := "testing-user"
+	pwd := "testing-pwd"
+	client := NewZabbixService("http://localhost:2222")
+
+	for i := 0; i < b.N; i++ {
+		client.Auth.NewAuthRequest(user, pwd)
 	}
 }
 
@@ -41,6 +51,20 @@ func TestGetCredentials(t *testing.T) {
 	}
 }
 
+func BenchmarkGetCredentials(b *testing.B) {
+	user := "Admin"
+	pwd := "zabbix"
+	client := newTestingService()
+	var err error
+
+	for i := 0; i < b.N; i++ {
+		_, err = client.Auth.GetCredentials(user, pwd)
+		if err != nil {
+			b.Fatalf("error while executing GetCredentials function\nReason : %v", err)
+		}
+	}
+}
+
 func TestAuthenticate(t *testing.T) {
 	client := newTestingService()
 
@@ -51,6 +75,18 @@ func TestAuthenticate(t *testing.T) {
 
 	if client.Auth.Client.Token == "" {
 		t.Fatal("Api token for the Auth service is null.\nExpected a string")
+	}
+}
+
+func BenchmarkAuthenticate(b *testing.B) {
+	client := newTestingService()
+	var err error
+
+	for i := 0; i < b.N; i++ {
+		err = client.Authenticate()
+		if err != nil {
+			b.Fatalf("error while executing Authenticate function\nReason : %v", err)
+		}
 	}
 }
 
@@ -70,5 +106,22 @@ func TestLogoutWithoutToken(t *testing.T) {
 	err := client.Logout()
 	if err != nil {
 		t.Fatalf("Logout function should not returned an error when the Token property of the ApiClient for the AuthService is empty.\nError returned : %v", err)
+	}
+}
+
+func BenchmarkLogout(b *testing.B) {
+	client := newTestingService()
+	var err error
+
+	for i := 0; i < b.N; i++ {
+		err = client.Authenticate()
+		if err != nil {
+			b.Fatalf("error while executing Authenticate function\nReason : %v", err)
+		}
+
+		err = client.Logout()
+		if err != nil {
+			b.Fatalf("error while executing Logout function\nReason : %v", err)
+		}
 	}
 }
