@@ -7,7 +7,7 @@ import (
 func TestNewAuthRequest(t *testing.T) {
 	user := "testing-user"
 	pwd := "testing-pwd"
-	client := NewZabbixService()
+	client := NewZabbixService("http://localhost:2222")
 
 	body := client.Auth.NewAuthRequest(user, pwd)
 
@@ -23,7 +23,7 @@ func TestNewAuthRequest(t *testing.T) {
 func BenchmarkNewAuthRequest(b *testing.B) {
 	user := "testing-user"
 	pwd := "testing-pwd"
-	client := NewZabbixService()
+	client := NewZabbixService("http://localhost:2222")
 
 	for i := 0; i < b.N; i++ {
 		client.Auth.NewAuthRequest(user, pwd)

@@ -1,6 +1,9 @@
 package zabbixgosdk
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 const (
 	hostName        = "test-host"
@@ -54,6 +57,53 @@ func TestHostCreate(t *testing.T) {
 	hostId = h.HostIds[0]
 }
 
+func BenchmarkHostCreate(b *testing.B) {
+	params := &HostCreateParameters{
+		Host:          hostName,
+		Name:          hostName,
+		Description:   "Testing description",
+		InventoryMode: HostManual,
+		Status:        HostUnmonitored,
+		Groups: []*HostGroupId{
+			{
+				GroupId: "1",
+			},
+		},
+		Interfaces: []*HostInterface{
+			{
+				Ip:    "127.0.0.1",
+				Dns:   "localhost",
+				Main:  HostInterfaceDefault,
+				Port:  "10050",
+				Type:  HostInterfaceAgent,
+				UseIp: HostInterfaceDns,
+			},
+		},
+		Tags: []*HostTag{
+			{
+				Tag:   "{$TEST_TAG}",
+				Value: "test-host-tag-value",
+			},
+		},
+		Inventory: map[HostInventory]string{
+			Name:  hostName,
+			Alias: "testing-host-alias",
+		},
+	}
+
+	var err error
+	for i := 0; i < b.N; i++ {
+		name := fmt.Sprintf("%s-%d", hostName, generateId())
+		params.Host = name
+		params.Name = name
+
+		_, err = testingClient.Host.Create(params)
+		if err != nil {
+			b.Fatalf("error while executing Create function\nReason : %v", err)
+		}
+	}
+}
+
 func TestHostGet(t *testing.T) {
 	h, err := testingClient.Host.Get(&HostGetParameters{
 		Filter: map[string]string{
@@ -71,6 +121,22 @@ func TestHostGet(t *testing.T) {
 
 	if h[0].HostId != hostId {
 		t.Fatalf("Wrong host returned.\nExpected : %s\nReturned : %s", hostId, h[0].HostId)
+	}
+}
+
+func BenchmarkHostGet(b *testing.B) {
+	params := &HostGetParameters{
+		Filter: map[string]string{
+			"name": "Zabbix server",
+		},
+	}
+
+	var err error
+	for i := 0; i < b.N; i++ {
+		_, err = testingClient.Host.Get(params)
+		if err != nil {
+			b.Fatalf("error while executing Get function\nReason : %v", err)
+		}
 	}
 }
 

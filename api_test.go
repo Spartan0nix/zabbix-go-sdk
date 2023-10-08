@@ -18,8 +18,7 @@ func init() {
 }
 
 func newTestingService() *ZabbixService {
-	client := NewZabbixService()
-	client.SetUrl("http://localhost:4444/api_jsonrpc.php")
+	client := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
 	client.SetUser(&ApiUser{
 		User: "Admin",
 		Pwd:  "zabbix",
@@ -36,7 +35,7 @@ func newTestingService() *ZabbixService {
 // generateId is used to generate a random id to prevent duplicate entry during benchmarks.
 func generateId() int {
 	rand.NewSource(time.Now().UnixNano())
-	value := rand.Intn(rand.Intn(9999))
+	value := rand.Intn(9999)
 
 	return value
 }
@@ -283,9 +282,9 @@ func TestCheckConnectivityFail(t *testing.T) {
 
 	}
 
-	expected_err := fmt.Sprintf("connectivity check failed for Zabbix server : %s", client.Auth.Client.Url)
-	if err.Error() != expected_err {
-		t.Fatalf("Expected error : %s\nError returned : %s", expected_err, err.Error())
+	expectedErr := fmt.Sprintf("connectivity check failed for '%s'", client.Auth.Client.Url)
+	if err.Error() != expectedErr {
+		t.Fatalf("Expected error : %s\nError returned : %s", expectedErr, err.Error())
 	}
 }
 
