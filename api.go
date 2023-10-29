@@ -4,29 +4,29 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 // ApiClient is the default client structure to interact with the Zabbix API
-type ApiClient struct {
+type apiClient struct {
 	// Handle HTTP request
 	client *http.Client
 	// URL of the Zabbix API
 	// Format : http[s]://<zabbix-ip-or-dns>[/zabbix]/api_jsonrpc.php
 	// [] are optional fields
 	// <> are required fields
-	Url string
+	url string
 	// API token use to authenticate when calling the differents methods
-	Token string
+	token string
 }
 
 // Request define the default body format to interact with the API
-type Request struct {
-	// Jsonrpc defined the version used of the json-rpc implementation
+type request struct {
+	// Jsonrpc define the version used of the json-rpc implementation
 	// By default "2.0"
-	Jsonrpc string `json:"jsonrpc"`
+	JsonRpc string `json:"jsonrpc"`
 	// Method is the name of the method called
 	Method string `json:"method"`
 	// Params contains the differents parameters to pass to the method
@@ -37,130 +37,136 @@ type Request struct {
 	Auth string `json:"auth"`
 }
 
-// ResponseError define the error format returned in the Response body when a server error occured
+// ResponseError define the error format returned in the Response body when a server error occurs.
 type ResponseError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Data    string `json:"data"`
 }
 
-// Response define the response format returned by the API
-type Response struct {
-	// Jsonrpc defined the version used of the json-rpc implementation
+// responseResults define the available data type support for the Result field of response.
+type ResponseResults interface {
+	any
+}
+
+// Response define the base format for each API response.
+// As the Result field can vary from one request to another, it must be defined for each method response.
+type Response[T ResponseResults] struct {
+	// Jsonrpc define the version used of the json-rpc implementation
 	// By default "2.0"
-	Jsonrpc string `json:"jsonrpc"`
-	// Result is the data returned by the method called
-	// Since the response differs from one method to another,
-	// the result is returned raw ([]byte) and will need more processing
-	Result json.RawMessage `json:"result"`
+	JsonRpc string `json:"jsonrpc"`
+	// Result define the data returned by the method called.
+	// Since the response differs from one method to another, the Result field need to be defined for each method.
+	Result T `json:"result,omitempty"`
 	// Error contains the more details about the server side error
 	Error ResponseError `json:"error,omitempty"`
 	// Id is an identifier for the corresponding request.
 	Id int `json:"id"`
 }
 
-// EvalType define the available evaluation operators.
-type EvalType string
-
-const (
-	EvalAndOr EvalType = "0"
-	EvalOr    EvalType = "2"
-)
-
-// NewRequest build a new API Request with the given method and params
-func (a *ApiClient) NewRequest(method string, params interface{}) Request {
-	return Request{
-		Jsonrpc: "2.0",
-		Method:  method,
-		Params:  params,
-		Id:      1,
-		Auth:    a.Token,
-	}
+// CommonGetParameters define parameters supported by all get methods.
+type CommonGetParameters struct {
+	CountOutput            bool        `json:"countOutput,omitempty"`
+	Editable               bool        `json:"editable,omitempty"`
+	ExcludeSearch          bool        `json:"excludeSearch,omitempty"`
+	Filter                 interface{} `json:"filter,omitempty"`
+	Limit                  string      `json:"limit,omitempty"`
+	Output                 interface{} `json:"output,omitempty"`
+	PreserveKeys           bool        `json:"preservekeys,omitempty"`
+	Search                 interface{} `json:"search,omitempty"`
+	SearchByAny            bool        `json:"searchByAny,omitempty"`
+	SearchWildcardsEnabled bool        `json:"searchWildcardsEnabled,omitempty"`
+	SortField              []string    `json:"sortfield,omitempty"`
+	SortOrder              []string    `json:"sortorder,omitempty"`
+	StartSearch            bool        `json:"startSearch,omitempty"`
 }
 
-// ExecuteRequest execute the given Request and return an []byte or an error
-func (a *ApiClient) ExecuteRequest(r *http.Request) ([]byte, error) {
-	resp, err := a.client.Do(r)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
+// Error return a more user-friendly error using the Error property in the given Response.
+func (r ResponseError) Error() string {
+	return "an error was returned by the Zabbix API: '" + r.Message + "' (data: '" + r.Data + "') (code: '" + strconv.Itoa(r.Code) + "')"
 }
 
-// Post is a method that accept a body an wrap multiple methods.
-//
-// 1. Convert the body to a JSON encoding.
-//
-// 2. Generate a new HTTP POST Request with the ApiClient.Url property and the enconded JSON body.
-//
-// 3. Set the 'Content-type' header to 'application/json-rpc'.
-//
-// 4. Execute the HTTP Request.
-//
-// 5. Convert the HTTP response to a API Response object.
-//
-// Return a Response object or an error that occured during the 5 previous steps
-func (a *ApiClient) Post(body interface{}) (*Response, error) {
-	b, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, a.Url, bytes.NewReader(b))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/json-rpc")
-
-	b, err = a.ExecuteRequest(req)
-	if err != nil {
-		return nil, err
-	}
-
-	res := Response{}
-	err = json.Unmarshal(b, &res)
-	if err != nil {
-		return nil, err
-	}
-
-	return &res, nil
-}
-
-// ConvertResponse convert the Result property in the given Response to the given 'v' type.
-// 'v' must be a pointer.
-func (a *ApiClient) ConvertResponse(r Response, v interface{}) error {
-	err := json.Unmarshal(r.Result, &v)
-	if err != nil {
-		// Check if an error was returned by the Zabbix Server.
-		// If an error occure, the result field is empty.
-		// This while leads to Unmarshal error.
-		if r.Error.Code != 0 {
-			err = a.Error(r)
-			return err
-		}
-
-		return err
+// Validate is used to check if an error was returned by the API in the current Response.
+func (r *Response[T]) Validate() error {
+	if r.Error.Code != 0 {
+		return r.Error
 	}
 
 	return nil
 }
 
-// Error return a more user-friendly error using the Error property in the given Response.
-func (a *ApiClient) Error(r Response) error {
-	return fmt.Errorf("code : %d\nmessage : %s\ndata : %s", r.Error.Code, r.Error.Message, r.Error.Data)
+func (a *apiClient) buildRequest(body interface{}) (*http.Request, error) {
+	b, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, a.url, bytes.NewBuffer(b))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json-rpc")
+
+	return req, nil
+}
+
+// NewRequest is used to build a new HTTP Request with the given method and params.
+// The request (r) struct is used as the base while method is used a r.Method and params as r.Params.
+func (a *apiClient) NewRequest(method string, params interface{}) (*http.Request, error) {
+	body := request{
+		JsonRpc: "2.0",
+		Method:  method,
+		Params:  params,
+		Id:      1,
+		Auth:    a.token,
+	}
+
+	return a.buildRequest(body)
+}
+
+// NewCustomRequest is a similar function to NewRequest but uses a fully customisable body.
+func (a *apiClient) NewCustomRequest(body interface{}) (*http.Request, error) {
+	return a.buildRequest(body)
+}
+
+// ExecuteRequest is used to execute an HTTP Request.
+// The HTTP response is returned a pointer.
+func (a *apiClient) ExecuteRequest(r *http.Request) (*http.Response, error) {
+	return a.client.Do(r)
+}
+
+// ConvertResponse is used to convert an HTTP response body to the value pointed by v.
+// The HTTP body is closed a the end of the function.
+func (a *apiClient) ConvertResponse(r *http.Response, v interface{}) error {
+	defer r.Body.Close()
+
+	return json.NewDecoder(r.Body).Decode(&v)
+}
+
+// Post is wrapper method to handle the differents actions required to execute an API request.
+// The given method and body are used to build a new request.
+// The API response is then converted and stored to the value pointed by v.
+func (a *apiClient) Post(method string, params interface{}, v interface{}) error {
+	// Create a new HTTP request
+	req, err := a.NewRequest(method, params)
+	if err != nil {
+		return err
+	}
+
+	// Execute the HTTP request
+	res, err := a.ExecuteRequest(req)
+	if err != nil {
+		return err
+	}
+
+	// Convert the HTTP response body
+	err = a.ConvertResponse(res, &v)
+	return err
 }
 
 // ResourceAlreadyExist check it the Data field in the given ResponseError indicate a 'resource already exists' type error.
-func (a *ApiClient) ResourceAlreadyExist(resource string, value string, err ResponseError) bool {
+func (a *apiClient) ResourceAlreadyExist(resource string, value string, err ResponseError) bool {
 	substring := fmt.Sprintf("%s \"%s\" already exists", resource, value)
 
 	if strings.Contains(err.Data, substring) {
@@ -168,42 +174,4 @@ func (a *ApiClient) ResourceAlreadyExist(resource string, value string, err Resp
 	} else {
 		return false
 	}
-}
-
-// connectivityRequest define the body format used to interact with the API only for the 'apiinfo.version' method
-type connectivityRequest struct {
-	Jsonrpc string      `json:"jsonrpc"`
-	Method  string      `json:"method"`
-	Params  interface{} `json:"params"`
-	Id      int         `json:"id"`
-	Auth    *string     `json:"auth"`
-}
-
-// CheckConnectivity is used to validate connectivity against the current ApiClient Zabbix server.
-// If the connection cannot be established, an error is returned.
-func (a *ApiClient) CheckConnectivity() error {
-	// If the Url property is not set, do not throw an error.
-	if a.Url == "" {
-		return fmt.Errorf("missing 'Url' property from the current *ApiClient. CheckConnectivity function will not be executed")
-	}
-
-	req := connectivityRequest{
-		Jsonrpc: "2.0",
-		Method:  "apiinfo.version",
-		Params:  map[string]string{},
-		Id:      1,
-		Auth:    nil,
-	}
-
-	_, err := a.Post(req)
-	if err != nil {
-		// Check if the error contains 'connect: connection refused'.
-		if strings.Contains(err.Error(), "connect: connection refused") {
-			return fmt.Errorf("connectivity check failed for '%s'", a.Url)
-		} else {
-			return err
-		}
-	}
-
-	return nil
 }

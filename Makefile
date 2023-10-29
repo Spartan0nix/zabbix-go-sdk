@@ -92,8 +92,29 @@ flame-cpu:
 flame-mem:
 	go tool pprof -http="localhost:8081" mem.prof
 
+svg-cpu:
+	go tool pprof -svg cpu.prof
+
+svg-mem:
+	go tool pprof -svg mem.prof
+
+
 # ------------------------------------------------
 # Utils
 # ------------------------------------------------
 run:
 	go run test/main.go
+
+
+bench-package:
+	go test -run=^$$ \
+        -bench "^BenchmarkHostGroupGet$$" \
+        -v \
+        -cpuprofile cpu.prof \
+        -benchmem \
+        -memprofile mem.prof  \
+        -count 6
+
+test-package:
+	go test -run="^TestTemplateMassRemove(.+)?$$" \
+        -v \

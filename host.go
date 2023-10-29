@@ -2,69 +2,31 @@ package zabbixgosdk
 
 // HostService create a new service to access host related methods and functions.
 type HostService struct {
-	Client *ApiClient
+	Client *apiClient
 }
 
-// HostFlag define the origin of the host.
-type HostFlag string
-
-// HostInventoryMode define the available inventory modes.
+// HostInventoryMode define the available mode of inventory for an host.
 type HostInventoryMode string
 
-// HostIpmiAuthType define the available ipmi auth modes.
-type HostIpmiAuthType string
-
-// HostIpmiPrivilege define the available ipmi privilege modes.
-type HostIpmiPrivilege string
-
-// HostMaintenanceStatus define the status of maintenance on the host.
-type HostMaintenanceStatus string
-
-// HostMaintenanceType define the type of maintenance of the host.
-type HostMaintenanceType string
-
-// HostStatus define the available host status.
+// HostStatus define the available status for an host.
 type HostStatus string
 
-// HostTlsMode define the available TLS modes.
+// HostTlsMode define the available tls modes for an host.
 type HostTlsMode string
 
-// HostInventory define the available inventory modes.
+// HostInventory define the available inventory alias key for an host.
 type HostInventory string
 
-// HostInventory define Zabbix id associated with the available inventory modes.
+// HostInventory define the id associated with an alias key for an host.
 type HostInventoryId string
 
-// HostTags define the available evaluation operators when searching hosts with tags.
-type HostTags string
+// HostTag define the available evaluation operators when searching hosts using tags.
+type HostTag string
 
 const (
-	HostPlain      HostFlag = "0"
-	HostDiscovered HostFlag = "4"
-
 	HostDisabled  HostInventoryMode = "-1"
 	HostManual    HostInventoryMode = "0"
 	HostAutomatic HostInventoryMode = "1"
-
-	HostDefault  HostIpmiAuthType = "-1"
-	HostNone     HostIpmiAuthType = "0"
-	HostMD2      HostIpmiAuthType = "1"
-	HostMD5      HostIpmiAuthType = "2"
-	HostStraight HostIpmiAuthType = "4"
-	HostIpmiOEM  HostIpmiAuthType = "5"
-	HostRMCP     HostIpmiAuthType = "6"
-
-	HostCallback HostIpmiPrivilege = "1"
-	HostUser     HostIpmiPrivilege = "2"
-	HostOperator HostIpmiPrivilege = "3"
-	HostAdmin    HostIpmiPrivilege = "4"
-	HostOEM      HostIpmiPrivilege = "5"
-
-	HostNoMaintenance       HostMaintenanceStatus = "0"
-	HostMaintenanceInEffect HostMaintenanceStatus = "1"
-
-	HostMaintenanceWithDataCollection    HostMaintenanceType = "0"
-	HostMaintenanceWithoutDataCollection HostMaintenanceType = "1"
 
 	HostMonitored   HostStatus = "0"
 	HostUnmonitored HostStatus = "1"
@@ -144,47 +106,39 @@ const (
 	UrlC             HostInventory = "url_c"
 	Vendor           HostInventory = "vendor"
 
-	HostTagContains  HostTags = "0"
-	HostTagEquals    HostTags = "1"
-	HostTagNotlike   HostTags = "2"
-	HostTagNotequal  HostTags = "3"
-	HostTagExists    HostTags = "4"
-	HostTagNotExists HostTags = "5"
+	HostTagContains  HostTag = "0"
+	HostTagEquals    HostTag = "1"
+	HostTagNotlike   HostTag = "2"
+	HostTagNotequal  HostTag = "3"
+	HostTagExists    HostTag = "4"
+	HostTagNotExists HostTag = "5"
 )
 
 // Host properties.
-// Some properties are read-only, which means they are only accessible after creation
-// and should not be passed as arguments in other methods.
 type Host struct {
-	// ReadOnly
-	HostId      string `json:"hostid"`
-	Host        string `json:"host"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	// ReadOnly
-	Flags         HostFlag          `json:"flags"`
-	InventoryMode HostInventoryMode `json:"inventory_mode"`
-	IpmiAuthType  HostIpmiAuthType  `json:"ipmi_authtype"`
-	IpmiPassword  string            `json:"ipmi_password"`
-	IpmiPrivilege HostIpmiPrivilege `json:"ipmi_privilege"`
-	IpmiUsername  string            `json:"ipmi_username"`
-	// ReadOnly
-	MaintenanceFrom string `json:"maintenance_from"`
-	// ReadOnly
-	MaintenanceStatus HostMaintenanceStatus `json:"maintenance_status"`
-	// ReadOnly
-	MaintenanceType HostMaintenanceType `json:"maintenance_type"`
-	// ReadOnly
-	MaintenanceId  string      `json:"maintenanceid"`
-	ProxyHostId    string      `json:"proxy_hostid"`
-	Status         HostStatus  `json:"status"`
-	TlsConnect     HostTlsMode `json:"tls_connect"`
-	TlsAccept      HostTlsMode `json:"tls_accept"`
-	TlsIssuer      string      `json:"tls_issuer"`
-	TlsSubject     string      `json:"tls_subject"`
-	TlsPskIdentity string      `json:"tls_psk_identity"`
-	TlsPsk         string      `json:"tls_psk"`
-	LastAccess     string      `json:"lastaccess"`
+	HostId            string            `json:"hostid,omitempty"`
+	Host              string            `json:"host,omitempty"`
+	Name              string            `json:"name,omitempty"`
+	Description       string            `json:"description,omitempty"`
+	Flags             OriginType        `json:"flags,omitempty"`
+	InventoryMode     HostInventoryMode `json:"inventory_mode,omitempty"`
+	IpmiAuthType      IpmiAuthType      `json:"ipmi_authtype,omitempty"`
+	IpmiPassword      string            `json:"ipmi_password,omitempty"`
+	IpmiPrivilege     IpmiPrivilege     `json:"ipmi_privilege,omitempty"`
+	IpmiUsername      string            `json:"ipmi_username,omitempty"`
+	MaintenanceFrom   string            `json:"maintenance_from,omitempty"`
+	MaintenanceStatus MaintenanceStatus `json:"maintenance_status,omitempty"`
+	MaintenanceType   MaintenanceType   `json:"maintenance_type,omitempty"`
+	MaintenanceId     string            `json:"maintenanceid,omitempty"`
+	ProxyHostId       string            `json:"proxy_hostid,omitempty"`
+	Status            HostStatus        `json:"status,omitempty"`
+	TlsConnect        HostTlsMode       `json:"tls_connect,omitempty"`
+	TlsAccept         HostTlsMode       `json:"tls_accept,omitempty"`
+	TlsIssuer         string            `json:"tls_issuer,omitempty"`
+	TlsSubject        string            `json:"tls_subject,omitempty"`
+	TlsPskIdentity    string            `json:"tls_psk_identity,omitempty"`
+	TlsPsk            string            `json:"tls_psk,omitempty"`
+	LastAccess        string            `json:"lastaccess,omitempty"`
 }
 
 // HostId define a representation for certain methods that only requires the 'hostid' property.
@@ -192,457 +146,457 @@ type HostId struct {
 	HostId string `json:"hostid"`
 }
 
-// HostTag define a tag assignable to an Host
-type HostTag struct {
-	Tag   string `json:"tag"`
-	Value string `json:"value"`
-}
+// // HostTag define a tag assignable to an Host
+// type HostTag struct {
+// 	Tag   string `json:"tag"`
+// 	Value string `json:"value"`
+// }
 
-// HostReponse define the server response format for Host methods.
-type HostReponse struct {
-	HostIds []string `json:"hostids"`
-}
+// // HostReponse define the server response format for Host methods.
+// type HostReponse struct {
+// 	HostIds []string `json:"hostids"`
+// }
 
-// HostCreateParameters define the properties needed to create a new Host
-// Properties using the 'omitempty' json parameters are optional
-type HostCreateParameters struct {
-	Host           string                   `json:"host"`
-	Groups         []*HostGroupId           `json:"groups"`
-	Name           string                   `json:"name,omitempty"`
-	Description    string                   `json:"description,omitempty"`
-	InventoryMode  HostInventoryMode        `json:"inventory_mode,omitempty"`
-	IpmiAuthType   HostIpmiAuthType         `json:"ipmi_authtype,omitempty"`
-	IpmiPassword   string                   `json:"ipmi_password,omitempty"`
-	IpmiPrivilege  HostIpmiPrivilege        `json:"ipmi_privilege,omitempty"`
-	IpmiUsername   string                   `json:"ipmi_username,omitempty"`
-	ProxyHostId    string                   `json:"proxy_hostid,omitempty"`
-	Status         HostStatus               `json:"status,omitempty"`
-	TlsConnect     HostTlsMode              `json:"tls_connect,omitempty"`
-	TlsAccept      HostTlsMode              `json:"tls_accept,omitempty"`
-	TlsIssuer      string                   `json:"tls_issuer,omitempty"`
-	TlsSubject     string                   `json:"tls_subject,omitempty"`
-	TlsPskIdentity string                   `json:"tls_psk_identity,omitempty"`
-	TlsPsk         string                   `json:"tls_psk,omitempty"`
-	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
-	Tags           []*HostTag               `json:"tags,omitempty"`
-	Templates      []*TemplateId            `json:"templates,omitempty"`
-	Macros         []*HostMacro             `json:"macros,omitempty"`
-	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
-}
+// // HostCreateParameters define the properties needed to create a new Host
+// // Properties using the 'omitempty' json parameters are optional
+// type HostCreateParameters struct {
+// 	Host           string                   `json:"host"`
+// 	Groups         []*HostGroupId           `json:"groups"`
+// 	Name           string                   `json:"name,omitempty"`
+// 	Description    string                   `json:"description,omitempty"`
+// 	InventoryMode  HostInventoryMode        `json:"inventory_mode,omitempty"`
+// 	IpmiAuthType   HostIpmiAuthType         `json:"ipmi_authtype,omitempty"`
+// 	IpmiPassword   string                   `json:"ipmi_password,omitempty"`
+// 	IpmiPrivilege  HostIpmiPrivilege        `json:"ipmi_privilege,omitempty"`
+// 	IpmiUsername   string                   `json:"ipmi_username,omitempty"`
+// 	ProxyHostId    string                   `json:"proxy_hostid,omitempty"`
+// 	Status         HostStatus               `json:"status,omitempty"`
+// 	TlsConnect     HostTlsMode              `json:"tls_connect,omitempty"`
+// 	TlsAccept      HostTlsMode              `json:"tls_accept,omitempty"`
+// 	TlsIssuer      string                   `json:"tls_issuer,omitempty"`
+// 	TlsSubject     string                   `json:"tls_subject,omitempty"`
+// 	TlsPskIdentity string                   `json:"tls_psk_identity,omitempty"`
+// 	TlsPsk         string                   `json:"tls_psk,omitempty"`
+// 	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
+// 	Tags           []*HostTag               `json:"tags,omitempty"`
+// 	Templates      []*TemplateId            `json:"templates,omitempty"`
+// 	Macros         []*HostMacro             `json:"macros,omitempty"`
+// 	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
+// }
 
-// Create is used to create a new Host.
-func (h *HostService) Create(p *HostCreateParameters) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.create", p)
+// // Create is used to create a new Host.
+// func (h *HostService) Create(p *HostCreateParameters) (*HostReponse, error) {
+// 	req := h.Client.NewRequest("host.create", p)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := HostReponse{}
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &r, nil
-}
+// 	return &r, nil
+// }
 
-// Delete is used to delete one or multiples Hosts.
-func (h *HostService) Delete(ids []string) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.delete", ids)
+// // Delete is used to delete one or multiples Hosts.
+// func (h *HostService) Delete(ids []string) (*HostReponse, error) {
+// 	req := h.Client.NewRequest("host.delete", ids)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := HostReponse{}
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &r, nil
-}
+// 	return &r, nil
+// }
 
-// HostGetParameters define the properties used to search Host(s)
-// Properties using the 'omitempty' json parameters are optional
-type HostGetParameters struct {
-	GroupIds                      []string    `json:"groupids,omitempty"`
-	DserviceIds                   []string    `json:"dserviceids,omitempty"`
-	GraphIds                      []string    `json:"graphids,omitempty"`
-	HostIds                       []string    `json:"hostids,omitempty"`
-	HttpTestIds                   []string    `json:"httptestids,omitempty"`
-	InterfaceIds                  []string    `json:"interfaceids,omitempty"`
-	ItemIds                       []string    `json:"itemids,omitempty"`
-	MaintenanceIds                []string    `json:"maintenanceids,omitempty"`
-	MonitoredHosts                bool        `json:"monitored_hosts,omitempty"`
-	ProxyHosts                    bool        `json:"proxy_hosts,omitempty"`
-	ProxyIds                      []string    `json:"proxyids,omitempty"`
-	TemplatedHosts                bool        `json:"templated_hosts,omitempty"`
-	TemplateIds                   []string    `json:"templateids,omitempty"`
-	TriggerIds                    []string    `json:"triggerids,omitempty"`
-	WithItems                     bool        `json:"with_items,omitempty"`
-	WithItemPrototypes            bool        `json:"with_item_prototypes,omitempty"`
-	WithSimpleGraphItemPrototypes bool        `json:"with_simple_graph_item_prototypes,omitempty"`
-	WithGraphs                    bool        `json:"with_graphs,omitempty"`
-	WithGraphPrototypes           bool        `json:"with_graph_prototypes,omitempty"`
-	WithHttpTests                 bool        `json:"with_httptests,omitempty"`
-	WithMonitoredHttpTests        bool        `json:"with_monitored_httptests,omitempty"`
-	WithMonitoredItems            bool        `json:"with_monitored_items,omitempty"`
-	WithSimpleGraphItems          bool        `json:"with_simple_graph_items,omitempty"`
-	WithTriggers                  bool        `json:"with_triggers,omitempty"`
-	WithProblemsSuppressed        bool        `json:"withProblemsSuppressed,omitempty"`
-	EvalType                      EvalType    `json:"evaltype,omitempty"`
-	Severities                    []string    `json:"severities,omitempty"`
-	Tags                          HostTags    `json:"tags,omitempty"`
-	InheritedTags                 bool        `json:"inheritedTags,omitempty"`
-	SelectDiscoveries             interface{} `json:"selectDiscoveries,omitempty"`
-	SelectDiscoveryRule           interface{} `json:"selectDiscoveryRule,omitempty"`
-	SelectGraphs                  interface{} `json:"selectGraphs,omitempty"`
-	SelectGroups                  interface{} `json:"selectGroups,omitempty"`
-	SelectHostDiscovery           interface{} `json:"selectHostDiscovery,omitempty"`
-	SelectHttpTests               interface{} `json:"selectHttpTests,omitempty"`
-	SelectInterfaces              interface{} `json:"selectInterfaces,omitempty"`
-	SelectInventory               interface{} `json:"selectInventory,omitempty"`
-	SelectItems                   interface{} `json:"selectItems,omitempty"`
-	SelectMacros                  interface{} `json:"selectMacros,omitempty"`
-	SelectParentTemplates         interface{} `json:"selectParentTemplates,omitempty"`
-	SelectDashboards              interface{} `json:"selectDashboards,omitempty"`
-	SelectTags                    interface{} `json:"selectTags,omitempty"`
-	SelectInheritedTags           interface{} `json:"selectInheritedTags,omitempty"`
-	SelectTriggers                interface{} `json:"selectTriggers,omitempty"`
-	SelectValueMaps               interface{} `json:"selectValueMaps,omitempty"`
-	LimitSelects                  string      `json:"limitSelects,omitempty"`
-	SearchInventory               interface{} `json:"searchInventory,omitempty"`
-	CountOutput                   bool        `json:"countOutput,omitempty"`
-	Editable                      bool        `json:"editable,omitempty"`
-	ExcludeSearch                 bool        `json:"excludeSearch,omitempty"`
-	Filter                        interface{} `json:"filter,omitempty"`
-	Limit                         string      `json:"limit,omitempty"`
-	Output                        interface{} `json:"output,omitempty"`
-	PreserveKeys                  bool        `json:"preservekeys,omitempty"`
-	Search                        interface{} `json:"search,omitempty"`
-	SearchByAny                   bool        `json:"searchByAny,omitempty"`
-	SearchWildcardsEnabled        bool        `json:"searchWildcardsEnabled,omitempty"`
-	SortField                     []string    `json:"sortfield,omitempty"`
-	SortOrder                     []string    `json:"sortorder,omitempty"`
-	StartSearch                   bool        `json:"startSearch,omitempty"`
-}
+// // HostGetParameters define the properties used to search Host(s)
+// // Properties using the 'omitempty' json parameters are optional
+// type HostGetParameters struct {
+// 	GroupIds                      []string    `json:"groupids,omitempty"`
+// 	DserviceIds                   []string    `json:"dserviceids,omitempty"`
+// 	GraphIds                      []string    `json:"graphids,omitempty"`
+// 	HostIds                       []string    `json:"hostids,omitempty"`
+// 	HttpTestIds                   []string    `json:"httptestids,omitempty"`
+// 	InterfaceIds                  []string    `json:"interfaceids,omitempty"`
+// 	ItemIds                       []string    `json:"itemids,omitempty"`
+// 	MaintenanceIds                []string    `json:"maintenanceids,omitempty"`
+// 	MonitoredHosts                bool        `json:"monitored_hosts,omitempty"`
+// 	ProxyHosts                    bool        `json:"proxy_hosts,omitempty"`
+// 	ProxyIds                      []string    `json:"proxyids,omitempty"`
+// 	TemplatedHosts                bool        `json:"templated_hosts,omitempty"`
+// 	TemplateIds                   []string    `json:"templateids,omitempty"`
+// 	TriggerIds                    []string    `json:"triggerids,omitempty"`
+// 	WithItems                     bool        `json:"with_items,omitempty"`
+// 	WithItemPrototypes            bool        `json:"with_item_prototypes,omitempty"`
+// 	WithSimpleGraphItemPrototypes bool        `json:"with_simple_graph_item_prototypes,omitempty"`
+// 	WithGraphs                    bool        `json:"with_graphs,omitempty"`
+// 	WithGraphPrototypes           bool        `json:"with_graph_prototypes,omitempty"`
+// 	WithHttpTests                 bool        `json:"with_httptests,omitempty"`
+// 	WithMonitoredHttpTests        bool        `json:"with_monitored_httptests,omitempty"`
+// 	WithMonitoredItems            bool        `json:"with_monitored_items,omitempty"`
+// 	WithSimpleGraphItems          bool        `json:"with_simple_graph_items,omitempty"`
+// 	WithTriggers                  bool        `json:"with_triggers,omitempty"`
+// 	WithProblemsSuppressed        bool        `json:"withProblemsSuppressed,omitempty"`
+// 	EvalType                      EvalType    `json:"evaltype,omitempty"`
+// 	Severities                    []string    `json:"severities,omitempty"`
+// 	Tags                          HostTags    `json:"tags,omitempty"`
+// 	InheritedTags                 bool        `json:"inheritedTags,omitempty"`
+// 	SelectDiscoveries             interface{} `json:"selectDiscoveries,omitempty"`
+// 	SelectDiscoveryRule           interface{} `json:"selectDiscoveryRule,omitempty"`
+// 	SelectGraphs                  interface{} `json:"selectGraphs,omitempty"`
+// 	SelectGroups                  interface{} `json:"selectGroups,omitempty"`
+// 	SelectHostDiscovery           interface{} `json:"selectHostDiscovery,omitempty"`
+// 	SelectHttpTests               interface{} `json:"selectHttpTests,omitempty"`
+// 	SelectInterfaces              interface{} `json:"selectInterfaces,omitempty"`
+// 	SelectInventory               interface{} `json:"selectInventory,omitempty"`
+// 	SelectItems                   interface{} `json:"selectItems,omitempty"`
+// 	SelectMacros                  interface{} `json:"selectMacros,omitempty"`
+// 	SelectParentTemplates         interface{} `json:"selectParentTemplates,omitempty"`
+// 	SelectDashboards              interface{} `json:"selectDashboards,omitempty"`
+// 	SelectTags                    interface{} `json:"selectTags,omitempty"`
+// 	SelectInheritedTags           interface{} `json:"selectInheritedTags,omitempty"`
+// 	SelectTriggers                interface{} `json:"selectTriggers,omitempty"`
+// 	SelectValueMaps               interface{} `json:"selectValueMaps,omitempty"`
+// 	LimitSelects                  string      `json:"limitSelects,omitempty"`
+// 	SearchInventory               interface{} `json:"searchInventory,omitempty"`
+// 	CountOutput                   bool        `json:"countOutput,omitempty"`
+// 	Editable                      bool        `json:"editable,omitempty"`
+// 	ExcludeSearch                 bool        `json:"excludeSearch,omitempty"`
+// 	Filter                        interface{} `json:"filter,omitempty"`
+// 	Limit                         string      `json:"limit,omitempty"`
+// 	Output                        interface{} `json:"output,omitempty"`
+// 	PreserveKeys                  bool        `json:"preservekeys,omitempty"`
+// 	Search                        interface{} `json:"search,omitempty"`
+// 	SearchByAny                   bool        `json:"searchByAny,omitempty"`
+// 	SearchWildcardsEnabled        bool        `json:"searchWildcardsEnabled,omitempty"`
+// 	SortField                     []string    `json:"sortfield,omitempty"`
+// 	SortOrder                     []string    `json:"sortorder,omitempty"`
+// 	StartSearch                   bool        `json:"startSearch,omitempty"`
+// }
 
-// Get is used to retrieve one or multiples Hosts matching the given criteria(s).
-func (h *HostService) Get(p *HostGetParameters) ([]*Host, error) {
-	req := h.Client.NewRequest("host.get", p)
+// // Get is used to retrieve one or multiples Hosts matching the given criteria(s).
+// func (h *HostService) Get(p *HostGetParameters) ([]*Host, error) {
+// 	req := h.Client.NewRequest("host.get", p)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := make([]*Host, 0)
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := make([]*Host, 0)
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return r, nil
-}
+// 	return r, nil
+// }
 
-// HostMassAddParameters define the properties used for the MassAdd method.
-// Properties using the 'omitempty' json parameters are optional.
-type HostMassAddParameters struct {
-	Hosts      []*HostId        `json:"hosts"`
-	Groups     []*HostGroupId   `json:"groups,omitempty"`
-	Interfaces []*HostInterface `json:"interfaces,omitempty"`
-	Macros     []*HostMacro     `json:"macros,omitempty"`
-	Templates  []*TemplateId    `json:"templates,omitempty"`
-}
+// // HostMassAddParameters define the properties used for the MassAdd method.
+// // Properties using the 'omitempty' json parameters are optional.
+// type HostMassAddParameters struct {
+// 	Hosts      []*HostId        `json:"hosts"`
+// 	Groups     []*HostGroupId   `json:"groups,omitempty"`
+// 	Interfaces []*HostInterface `json:"interfaces,omitempty"`
+// 	Macros     []*HostMacro     `json:"macros,omitempty"`
+// 	Templates  []*TemplateId    `json:"templates,omitempty"`
+// }
 
-// MassAdd is used to massively add properties to existing Hosts.
-func (h *HostService) MassAdd(p *HostMassAddParameters) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.massadd", p)
+// // MassAdd is used to massively add properties to existing Hosts.
+// func (h *HostService) MassAdd(p *HostMassAddParameters) (*HostReponse, error) {
+// 	req := h.Client.NewRequest("host.massadd", p)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := HostReponse{}
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &r, nil
-}
+// 	return &r, nil
+// }
 
-// HostMassRemoveParameters define the properties used for the MassRemove method.
-// Properties using the 'omitempty' json parameters are optional.
-type HostMassRemoveParameters struct {
-	HostIds          []string         `json:"hostids"`
-	GroupIds         []string         `json:"groupids,omitempty"`
-	Interfaces       []*HostInterface `json:"interfaces,omitempty"`
-	Macros           []string         `json:"macros,omitempty"`
-	TemplateIds      []string         `json:"templateids,omitempty"`
-	TemplateIdsClear []string         `json:"templateids_clear,omitempty"`
-}
+// // HostMassRemoveParameters define the properties used for the MassRemove method.
+// // Properties using the 'omitempty' json parameters are optional.
+// type HostMassRemoveParameters struct {
+// 	HostIds          []string         `json:"hostids"`
+// 	GroupIds         []string         `json:"groupids,omitempty"`
+// 	Interfaces       []*HostInterface `json:"interfaces,omitempty"`
+// 	Macros           []string         `json:"macros,omitempty"`
+// 	TemplateIds      []string         `json:"templateids,omitempty"`
+// 	TemplateIdsClear []string         `json:"templateids_clear,omitempty"`
+// }
 
-// MassRemove is used to massively remove properties from existing Hosts.
-func (h *HostService) MassRemove(p *HostMassRemoveParameters) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.massremove", p)
+// // MassRemove is used to massively remove properties from existing Hosts.
+// func (h *HostService) MassRemove(p *HostMassRemoveParameters) (*HostReponse, error) {
+// 	req := h.Client.NewRequest("host.massremove", p)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := HostReponse{}
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &r, nil
-}
+// 	return &r, nil
+// }
 
-// HostMassUpdateParameters define the properties used for the MassUpdate method.
-// Properties using the 'omitempty' json parameters are optional.
-type HostMassUpdateParameters struct {
-	Hosts          []*HostId                `json:"hosts"`
-	Host           string                   `json:"host,omitempty"`
-	Name           string                   `json:"name,omitempty"`
-	Description    string                   `json:"description,omitempty"`
-	InventoryMode  HostInventoryMode        `json:"inventory_mode,omitempty"`
-	IpmiAuthType   HostIpmiAuthType         `json:"ipmi_authtype,omitempty"`
-	IpmiPassword   string                   `json:"ipmi_password,omitempty"`
-	IpmiPrivilege  HostIpmiPrivilege        `json:"ipmi_privilege,omitempty"`
-	IpmiUsername   string                   `json:"ipmi_username,omitempty"`
-	ProxyHostId    string                   `json:"proxy_hostid,omitempty"`
-	Status         HostStatus               `json:"status,omitempty"`
-	TlsConnect     HostTlsMode              `json:"tls_connect,omitempty"`
-	TlsAccept      HostTlsMode              `json:"tls_accept,omitempty"`
-	TlsIssuer      string                   `json:"tls_issuer,omitempty"`
-	TlsSubject     string                   `json:"tls_subject,omitempty"`
-	TlsPskIdentity string                   `json:"tls_psk_identity,omitempty"`
-	TlsPsk         string                   `json:"tls_psk,omitempty"`
-	Groups         []*HostGroupId           `json:"groups,omitempty"`
-	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
-	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
-	Macros         []*HostMacro             `json:"macros,omitempty"`
-	Templates      []*TemplateId            `json:"templates,omitempty"`
-	TemplatesClear []*TemplateId            `json:"templates_clear,omitempty"`
-}
+// // HostMassUpdateParameters define the properties used for the MassUpdate method.
+// // Properties using the 'omitempty' json parameters are optional.
+// type HostMassUpdateParameters struct {
+// 	Hosts          []*HostId                `json:"hosts"`
+// 	Host           string                   `json:"host,omitempty"`
+// 	Name           string                   `json:"name,omitempty"`
+// 	Description    string                   `json:"description,omitempty"`
+// 	InventoryMode  HostInventoryMode        `json:"inventory_mode,omitempty"`
+// 	IpmiAuthType   HostIpmiAuthType         `json:"ipmi_authtype,omitempty"`
+// 	IpmiPassword   string                   `json:"ipmi_password,omitempty"`
+// 	IpmiPrivilege  HostIpmiPrivilege        `json:"ipmi_privilege,omitempty"`
+// 	IpmiUsername   string                   `json:"ipmi_username,omitempty"`
+// 	ProxyHostId    string                   `json:"proxy_hostid,omitempty"`
+// 	Status         HostStatus               `json:"status,omitempty"`
+// 	TlsConnect     HostTlsMode              `json:"tls_connect,omitempty"`
+// 	TlsAccept      HostTlsMode              `json:"tls_accept,omitempty"`
+// 	TlsIssuer      string                   `json:"tls_issuer,omitempty"`
+// 	TlsSubject     string                   `json:"tls_subject,omitempty"`
+// 	TlsPskIdentity string                   `json:"tls_psk_identity,omitempty"`
+// 	TlsPsk         string                   `json:"tls_psk,omitempty"`
+// 	Groups         []*HostGroupId           `json:"groups,omitempty"`
+// 	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
+// 	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
+// 	Macros         []*HostMacro             `json:"macros,omitempty"`
+// 	Templates      []*TemplateId            `json:"templates,omitempty"`
+// 	TemplatesClear []*TemplateId            `json:"templates_clear,omitempty"`
+// }
 
-// MassUpdate is used to massively update or overwrite properties from existing Hosts.
-func (h *HostService) MassUpdate(p *HostMassUpdateParameters) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.massupdate", p)
+// // MassUpdate is used to massively update or overwrite properties from existing Hosts.
+// func (h *HostService) MassUpdate(p *HostMassUpdateParameters) (*HostReponse, error) {
+// 	req := h.Client.NewRequest("host.massupdate", p)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := HostReponse{}
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &r, nil
-}
+// 	return &r, nil
+// }
 
-// HostUpdateParameters define the properties needed for the Update method.
-// Properties using the 'omitempty' json parameters are optional.
-type HostUpdateParameters struct {
-	HostId         string                   `json:"hostid"`
-	Host           string                   `json:"host,omitempty"`
-	Name           string                   `json:"name,omitempty"`
-	Description    string                   `json:"description,omitempty"`
-	InventoryMode  HostInventoryMode        `json:"inventory_mode,omitempty"`
-	IpmiAuthType   HostIpmiAuthType         `json:"ipmi_authtype,omitempty"`
-	IpmiPassword   string                   `json:"ipmi_password,omitempty"`
-	IpmiPrivilege  HostIpmiPrivilege        `json:"ipmi_privilege,omitempty"`
-	IpmiUsername   string                   `json:"ipmi_username,omitempty"`
-	ProxyHostId    string                   `json:"proxy_hostid,omitempty"`
-	Status         HostStatus               `json:"status,omitempty"`
-	TlsConnect     HostTlsMode              `json:"tls_connect,omitempty"`
-	TlsAccept      HostTlsMode              `json:"tls_accept,omitempty"`
-	TlsIssuer      string                   `json:"tls_issuer,omitempty"`
-	TlsSubject     string                   `json:"tls_subject,omitempty"`
-	TlsPskIdentity string                   `json:"tls_psk_identity,omitempty"`
-	TlsPsk         string                   `json:"tls_psk,omitempty"`
-	Groups         []*HostGroupId           `json:"groups,omitempty"`
-	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
-	Tags           []*HostTag               `json:"tags,omitempty"`
-	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
-	Macros         []*HostMacro             `json:"macros,omitempty"`
-	Templates      []*TemplateId            `json:"templates,omitempty"`
-	TemplatesClear []*TemplateId            `json:"templates_clear,omitempty"`
-}
+// // HostUpdateParameters define the properties needed for the Update method.
+// // Properties using the 'omitempty' json parameters are optional.
+// type HostUpdateParameters struct {
+// 	HostId         string                   `json:"hostid"`
+// 	Host           string                   `json:"host,omitempty"`
+// 	Name           string                   `json:"name,omitempty"`
+// 	Description    string                   `json:"description,omitempty"`
+// 	InventoryMode  HostInventoryMode        `json:"inventory_mode,omitempty"`
+// 	IpmiAuthType   HostIpmiAuthType         `json:"ipmi_authtype,omitempty"`
+// 	IpmiPassword   string                   `json:"ipmi_password,omitempty"`
+// 	IpmiPrivilege  HostIpmiPrivilege        `json:"ipmi_privilege,omitempty"`
+// 	IpmiUsername   string                   `json:"ipmi_username,omitempty"`
+// 	ProxyHostId    string                   `json:"proxy_hostid,omitempty"`
+// 	Status         HostStatus               `json:"status,omitempty"`
+// 	TlsConnect     HostTlsMode              `json:"tls_connect,omitempty"`
+// 	TlsAccept      HostTlsMode              `json:"tls_accept,omitempty"`
+// 	TlsIssuer      string                   `json:"tls_issuer,omitempty"`
+// 	TlsSubject     string                   `json:"tls_subject,omitempty"`
+// 	TlsPskIdentity string                   `json:"tls_psk_identity,omitempty"`
+// 	TlsPsk         string                   `json:"tls_psk,omitempty"`
+// 	Groups         []*HostGroupId           `json:"groups,omitempty"`
+// 	Interfaces     []*HostInterface         `json:"interfaces,omitempty"`
+// 	Tags           []*HostTag               `json:"tags,omitempty"`
+// 	Inventory      map[HostInventory]string `json:"inventory,omitempty"`
+// 	Macros         []*HostMacro             `json:"macros,omitempty"`
+// 	Templates      []*TemplateId            `json:"templates,omitempty"`
+// 	TemplatesClear []*TemplateId            `json:"templates_clear,omitempty"`
+// }
 
-// Update is used to update or overwrite properties from an existing Host.
-func (h *HostService) Update(p *HostUpdateParameters) (*HostReponse, error) {
-	req := h.Client.NewRequest("host.update", p)
+// // Update is used to update or overwrite properties from an existing Host.
+// func (h *HostService) Update(p *HostUpdateParameters) (*HostReponse, error) {
+// 	req := h.Client.NewRequest("host.update", p)
 
-	res, err := h.Client.Post(req)
-	if err != nil {
-		return nil, err
-	}
+// 	res, err := h.Client.Post(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	r := HostReponse{}
-	err = h.Client.ConvertResponse(*res, &r)
-	if err != nil {
-		return nil, err
-	}
+// 	r := HostReponse{}
+// 	err = h.Client.ConvertResponse(*res, &r)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &r, nil
-}
+// 	return &r, nil
+// }
 
-// GetId is used to retrieve the zabbix id associated with the curent HostInventory field
-func GetHostInventoryId(h HostInventory) HostInventoryId {
-	switch h {
-	case Alias:
-		return "4"
-	case AssetTag:
-		return "11"
-	case Chassis:
-		return "28"
-	case Contact:
-		return "23"
-	case ContractNumber:
-		return "32"
-	case DateHwDecomm:
-		return "47"
-	case DateHwExpiry:
-		return "46"
-	case DateHwInstall:
-		return "45"
-	case DateHwPurchase:
-		return "44"
-	case DeploymentStatus:
-		return "34"
-	case Hardware:
-		return "14"
-	case HardwareFull:
-		return "15"
-	case HostNetmask:
-		return "39"
-	case HostNetworks:
-		return "38"
-	case HostRouter:
-		return "40"
-	case HwArch:
-		return "30"
-	case InstallerName:
-		return "33"
-	case Location:
-		return "24"
-	case LocationLat:
-		return "25"
-	case LocationLon:
-		return "26"
-	case MacAddressA:
-		return "12"
-	case MacAddressB:
-		return "13"
-	case Model:
-		return "29"
-	case Name:
-		return "3"
-	case Notes:
-		return "27"
-	case OobIp:
-		return "41"
-	case OobNetmask:
-		return "42"
-	case OobRouter:
-		return "43"
-	case Os:
-		return "5"
-	case OsFull:
-		return "6"
-	case OsShort:
-		return "7"
-	case Poc1Cell:
-		return "61"
-	case Poc1Email:
-		return "58"
-	case Poc1Name:
-		return "57"
-	case Poc1Notes:
-		return "63"
-	case Poc1PhoneA:
-		return "59"
-	case Poc1PhoneB:
-		return "60"
-	case Poc1Screen:
-		return "62"
-	case Poc2Cell:
-		return "68"
-	case Poc2Email:
-		return "65"
-	case Poc2Name:
-		return "64"
-	case Poc2Notes:
-		return "70"
-	case Poc2PhoneA:
-		return "66"
-	case Poc2PhoneB:
-		return "67"
-	case Poc2Screen:
-		return "69"
-	case SerialNoA:
-		return "8"
-	case SerialNoB:
-		return "9"
-	case SiteAddressA:
-		return "48"
-	case SiteAddressB:
-		return "49"
-	case SiteAddressC:
-		return "50"
-	case SiteCity:
-		return "51"
-	case SiteCountry:
-		return "53"
-	case SitNotes:
-		return "56"
-	case SiteRack:
-		return "55"
-	case SiteState:
-		return "52"
-	case SiteZip:
-		return "54"
-	case Software:
-		return "16"
-	case SoftwareAppA:
-		return "18"
-	case SoftwareAppB:
-		return "19"
-	case SoftwareAppC:
-		return "20"
-	case SoftwareAppD:
-		return "21"
-	case SoftwareAppE:
-		return "22"
-	case SoftwareFull:
-		return "17"
-	case Tag:
-		return "10"
-	case Type:
-		return "1"
-	case TypeFull:
-		return "2"
-	case UrlA:
-		return "35"
-	case UrlB:
-		return "36"
-	case UrlC:
-		return "37"
-	case Vendor:
-		return "31"
-	default:
-		return "0"
-	}
-}
+// // GetId is used to retrieve the zabbix id associated with the curent HostInventory field
+// func GetHostInventoryId(h HostInventory) HostInventoryId {
+// 	switch h {
+// 	case Alias:
+// 		return "4"
+// 	case AssetTag:
+// 		return "11"
+// 	case Chassis:
+// 		return "28"
+// 	case Contact:
+// 		return "23"
+// 	case ContractNumber:
+// 		return "32"
+// 	case DateHwDecomm:
+// 		return "47"
+// 	case DateHwExpiry:
+// 		return "46"
+// 	case DateHwInstall:
+// 		return "45"
+// 	case DateHwPurchase:
+// 		return "44"
+// 	case DeploymentStatus:
+// 		return "34"
+// 	case Hardware:
+// 		return "14"
+// 	case HardwareFull:
+// 		return "15"
+// 	case HostNetmask:
+// 		return "39"
+// 	case HostNetworks:
+// 		return "38"
+// 	case HostRouter:
+// 		return "40"
+// 	case HwArch:
+// 		return "30"
+// 	case InstallerName:
+// 		return "33"
+// 	case Location:
+// 		return "24"
+// 	case LocationLat:
+// 		return "25"
+// 	case LocationLon:
+// 		return "26"
+// 	case MacAddressA:
+// 		return "12"
+// 	case MacAddressB:
+// 		return "13"
+// 	case Model:
+// 		return "29"
+// 	case Name:
+// 		return "3"
+// 	case Notes:
+// 		return "27"
+// 	case OobIp:
+// 		return "41"
+// 	case OobNetmask:
+// 		return "42"
+// 	case OobRouter:
+// 		return "43"
+// 	case Os:
+// 		return "5"
+// 	case OsFull:
+// 		return "6"
+// 	case OsShort:
+// 		return "7"
+// 	case Poc1Cell:
+// 		return "61"
+// 	case Poc1Email:
+// 		return "58"
+// 	case Poc1Name:
+// 		return "57"
+// 	case Poc1Notes:
+// 		return "63"
+// 	case Poc1PhoneA:
+// 		return "59"
+// 	case Poc1PhoneB:
+// 		return "60"
+// 	case Poc1Screen:
+// 		return "62"
+// 	case Poc2Cell:
+// 		return "68"
+// 	case Poc2Email:
+// 		return "65"
+// 	case Poc2Name:
+// 		return "64"
+// 	case Poc2Notes:
+// 		return "70"
+// 	case Poc2PhoneA:
+// 		return "66"
+// 	case Poc2PhoneB:
+// 		return "67"
+// 	case Poc2Screen:
+// 		return "69"
+// 	case SerialNoA:
+// 		return "8"
+// 	case SerialNoB:
+// 		return "9"
+// 	case SiteAddressA:
+// 		return "48"
+// 	case SiteAddressB:
+// 		return "49"
+// 	case SiteAddressC:
+// 		return "50"
+// 	case SiteCity:
+// 		return "51"
+// 	case SiteCountry:
+// 		return "53"
+// 	case SitNotes:
+// 		return "56"
+// 	case SiteRack:
+// 		return "55"
+// 	case SiteState:
+// 		return "52"
+// 	case SiteZip:
+// 		return "54"
+// 	case Software:
+// 		return "16"
+// 	case SoftwareAppA:
+// 		return "18"
+// 	case SoftwareAppB:
+// 		return "19"
+// 	case SoftwareAppC:
+// 		return "20"
+// 	case SoftwareAppD:
+// 		return "21"
+// 	case SoftwareAppE:
+// 		return "22"
+// 	case SoftwareFull:
+// 		return "17"
+// 	case Tag:
+// 		return "10"
+// 	case Type:
+// 		return "1"
+// 	case TypeFull:
+// 		return "2"
+// 	case UrlA:
+// 		return "35"
+// 	case UrlB:
+// 		return "36"
+// 	case UrlC:
+// 		return "37"
+// 	case Vendor:
+// 		return "31"
+// 	default:
+// 		return "0"
+// 	}
+// }
