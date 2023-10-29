@@ -1,185 +1,330 @@
 package zabbixgosdk
 
 import (
+	"fmt"
 	"testing"
 )
 
-const (
-	hostGroupName        = "test-host-group"
-	updatedHostGroupName = "test-host-group-update"
-)
-
-var hostGroupId string
-
 func TestHostGroupCreate(t *testing.T) {
-	g, err := testingClient.HostGroup.Create(hostGroupName)
+	g, err := testingClient.HostGroup.Create(fmt.Sprintf("test-host-group-%d", generateId()))
 	if err != nil {
-		t.Fatalf("Error when creating hostgroup '%s'.\nReason : %v", hostGroupName, err)
+		t.Fatalf("error while executing Create function\nReason: %v", err)
 	}
 
-	if g == nil || len(g.GroupIds) == 0 {
-		t.Fatalf("Create method should return a list of the created hostgroups.\nAn empty list was returned.")
+	if g == nil || len(g.Result.Ids) == 0 {
+		t.Fatal("an empty list of hostGroup ids was returned")
 	}
-
-	hostGroupId = g.GroupIds[0]
 }
 
-func TestHostGroupList(t *testing.T) {
-	g, err := testingClient.HostGroup.List()
-	if err != nil {
-		t.Fatalf("Error when listing hostgroups.\nReason : %v", err)
-	}
+func BenchmarkHostGroupCreate(b *testing.B) {
+	var name string
+	for i := 0; i < b.N; i++ {
+		name = fmt.Sprintf("test-host-group-%d", generateId())
 
-	if len(g) == 0 {
-		t.Fatalf("List method should return a list with all the existing hostgroups on the server.\nAn empty list was returned.")
+		_, err := testingClient.HostGroup.Create(name)
+		if err != nil {
+			b.Fatalf("error while executing Create function\nReason: %v", err)
+		}
 	}
 }
 
 func TestHostGroupGet(t *testing.T) {
 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
-		GroupIds: []string{
-			hostGroupId,
+		CommonGetParameters: CommonGetParameters{
+			Filter: map[string]string{},
 		},
+		SelectDiscoveryRule:  "extend",
+		SelectGroupDiscovery: "extend",
+		SelectHosts:          "extend",
+		SelectTemplates:      "extend",
 	})
 
 	if err != nil {
-		t.Fatalf("Error when getting host group '%s'.\nReason : %v", hostGroupName, err)
+		t.Fatalf("error while executing Get function\nReason: %v", err)
 	}
 
-	if len(g) == 0 {
-		t.Fatalf("Get method should return a list of hostgroups matching the given criteria.\nAn empty list was returned.")
-	}
-
-	if g[0].Id != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g[0].Id)
+	if len(g.Result) == 0 {
+		t.Fatal("an empty list of HostGroups was returned")
 	}
 }
 
-func TestHostGroupMassAdd(t *testing.T) {
-	g, err := testingClient.HostGroup.MassAdd(&HostGroupMassAddParameters{
-		Groups: []*HostGroupId{
-			{
-				GroupId: hostGroupId,
-			},
+func BenchmarkHostGroupGet(b *testing.B) {
+	params := HostGroupGetParameters{
+		CommonGetParameters: CommonGetParameters{
+			Filter: map[string]string{},
 		},
-		Hosts: []*HostId{
-			{
-				HostId: "10084",
-			},
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when massadding hosts to the hostgroup '%s'.\nReason : %v", hostGroupId, err)
+		SelectDiscoveryRule:  "extend",
+		SelectGroupDiscovery: "extend",
+		SelectHosts:          "extend",
+		SelectTemplates:      "extend",
 	}
 
-	if g == nil || len(g.GroupIds) == 0 {
-		t.Fatal("MassAdd method should return a list of the updated hostgroups.\nAn empty list was returned.")
-	}
+	for i := 0; i < b.N; i++ {
+		_, err := testingClient.HostGroup.Get(&params)
 
-	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong hostgroup returned.\nExpected : %s\nRreturned : %s", hostGroupId, g.GroupIds[0])
-	}
-}
-
-func TestHostGroupMassRemove(t *testing.T) {
-	g, err := testingClient.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
-		GroupsIds: []string{
-			hostGroupId,
-		},
-		HostIds: []string{
-			"10084",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when massremoving hosts from the hostgroup '%s'.\nReason : %v", hostGroupId, err)
-	}
-
-	if g == nil || len(g.GroupIds) == 0 {
-		t.Fatal("MassRemove method should return a list of the updated hostgroups.\nAn empty list was returned.")
-	}
-
-	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
-	}
-}
-
-func TestHostGroupMassUpdate(t *testing.T) {
-	template, err := testingClient.Template.Get(&TemplateGetParameters{
-		Filter: map[string]string{
-			"name": "Zabbix server health",
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when getting template 'Zabbix server health'.\nReason : %v", err)
-	}
-
-	if len(template) == 0 {
-		t.Fatalf("An empty list was returned when getting the template 'Zabbix server health'")
-	}
-
-	g, err := testingClient.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
-		Groups: []*HostGroupId{
-			{
-				GroupId: hostGroupId,
-			},
-		},
-		Hosts: []*HostId{
-			{
-				HostId: "10084",
-			},
-		},
-		Templates: []*TemplateId{
-			{
-				Id: template[0].TemplateId,
-			},
-		},
-	})
-
-	if err != nil {
-		t.Fatalf("Error when mass updating hostgroup '%s'.\nReason : %v", hostGroupId, err)
-	}
-
-	if g == nil || len(g.GroupIds) == 0 {
-		t.Fatal("MassUpdate method should return a list of the updated hostgroups.\nAn empty list was returned.")
-	}
-
-	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
+		if err != nil {
+			b.Fatalf("error while executing Get function\nReason: %v", err)
+		}
 	}
 }
 
 func TestHostGroupUpdate(t *testing.T) {
-	g, err := testingClient.HostGroup.Update(hostGroupId, updatedHostGroupName)
+	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+		CommonGetParameters: CommonGetParameters{
+			Search: map[string]string{
+				"name": "Hypervisors",
+			},
+			Output: []string{
+				"groupid",
+			},
+		},
+	})
+
 	if err != nil {
-		t.Fatalf("Error when updating name of the hostgroup '%s'.\nReason : %v", hostGroupName, err)
+		t.Fatalf("error while executing Get function\nReason: %v", err)
 	}
 
-	if g == nil || len(g.GroupIds) == 0 {
-		t.Fatal("Update method should return a list of the updated hostgroups.\nAn empty list was returned.")
+	updatedG, err := testingClient.HostGroup.Update(g.Result[0].Id, "Hypervisors-updated")
+	if err != nil {
+		t.Fatalf("error while executing Update function\nReason: %v", err)
 	}
 
-	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
+	if len(updatedG.Result.Ids) == 0 {
+		t.Fatalf("an empty list of HostGroups was returned")
+	}
+}
+
+func BenchmarkHostGroupUpdate(b *testing.B) {
+	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+		CommonGetParameters: CommonGetParameters{
+			Search: map[string]string{
+				"name": "Hypervisors",
+			},
+			Output: []string{
+				"groupid",
+			},
+		},
+	})
+
+	if err != nil {
+		b.Fatalf("error while executing Get function\nReason: %v", err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err := testingClient.HostGroup.Update(g.Result[0].Id, fmt.Sprintf("Hypervisors-%d", generateId()))
+		if err != nil {
+			b.Fatalf("error while executing Update function\nReason: %v", err)
+		}
 	}
 }
 
 func TestHostGroupDelete(t *testing.T) {
-	g, err := testingClient.HostGroup.Delete([]string{
-		hostGroupId,
-	})
-
+	name := fmt.Sprintf("test-host-group-%d", generateId())
+	g, err := testingClient.HostGroup.Create(name)
 	if err != nil {
-		t.Fatalf("Error when deleting hostgroup '%s'.\nReason : %v", hostGroupName, err)
+		t.Fatalf("error while creating '%s' host group\nReason: %v", name, err)
 	}
 
-	if g.GroupIds == nil || len(g.GroupIds) == 0 {
-		t.Fatalf("Delete method should return a list with the id of the deleted hostgroups.\nAn empty list was returned.")
+	removedG, err := testingClient.HostGroup.Delete([]string{
+		g.Result.Ids[0],
+	})
+	if err != nil {
+		t.Fatalf("error while executing Delete function\nReason: %v", err)
 	}
 
-	if g.GroupIds[0] != hostGroupId {
-		t.Fatalf("Wrong host group returned.\nExpected : %s\nReturned : %s", hostGroupId, g.GroupIds[0])
+	if len(removedG.Result.Ids) == 0 {
+		t.Fatalf("an empty list of HostGroups was returned")
 	}
 }
+
+// No benchmark provided for the HostGroup delete method
+
+// -- TODO : implement after refactoring 'host.get'
+// func TestHostGroupMassAdd(t *testing.T) {
+// 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+// 		CommonGetParameters: CommonGetParameters{
+// 			Search: map[string]string{
+// 				"name": "Discovered hosts",
+// 			},
+// 			Output: []string{
+// 				"groupid",
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		t.Fatalf("error while executing Get function\nReason: %v", err)
+// 	}
+
+// 	fmt.Println(g.Result[0].Id)
+// 	massAddedG, err := testingClient.HostGroup.MassAdd(&HostGroupMassAddParameters{
+// 		Groups: []*HostGroupId{
+// 			{
+// 				Id: g.Result[0].Id,
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		t.Fatalf("error while executing MassAdd function\nReason: %v", err)
+// 	}
+
+// 	if len(massAddedG.Result.Ids) == 0 {
+// 		t.Fatalf("an empty list of HostGroups was returned")
+// 	}
+// }
+
+// func BenchmarkHostGroupMassAdd(b *testing.B) {
+// 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+// 		CommonGetParameters: CommonGetParameters{
+// 			Search: map[string]string{
+// 				"name": "Discovered hosts",
+// 			},
+// 			Output: []string{
+// 				"groupid",
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		b.Fatalf("error while executing Get function\nReason: %v", err)
+// 	}
+
+// 	for i := 0; i < b.N; i++ {
+// 		_, err = testingClient.HostGroup.MassAdd(&HostGroupMassAddParameters{
+// 			Groups: []*HostGroupId{
+// 				{
+// 					Id: g.Result[0].Id,
+// 				},
+// 			},
+// 		})
+
+// 		if err != nil {
+// 			b.Fatalf("error while executing MassAdd function\nReason: %v", err)
+// 		}
+// 	}
+// }
+
+// func TestHostGroupMassRemove(t *testing.T) {
+// 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+// 		CommonGetParameters: CommonGetParameters{
+// 			Search: map[string]string{
+// 				"name": "Discovered hosts",
+// 			},
+// 			Output: []string{
+// 				"groupid",
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		t.Fatalf("error while executing Get function\nReason: %v", err)
+// 	}
+
+// 	massRemovedG, err := testingClient.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
+// 		GroupsIds: []string{
+// 			g.Result[0].Id,
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		t.Fatalf("error while executing MassRemove function\nReason: %v", err)
+// 	}
+
+// 	if len(massRemovedG.Result.Ids) == 0 {
+// 		t.Fatalf("an empty list of HostGroups was returned")
+// 	}
+// }
+
+// func BenchmarkHostGroupMassRemove(b *testing.B) {
+// 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+// 		CommonGetParameters: CommonGetParameters{
+// 			Search: map[string]string{
+// 				"name": "Discovered hosts",
+// 			},
+// 			Output: []string{
+// 				"groupid",
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		b.Fatalf("error while executing Get function\nReason: %v", err)
+// 	}
+
+// 	for i := 0; i < b.N; i++ {
+// 		_, err = testingClient.HostGroup.MassRemove(&HostGroupMassRemoveParameters{
+// 			GroupsIds: []string{
+// 				g.Result[0].Id,
+// 			},
+// 		})
+
+// 		if err != nil {
+// 			b.Fatalf("error while executing MassRemove function\nReason: %v", err)
+// 		}
+// 	}
+// }
+
+// func TestHostGroupMassUpdate(t *testing.T) {
+// 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+// 		CommonGetParameters: CommonGetParameters{
+// 			Search: map[string]string{
+// 				"name": "Discovered hosts",
+// 			},
+// 			Output: []string{
+// 				"groupid",
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		t.Fatalf("error while executing Get function\nReason: %v", err)
+// 	}
+
+// 	massUpdatedG, err := testingClient.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
+// 		Groups: []*HostGroupId{
+// 			{
+// 				Id: g.Result[0].Id,
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		t.Fatalf("error while executing MassUpdate function\nReason: %v", err)
+// 	}
+
+// 	if len(massUpdatedG.Result.Ids) == 0 {
+// 		t.Fatalf("an empty list of HostGroups was returned")
+// 	}
+// }
+
+// func BenchmarkHostGroupMassUpdate(b *testing.B) {
+// 	g, err := testingClient.HostGroup.Get(&HostGroupGetParameters{
+// 		CommonGetParameters: CommonGetParameters{
+// 			Search: map[string]string{
+// 				"name": "Discovered hosts",
+// 			},
+// 			Output: []string{
+// 				"groupid",
+// 			},
+// 		},
+// 	})
+
+// 	if err != nil {
+// 		b.Fatalf("error while executing Get function\nReason: %v", err)
+// 	}
+
+// 	for i := 0; i < b.N; i++ {
+// 		_, err := testingClient.HostGroup.MassUpdate(&HostGroupMassUpdateParameters{
+// 			Groups: []*HostGroupId{
+// 				{
+// 					Id: g.Result[0].Id,
+// 				},
+// 			},
+// 		})
+
+// 		if err != nil {
+// 			b.Fatalf("error while executing MassUpdate function\nReason: %v", err)
+// 		}
+// 	}
+// }

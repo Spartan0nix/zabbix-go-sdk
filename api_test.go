@@ -2,55 +2,166 @@ package zabbixgosdk
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"math/rand"
+	"io"
 	"net/http"
+	"reflect"
 	"testing"
-	"time"
 )
 
-var testingClient *ZabbixService
+func TestError(t *testing.T) {
+	testCode := 1
+	testMessage := "testing error message"
+	testData := "testing error data"
+	errExpected := fmt.Sprintf("an error was returned by the Zabbix API: '%s' (data: '%s') (code: '%d')", testMessage, testData, testCode)
 
-func init() {
-	testingClient = newTestingService()
-}
-
-func newTestingService() *ZabbixService {
-	client := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
-	client.SetUser(&ApiUser{
-		User: "Admin",
-		Pwd:  "zabbix",
-	})
-
-	err := client.Authenticate()
-	if err != nil {
-		log.Fatalf("Error when creating new testing service.\nReason : %v", err)
+	err := ResponseError{
+		Code:    testCode,
+		Message: testMessage,
+		Data:    testData,
 	}
 
-	return client
+	errReturned := err.Error()
+	if errReturned != errExpected {
+		t.Fatalf("wrong format returned\nExpected: '%s'\nReturned: '%s'", errExpected, errReturned)
+	}
 }
 
-// generateId is used to generate a random id to prevent duplicate entry during benchmarks.
-func generateId() int {
-	rand.NewSource(time.Now().UnixNano())
-	value := rand.Intn(9999)
+func BenchmarkError(b *testing.B) {
+	err := ResponseError{
+		Code:    1,
+		Message: "testing error message",
+		Data:    "testing error data",
+	}
 
-	return value
+	for i := 0; i < b.N; i++ {
+		_ = err.Error()
+	}
+}
+
+func TestValidate(t *testing.T) {
+	testCode := 1
+	testMessage := "testing error message"
+	testData := "testing error data"
+	errExpected := fmt.Sprintf("an error was returned by the Zabbix API: '%s' (data: '%s') (code: '%d')", testMessage, testData, testCode)
+
+	res := Response[string]{
+		JsonRpc: "2.0",
+		Result:  "",
+		Error: ResponseError{
+			Code:    testCode,
+			Message: testMessage,
+			Data:    testData,
+		},
+		Id: 1,
+	}
+
+	errReturned := res.Validate()
+
+	if errReturned == nil {
+		t.Fatalf("expected an error while executing Validate, a nil value was returned")
+	}
+
+	if errReturned.Error() != errExpected {
+		t.Fatalf("wrong format returned\nExpected: '%s'\nReturned: '%s'", errExpected, errReturned.Error())
+	}
+}
+
+func TestValidateNoError(t *testing.T) {
+	res := Response[string]{
+		JsonRpc: "2.0",
+		Result:  "my-response",
+		Id:      1,
+	}
+
+	err := res.Validate()
+	if err != nil {
+		t.Fatalf("expected an nil error while executing Validate\nValue returned: %v", err)
+	}
+
+}
+
+func BenchmarkValidate(b *testing.B) {
+	res := Response[string]{
+		JsonRpc: "2.0",
+		Result:  "",
+		Error: ResponseError{
+			Code:    1,
+			Message: "testing error message",
+			Data:    "testing error data",
+		},
+		Id: 1,
+	}
+
+	var err error
+	for i := 0; i < b.N; i++ {
+		err = res.Validate()
+		if err == nil {
+			b.Fatalf("expected an error while executing Validate, a nil value was returned")
+		}
+	}
+}
+
+func BenchmarkValidateNoError(b *testing.B) {
+	res := Response[string]{
+		JsonRpc: "2.0",
+		Result:  "my-response",
+		Id:      1,
+	}
+
+	var err error
+	for i := 0; i < b.N; i++ {
+		err = res.Validate()
+		if err != nil {
+			b.Fatalf("expected an nil error while executing Validate\nValue returned: %v", err)
+		}
+	}
+}
+
+func TestBuildRequest(t *testing.T) {
+	req, err := testingClient.User.client.buildRequest(map[string]string{
+		"key": "value",
+	})
+
+	if err != nil {
+		t.Fatalf("error while executing buildRequest function\nReason: %v", err)
+	}
+
+	if req == nil {
+		t.Fatalf("expected an *http.Request to be returned\nelement returned: %v", reflect.TypeOf(req))
+	}
+}
+
+func BenchmarkBuildRequest(b *testing.B) {
+	params := map[string]string{
+		"key": "value",
+	}
+
+	for i := 0; i < b.N; i++ {
+		req, err := testingClient.User.client.buildRequest(params)
+		if err != nil {
+			b.Fatalf("error while executing buildRequest function\nReason: %v", err)
+		}
+
+		if req == nil {
+			b.Fatalf("expected an *http.Request to be returned\nelement returned: %v", reflect.TypeOf(req))
+		}
+	}
 }
 
 func TestNewRequest(t *testing.T) {
-	req := testingClient.Auth.Client.NewRequest("method.test", []string{
+	req, err := testingClient.User.client.NewRequest("method.test", []string{
 		"test-params",
 	})
 
-	if req.Method != "method.test" {
-		t.Fatalf("Wrong method returned.\nExpected : 'method.test'\nReturned : %s", req.Method)
+	if err != nil {
+		t.Fatalf("error while executing NewRequest function\nReason: %v", err)
 	}
 
-	if req.Params.([]string)[0] != "test-params" {
-		t.Fatalf("Wrong params returned.\nExpected : 'test-params'\nReturned : %v", req.Params)
+	if req == nil {
+		t.Fatalf("expected an *http.Request to be returned\nelement returned: %v", reflect.TypeOf(req))
 	}
 }
 
@@ -60,251 +171,274 @@ func BenchmarkNewRequest(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
-		testingClient.Auth.Client.NewRequest("method.test", params)
+		testingClient.User.client.NewRequest("method.test", params)
+	}
+}
+
+func TestNewCustomRequest(t *testing.T) {
+	type testingRequest struct {
+		JsonRpc string            `json:"jsonrpc"`
+		Method  string            `json:"method"`
+		Params  map[string]string `json:"params"`
+		Id      int               `json:"id"`
+	}
+
+	body := testingRequest{
+		JsonRpc: "2.0",
+		Method:  "method.test",
+		Params: map[string]string{
+			"field1": "value1",
+			"field2": "value2",
+		},
+		Id: 1,
+	}
+
+	req, err := testingClient.User.client.NewCustomRequest(body)
+
+	if err != nil {
+		t.Fatalf("error while executing NewCustomRequest function\nReason: %v", err)
+	}
+
+	if req == nil {
+		t.Fatalf("expected an *http.Request to be returned\nelement returned: %v", reflect.TypeOf(req))
+	}
+}
+
+func BenchmarkNewCustomRequest(b *testing.B) {
+	type testingRequest struct {
+		JsonRpc string            `json:"jsonrpc"`
+		Method  string            `json:"method"`
+		Params  map[string]string `json:"params"`
+		Id      int               `json:"id"`
+	}
+
+	body := testingRequest{
+		JsonRpc: "2.0",
+		Method:  "method.test",
+		Params: map[string]string{
+			"field1": "value1",
+			"field2": "value2",
+		},
+		Id: 1,
+	}
+
+	for i := 0; i < b.N; i++ {
+		testingClient.User.client.NewCustomRequest(body)
 	}
 }
 
 func TestExecuteRequest(t *testing.T) {
-	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
-		Filter: map[string]string{},
+	req, err := testingClient.HostGroup.client.NewRequest("usergroup.get", HostGroupGetParameters{
+		CommonGetParameters: CommonGetParameters{
+			Filter: map[string]string{},
+		},
 	})
 
-	b, err := json.Marshal(params)
 	if err != nil {
-		t.Fatalf("Error when convertig request to json.\nReason : %v", err)
+		t.Fatalf("error while executing NewRequest function\nReason: %v", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, testingClient.UserGroup.Client.Url, bytes.NewReader(b))
+	res, err := testingClient.HostGroup.client.ExecuteRequest(req)
 	if err != nil {
-		t.Fatalf("Error when creating a new POST request.\nReason : %v", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json-rpc")
-
-	res, err := testingClient.UserGroup.Client.ExecuteRequest(req)
-	if err != nil {
-		t.Fatalf("Error when executing POST request.\nReason %v", err)
+		t.Fatalf("Error when executing ExecuteRequest function\nReason: %v", err)
 	}
 
 	if res == nil {
-		t.Fatal("The POST request returned an empty slice of byte.")
+		t.Fatal("A nil value was returned instead of *http.Response")
 	}
 }
 
 func BenchmarkExecuteRequest(b *testing.B) {
-	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
-		Filter: map[string]string{},
-	})
-
-	byte, err := json.Marshal(params)
-	if err != nil {
-		b.Fatalf("error while converting request to json\nReason : %v", err)
+	body := request{
+		JsonRpc: "2.0",
+		Method:  "usergroup.get",
+		Params: &HostGroupGetParameters{
+			CommonGetParameters: CommonGetParameters{
+				Filter: map[string]string{},
+			},
+		},
+		Id:   1,
+		Auth: testingClient.HostGroup.client.token,
 	}
 
-	req, err := http.NewRequest(http.MethodPost, testingClient.UserGroup.Client.Url, bytes.NewReader(byte))
+	baseReq, err := testingClient.HostGroup.client.NewCustomRequest(body)
 	if err != nil {
-		b.Fatalf("error while creating a new POST request\nReason : %v", err)
+		b.Fatalf("error while executing NewRequest function\nReason: %v", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json-rpc")
+	var buf bytes.Buffer
+	buf.ReadFrom(baseReq.Body)
 
 	for i := 0; i < b.N; i++ {
-		_, err = testingClient.UserGroup.Client.ExecuteRequest(req)
+		req := baseReq.Clone(context.Background())
+		req.Body = io.NopCloser(bytes.NewReader(buf.Bytes()))
+
+		res, err := testingClient.HostGroup.client.ExecuteRequest(req)
 		if err != nil {
-			b.Fatalf("error while executing ExecuteRequest function\nReason : %v", err)
+			b.Fatalf("Error when executing ExecuteRequest function\nReason: %v", err)
 		}
-	}
-}
 
-func TestPost(t *testing.T) {
-	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
-		Filter: map[string]string{},
-	})
-
-	res, err := testingClient.UserGroup.Client.Post(params)
-	if err != nil {
-		t.Fatalf("Error when executing POST request.\nReason : %v", err)
-	}
-
-	if res.Result == nil {
-		t.Fatalf("The POST request returned an empty result.\nResponse error : %v", res.Error)
-	}
-}
-
-func BenchmarkPost(b *testing.B) {
-	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
-		Filter: map[string]string{},
-	})
-
-	var err error
-	for i := 0; i < b.N; i++ {
-		_, err = testingClient.UserGroup.Client.Post(params)
-		if err != nil {
-			b.Fatalf("error while executing Post function\nReason : %v", err)
+		if res == nil {
+			b.Fatal("A nil value was returned instead of *http.Response")
 		}
 	}
 }
 
 func TestConvertResponse(t *testing.T) {
-	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
-		Filter: map[string]string{},
-	})
+	resBody := Response[string]{
+		JsonRpc: "2.0",
+		Result:  "my-response",
+		Id:      1,
+	}
 
-	res, err := testingClient.UserGroup.Client.Post(params)
+	body, err := json.Marshal(resBody)
 	if err != nil {
-		t.Fatalf("Error when executing POST request.\nReason : %v", err)
+		t.Fatalf("error while converting body to json\nReason: %v", err)
 	}
 
-	if res.Result == nil {
-		t.Fatalf("The POST request returned an empty result.\nResponse error : %v", res.Error)
+	res := http.Response{
+		Status: http.StatusText(200),
+		Body:   io.NopCloser(bytes.NewReader(body)),
 	}
 
-	groups := make([]UserGroup, 0)
-	err = testingClient.UserGroup.Client.ConvertResponse(*res, &groups)
+	expectedResponse := Response[string]{}
+	err = testingClient.HostGroup.client.ConvertResponse(&res, &expectedResponse)
 	if err != nil {
-		t.Fatalf("Error when converting the response.\nReason : %v", err)
+		t.Fatalf("error while executing ConvertResponse function\nReason: %v", err)
 	}
 
-	if groups[0].UsrGrpId == "" {
-		t.Fatalf("Converted response is empty.\nResponse : %v", res)
+	if expectedResponse.JsonRpc != "2.0" {
+		t.Fatalf("expected '%s' for the 'JsonRpc' field\nValue returned: '%s'", "2.0", expectedResponse.JsonRpc)
+	}
+
+	if expectedResponse.Result != "my-response" {
+		t.Fatalf("expected '%s' for the 'Result' field\nValue returned: '%s'", "my-response", expectedResponse.Result)
+	}
+
+	if expectedResponse.Id != 1 {
+		t.Fatalf("expected '%d' for the 'Id' field\nValue returned: '%d'", 1, expectedResponse.Id)
 	}
 }
 
 func BenchmarkConvertResponse(b *testing.B) {
-	params := testingClient.UserGroup.Client.NewRequest("usergroup.get", UserGroupGetParameters{
-		Filter: map[string]string{},
-	})
+	resBody := Response[string]{
+		JsonRpc: "2.0",
+		Result:  "my-response",
+		Id:      1,
+	}
 
-	res, err := testingClient.UserGroup.Client.Post(params)
+	body, err := json.Marshal(resBody)
 	if err != nil {
-		b.Fatalf("error when executing POST request\nReason : %v", err)
+		b.Fatalf("error while converting body to json\nReason: %v", err)
 	}
 
-	if res.Result == nil {
-		b.Fatalf("the request returned an empty result\nResponse error : %v", res.Error)
-	}
-
-	groups := make([]UserGroup, 0)
 	for i := 0; i < b.N; i++ {
-		groups = []UserGroup{}
+		res := http.Response{
+			Status: http.StatusText(200),
+			Body:   io.NopCloser(bytes.NewReader(body)),
+		}
 
-		err = testingClient.UserGroup.Client.ConvertResponse(*res, &groups)
+		expectedResponse := Response[string]{}
+		err = testingClient.HostGroup.client.ConvertResponse(&res, &expectedResponse)
 		if err != nil {
-			b.Fatalf("error while executing ConvertResponse function\nReason : %v", err)
+			b.Fatalf("error while executing ConvertResponse function\nReason: %v", err)
 		}
+
 	}
 }
 
-func TestError(t *testing.T) {
-	params := testingClient.UserGroup.Client.NewRequest("test.error", map[string]string{})
-
-	res, err := testingClient.UserGroup.Client.Post(params)
-	if err != nil {
-		t.Fatalf("Error when executing POST request.\nReason : %v", err)
+func TestPost(t *testing.T) {
+	res := Response[[]*HostGroup]{}
+	params := HostGroupGetParameters{
+		CommonGetParameters: CommonGetParameters{
+			Filter: map[string]string{},
+		},
 	}
 
-	err = testingClient.Auth.Client.Error(*res)
-	if err == nil {
-		t.Fatalf("Error when formatting error message.\nResponse : %v", res)
+	err := testingClient.HostGroup.client.Post("hostgroup.get", &params, &res)
+	if err != nil {
+		t.Fatalf("error while executing Post function\nReason: %v", err)
+	}
+
+	if len(res.Result) == 0 {
+		t.Fatalf("an empty list of HostGroup was returned, expected at least the default groups")
 	}
 }
 
-func BenchmarkError(b *testing.B) {
-	params := testingClient.UserGroup.Client.NewRequest("test.error", map[string]string{})
-
-	res, err := testingClient.UserGroup.Client.Post(params)
-	if err != nil {
-		b.Fatalf("error while executing POST request\nReason : %v", err)
-	}
-
+func BenchmarkPost(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		err = testingClient.Auth.Client.Error(*res)
-		if err == nil {
-			b.Fatalf("Error while executing Error function\nResponse : %v\nError : %v", res, err)
+		res := Response[[]*HostGroup]{}
+		params := HostGroupGetParameters{
+			CommonGetParameters: CommonGetParameters{
+				Filter: map[string]string{},
+			},
+		}
+
+		err := testingClient.HostGroup.client.Post("hostgroup.get", &params, &res)
+		if err != nil {
+			b.Fatalf("error while executing Post function\nReason: %v", err)
+		}
+
+		if len(res.Result) == 0 {
+			b.Fatalf("an empty list of HostGroup was returned, expected at least the default groups")
 		}
 	}
 }
 
-func TestResourceAlreadyExistSuccess(t *testing.T) {
-	resource := "ExampleResource"
-	value := "Test"
+func TestResourceAlreadyExist(t *testing.T) {
+	resource := "host-group"
+	value := "my-host-group"
 	err := ResponseError{
-		Data: fmt.Sprintf("%s \"%s\" already exists", resource, value),
+		Code:    1,
+		Data:    "host-group \"my-host-group\" already exists",
+		Message: "",
 	}
 
-	exist := testingClient.Auth.Client.ResourceAlreadyExist(resource, value, err)
-	if !exist {
-		t.Fatalf("Resource do not match the exist.\nString : %s\nResource : %s\nValue : %s", err.Data, resource, value)
+	b := testingClient.HostGroup.client.ResourceAlreadyExist(resource, value, err)
+	if !b {
+		t.Fatalf("expected a positive boolean to be returned, '%t' was returned instead", b)
 	}
 }
 
-func TestResourceAlreadyExistFail(t *testing.T) {
-	resource := "ExampleResource"
-	value := "Test"
+func TestResourceAlreadyExistNoMatch(t *testing.T) {
+	resource := "host-group"
+	value := "my-host-group"
 	err := ResponseError{
-		Data: fmt.Sprintf("%s \"%s\" already exists", resource, value),
+		Code:    1,
+		Data:    "host-group \"my-host-group-2\" already exists",
+		Message: "",
 	}
 
-	exist := testingClient.Auth.Client.ResourceAlreadyExist(resource, "WrongValue", err)
-
-	if exist {
-		t.Fatalf("Resource do not match the exist.\nString : %s\nResource : %s\nValue : %s", err.Data, resource, value)
+	b := testingClient.HostGroup.client.ResourceAlreadyExist(resource, value, err)
+	if b {
+		t.Fatalf("expected a negative boolean to be returned, '%t' was returned instead", b)
 	}
 }
 
 func BenchmarkResourceAlreadyExist(b *testing.B) {
-	resource := "ExampleResource"
-	value := "Test"
+	resource := "host-group"
+	value := "my-host-group"
 	err := ResponseError{
-		Data: fmt.Sprintf("%s \"%s\" already exists", resource, value),
+		Code:    1,
+		Data:    "host-group \"my-host-group\" already exists",
+		Message: "",
 	}
 
 	for i := 0; i < b.N; i++ {
-		testingClient.Auth.Client.ResourceAlreadyExist(resource, value, err)
-	}
-
-}
-
-func TestCheckConnectivitySuccess(t *testing.T) {
-	err := testingClient.Auth.Client.CheckConnectivity()
-	if err != nil {
-		t.Fatalf("Error when executing CheckConnectivity.\nReason : %v", err)
+		testingClient.HostGroup.client.ResourceAlreadyExist(resource, value, err)
 	}
 }
 
-func TestCheckConnectivityFail(t *testing.T) {
-	client := newTestingService()
-	client.Auth.Client.Url = "http://localhost:7777"
-
-	err := client.Auth.Client.CheckConnectivity()
-	if err == nil {
-		t.Fatalf("CheckConnectivity should returned an error when Zabbix server is unreachable.")
-
+func BenchmarkResourceAlreadyExistNoMatch(b *testing.B) {
+	resource := "host-group"
+	value := "my-host-group"
+	err := ResponseError{
+		Code:    1,
+		Data:    "host-group \"my-host-group-2\" already exists",
+		Message: "",
 	}
-
-	expectedErr := fmt.Sprintf("connectivity check failed for '%s'", client.Auth.Client.Url)
-	if err.Error() != expectedErr {
-		t.Fatalf("Expected error : %s\nError returned : %s", expectedErr, err.Error())
-	}
-}
-
-func TestCheckConnectivityMissingUrl(t *testing.T) {
-	client := newTestingService()
-	client.Auth.Client.Url = ""
-
-	err := client.Auth.Client.CheckConnectivity()
-	if err == nil {
-		t.Fatalf("CheckConnectivity should returned an error when the 'Url' property is not set.")
-	}
-}
-
-func BenchmarkCheckConnectivity(b *testing.B) {
-	var err error
 
 	for i := 0; i < b.N; i++ {
-		err = testingClient.Auth.Client.CheckConnectivity()
-		if err != nil {
-			b.Fatalf("error while executing CheckConnectivity function\nReason : %v", err)
-		}
+		testingClient.HostGroup.client.ResourceAlreadyExist(resource, value, err)
 	}
 }

@@ -1,13 +1,40 @@
 package zabbixgosdk
 
 import (
+	"log"
+	"math/rand"
 	"testing"
+	"time"
 )
+
+var testingClient *ZabbixService
+
+func init() {
+	testingClient = newTestingService()
+}
+
+func newTestingService() *ZabbixService {
+	client := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
+	err := client.Authenticate("Admin", "zabbix")
+	if err != nil {
+		log.Fatalf("Error when executing Authenticate function on the ZabbixService\nReason: %v", err)
+	}
+
+	return client
+}
+
+// generateId is used to generate a random id to prevent duplicate entry during benchmarks.
+func generateId() int {
+	rand.NewSource(time.Now().UnixNano())
+	value := rand.Intn(9999)
+
+	return value
+}
 
 func TestNewZabbixService(t *testing.T) {
 	client := NewZabbixService("http://localhost:2222")
 	if client == nil {
-		t.Fatalf("A nol pointer was returned instead of *ZabbixService.")
+		t.Fatalf("A nil pointer was returned instead of *ZabbixService.")
 	}
 }
 
@@ -22,53 +49,53 @@ func TestSetUrl(t *testing.T) {
 	url := "localhost:7777"
 	client.SetUrl(url)
 
-	if client.Auth.Client.Url != url {
-		t.Fatalf("Auth client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Auth.Client.Url)
+	if client.User.client.url != url {
+		t.Fatalf("User client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.User.client.url)
 	}
 
-	if client.UserGroup.Client.Url != url {
-		t.Fatalf("UserGroup client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.UserGroup.Client.Url)
+	// if client.UserGroup.client.url != url {
+	// 	t.Fatalf("UserGroup client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.UserGroup.client.url)
+	// }
+
+	// if client.UserMacro.client.url != url {
+	// 	t.Fatalf("UserMacro client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.UserMacro.client.url)
+	// }
+
+	if client.HostGroup.client.url != url {
+		t.Fatalf("HostGroup client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.HostGroup.client.url)
 	}
 
-	if client.UserMacro.Client.Url != url {
-		t.Fatalf("UserMacro client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.UserMacro.Client.Url)
+	if client.Template.client.url != url {
+		t.Fatalf("Template client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Template.client.url)
 	}
 
-	if client.HostGroup.Client.Url != url {
-		t.Fatalf("HostGroup client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.HostGroup.Client.Url)
-	}
+	// if client.HostInterface.client.url != url {
+	// 	t.Fatalf("HostInterface client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.HostInterface.client.url)
+	// }
 
-	if client.Template.Client.Url != url {
-		t.Fatalf("Template client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Template.Client.Url)
-	}
+	// if client.Host.client.url != url {
+	// 	t.Fatalf("Host client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Host.client.url)
+	// }
 
-	if client.HostInterface.Client.Url != url {
-		t.Fatalf("HostInterface client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.HostInterface.Client.Url)
-	}
+	// if client.Service.client.url != url {
+	// 	t.Fatalf("Service client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Service.client.url)
+	// }
 
-	if client.Host.Client.Url != url {
-		t.Fatalf("Host client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Host.Client.Url)
-	}
+	// if client.IconMap.client.url != url {
+	// 	t.Fatalf("IconMap client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.IconMap.client.url)
+	// }
 
-	if client.Service.Client.Url != url {
-		t.Fatalf("Service client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Service.Client.Url)
-	}
+	// if client.Image.client.url != url {
+	// 	t.Fatalf("Image client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Image.client.url)
+	// }
 
-	if client.IconMap.Client.Url != url {
-		t.Fatalf("IconMap client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.IconMap.Client.Url)
-	}
+	// if client.Trigger.client.url != url {
+	// 	t.Fatalf("Trigger client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Trigger.client.url)
+	// }
 
-	if client.Image.Client.Url != url {
-		t.Fatalf("Image client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Image.Client.Url)
-	}
-
-	if client.Trigger.Client.Url != url {
-		t.Fatalf("Trigger client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Trigger.Client.Url)
-	}
-
-	if client.Map.Client.Url != url {
-		t.Fatalf("Map client 'url' property was not set correctly\n.Expected : %s\nReturned : %s", url, client.Map.Client.Url)
-	}
+	// if client.Map.client.url != url {
+	// 	t.Fatalf("Map client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Map.client.url)
+	// }
 }
 
 func BenchmarkSetUrl(b *testing.B) {
@@ -80,91 +107,59 @@ func BenchmarkSetUrl(b *testing.B) {
 	}
 }
 
-func TestSetUser(t *testing.T) {
-	user := "testing-user"
-	pwd := "testing-password"
-	client := NewZabbixService("http://localhost:2222")
-
-	client.SetUser(&ApiUser{
-		User: user,
-		Pwd:  pwd,
-	})
-
-	if client.Auth.User.User != user {
-		t.Fatalf("Auth client 'user' property was not set correctly.\n.Expected : %s\nReturned : %s", user, client.Auth.User.User)
-	}
-
-	if client.Auth.User.Pwd != pwd {
-		t.Fatalf("Auth client 'pwd' property was not set correctly.\n.Expected : %s\nReturned : %s", pwd, client.Auth.User.Pwd)
-	}
-}
-
-func BenchmarkSetUser(b *testing.B) {
-	user := &ApiUser{
-		User: "testing-user",
-		Pwd:  "testing-password",
-	}
-
-	client := NewZabbixService("http://localhost:2222")
-
-	for i := 0; i < b.N; i++ {
-		client.SetUser(user)
-	}
-}
-
 func TestToken(t *testing.T) {
 	token := "random-complex-token"
 	client := NewZabbixService("http://localhost:2222")
 
 	client.SetToken(token)
 
-	if client.Auth.Client.Token != token {
-		t.Fatalf("Auth client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Auth.Client.Token)
+	if client.User.client.token != token {
+		t.Fatalf("User client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.User.client.token)
 	}
 
-	if client.UserGroup.Client.Token != token {
-		t.Fatalf("UserGroup client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.UserGroup.Client.Token)
+	// if client.UserGroup.client.token != token {
+	// 	t.Fatalf("UserGroup client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.UserGroup.client.token)
+	// }
+
+	// if client.UserMacro.client.token != token {
+	// 	t.Fatalf("UserMacro client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.UserMacro.client.token)
+	// }
+
+	if client.HostGroup.client.token != token {
+		t.Fatalf("HostGroup client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.HostGroup.client.token)
 	}
 
-	if client.UserMacro.Client.Token != token {
-		t.Fatalf("UserMacro client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.UserMacro.Client.Token)
+	if client.Template.client.token != token {
+		t.Fatalf("Template client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Template.client.token)
 	}
 
-	if client.HostGroup.Client.Token != token {
-		t.Fatalf("HostGroup client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.HostGroup.Client.Token)
-	}
+	// if client.HostInterface.client.token != token {
+	// 	t.Fatalf("HostInterface client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.HostInterface.client.token)
+	// }
 
-	if client.Template.Client.Token != token {
-		t.Fatalf("Template client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Template.Client.Token)
-	}
+	// if client.Host.client.token != token {
+	// 	t.Fatalf("Host client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Host.client.token)
+	// }
 
-	if client.HostInterface.Client.Token != token {
-		t.Fatalf("HostInterface client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.HostInterface.Client.Token)
-	}
+	// if client.Service.client.token != token {
+	// 	t.Fatalf("Service client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Service.client.token)
+	// }
 
-	if client.Host.Client.Token != token {
-		t.Fatalf("Host client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Host.Client.Token)
-	}
+	// if client.IconMap.client.token != token {
+	// 	t.Fatalf("IconMap client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.IconMap.client.token)
+	// }
 
-	if client.Service.Client.Token != token {
-		t.Fatalf("Service client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Service.Client.Token)
-	}
+	// if client.Image.client.token != token {
+	// 	t.Fatalf("Image client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Image.client.token)
+	// }
 
-	if client.IconMap.Client.Token != token {
-		t.Fatalf("IconMap client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.IconMap.Client.Token)
-	}
+	// if client.Trigger.client.token != token {
+	// 	t.Fatalf("Trigger client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Trigger.client.token)
+	// }
 
-	if client.Image.Client.Token != token {
-		t.Fatalf("Image client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Image.Client.Token)
-	}
-
-	if client.Trigger.Client.Token != token {
-		t.Fatalf("Trigger client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Trigger.Client.Token)
-	}
-
-	if client.Map.Client.Token != token {
-		t.Fatalf("Map client 'token' property was not set correctly\n.Expected : %s\nReturned : %s", token, client.Trigger.Client.Token)
-	}
+	// if client.Map.client.token != token {
+	// 	t.Fatalf("Map client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Trigger.client.token)
+	// }
 }
 
 func BenchmarkSetToken(b *testing.B) {
@@ -172,5 +167,92 @@ func BenchmarkSetToken(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		client.SetToken("testing-token")
+	}
+}
+
+func TestAuthenticate(t *testing.T) {
+	service := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
+	err := service.Authenticate("Admin", "zabbix")
+	if err != nil {
+		t.Fatalf("error while executing Authenticate function\nReason: %v", err)
+	}
+}
+
+func BenchmarkAuthenticate(b *testing.B) {
+	var err error
+	service := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
+
+	for i := 0; i < b.N; i++ {
+		err = service.Authenticate("Admin", "zabbix")
+		if err != nil {
+			b.Fatalf("error while executing Authenticate function\nReason: %v", err)
+		}
+	}
+}
+
+func TestLogout(t *testing.T) {
+	service := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
+	err := service.Authenticate("Admin", "zabbix")
+	if err != nil {
+		t.Fatalf("error while executing Authenticate function\nReason: %v", err)
+	}
+
+	err = service.Logout()
+	if err != nil {
+		t.Fatalf("error while executing Logout function\nReason: %v", err)
+	}
+}
+
+func BenchmarkLogout(b *testing.B) {
+	var err error
+	service := NewZabbixService("http://localhost:4444/api_jsonrpc.php")
+
+	for i := 0; i < b.N; i++ {
+		err = service.Authenticate("Admin", "zabbix")
+		if err != nil {
+			b.Fatalf("error while executing Authenticate function\nReason: %v", err)
+		}
+
+		err = service.Logout()
+		if err != nil {
+			b.Fatalf("error while executing Logout function\nReason: %v", err)
+		}
+	}
+}
+
+func TestGetApiVersion(t *testing.T) {
+	v, err := testingClient.GetApiVersion()
+	if err != nil {
+		t.Fatalf("error while executing GetApiVersion\nReason: %v", err)
+	}
+
+	if v == "" {
+		t.Fatal("an empty string was returned instead of the Zabbix API version")
+	}
+}
+
+func BenchmarkGetApiVersion(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := testingClient.GetApiVersion()
+		if err != nil {
+			b.Fatalf("error while executing GetApiVersion\nReason: %v", err)
+		}
+	}
+}
+
+func TestCheckConnectivity(t *testing.T) {
+	err := testingClient.CheckConnectivity()
+	if err != nil {
+		t.Fatalf("error while executing CheckConnectivity\nReason: %v", err)
+	}
+
+}
+
+func BenchmarkCheckConnectivity(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		err := testingClient.CheckConnectivity()
+		if err != nil {
+			b.Fatalf("error while executing CheckConnectivity\nReason: %v", err)
+		}
 	}
 }
