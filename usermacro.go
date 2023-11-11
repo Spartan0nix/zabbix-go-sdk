@@ -20,18 +20,15 @@ const (
 	UserMacroVault  UserMacroType = "2"
 )
 
-// // HostMacro properties.
-// // Some properties are read-only, which means they are only accessible after creation
-// // and should not be passed as arguments in other methods.
-// type HostMacro struct {
-// 	// ReadOnly
-// 	HostMacroId string        `json:"hostmacroid,omitempty"`
-// 	HostId      string        `json:"hostid,omitempty"`
-// 	Macro       string        `json:"macro"`
-// 	Value       string        `json:"value"`
-// 	Type        UserMacroType `json:"type,omitempty"`
-// 	Description string        `json:"description,omitempty"`
-// }
+// HostMacro properties.
+type HostMacro struct {
+	HostMacroId string        `json:"hostmacroid,omitempty"`
+	HostId      string        `json:"hostid,omitempty"`
+	Macro       string        `json:"macro"`
+	Value       string        `json:"value"`
+	Type        UserMacroType `json:"type,omitempty"`
+	Description string        `json:"description,omitempty"`
+}
 
 // // GlobalMacro properties.
 // // Some properties are read-only, which means they are only accessible after creation
@@ -74,6 +71,14 @@ const (
 
 // 	return nil
 // }
+
+// HostMacroCreateParamaters define the properties used to create an user macro.
+type HostMacroCreateParamaters struct {
+	Macro       string        `json:"macro"`
+	Value       string        `json:"value"`
+	Type        UserMacroType `json:"type,omitempty"`
+	Description string        `json:"description,omitempty"`
+}
 
 // // Create is used to create a new HostMacro.
 // func (u *UserMacroService) Create(h *HostMacro) (*HostMacroResponse, error) {
@@ -242,6 +247,14 @@ const (
 
 // 	return r, nil
 // }
+
+// HostMacroUpdateParamaters define the properties used to update an host macro.
+type HostMacroUpdateParamaters struct {
+	Macro       string        `json:"macro,omitempty"`
+	Value       string        `json:"value,omitempty"`
+	Type        UserMacroType `json:"type,omitempty"`
+	Description string        `json:"description,omitempty"`
+}
 
 // type HostMacroUpdateParameters struct {
 // 	HostMacroId string        `json:"hostmacroid"`

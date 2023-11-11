@@ -15,7 +15,7 @@ type ZabbixService struct {
 	HostGroup *HostGroupService
 	Template  *TemplateService
 	// HostInterface *HostInterfaceService
-	// Host          *HostService
+	Host *HostService
 	// Service       *ZbxService
 	// IconMap       *IconMapService
 	// Image         *ImageService
@@ -53,9 +53,9 @@ func NewZabbixService(url string) *ZabbixService {
 		// HostInterface: &HostInterfaceService{
 		// 	Client: c,
 		// },
-		// Host: &HostService{
-		// 	Client: c,
-		// },
+		Host: &HostService{
+			client: c,
+		},
 		// Service: &ZbxService{
 		// 	Client: c,
 		// },
@@ -85,7 +85,7 @@ func (s *ZabbixService) SetUrl(url string) {
 	s.HostGroup.client.url = url
 	s.Template.client.url = url
 	// s.HostInterface.Client.Url = url
-	// s.Host.Client.Url = url
+	s.Host.client.url = url
 	// s.Service.Client.Url = url
 	// s.IconMap.Client.Url = url
 	// s.Image.Client.Url = url
@@ -102,7 +102,7 @@ func (s *ZabbixService) SetToken(token string) {
 	s.HostGroup.client.token = token
 	s.Template.client.token = token
 	// s.HostInterface.Client.Token = token
-	// s.Host.Client.Token = token
+	s.Host.client.token = token
 	// s.Service.Client.Token = token
 	// s.IconMap.Client.Token = token
 	// s.Image.Client.Token = token

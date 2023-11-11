@@ -73,9 +73,9 @@ func TestSetUrl(t *testing.T) {
 	// 	t.Fatalf("HostInterface client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.HostInterface.client.url)
 	// }
 
-	// if client.Host.client.url != url {
-	// 	t.Fatalf("Host client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Host.client.url)
-	// }
+	if client.Host.client.url != url {
+		t.Fatalf("Host client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Host.client.url)
+	}
 
 	// if client.Service.client.url != url {
 	// 	t.Fatalf("Service client 'url' property was not set correctly\nExpected : %s\nReturned : %s", url, client.Service.client.url)
@@ -137,9 +137,9 @@ func TestToken(t *testing.T) {
 	// 	t.Fatalf("HostInterface client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.HostInterface.client.token)
 	// }
 
-	// if client.Host.client.token != token {
-	// 	t.Fatalf("Host client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Host.client.token)
-	// }
+	if client.Host.client.token != token {
+		t.Fatalf("Host client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Host.client.token)
+	}
 
 	// if client.Service.client.token != token {
 	// 	t.Fatalf("Service client 'token' property was not set correctly\nExpected : %s\nReturned : %s", token, client.Service.client.token)

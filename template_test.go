@@ -34,7 +34,7 @@ func TestTemplateCreate(t *testing.T) {
 				Id: sysHostGroup.Result[0].Id,
 			},
 		},
-		Macros: []*TemplateMacro{
+		Macros: []*HostMacroCreateParamaters{
 			{
 				Macro:       "{$TESTS.MACRO}",
 				Value:       "testing-macro",
@@ -106,13 +106,23 @@ func TestTemplateUpdate(t *testing.T) {
 		})
 	}
 
+	macros := make([]*HostMacroUpdateParamaters, len(sysTemplate.Result[0].Macros))
+	for _, m := range sysTemplate.Result[0].Macros {
+		macros = append(macros, &HostMacroUpdateParamaters{
+			Macro:       m.Macro,
+			Value:       m.Value,
+			Type:        m.Type,
+			Description: m.Description,
+		})
+	}
+
 	template, err := testingClient.Template.Update(&TemplateUpdateParameters{
 		Id:          sysTemplate.Result[0].Id,
 		Host:        fmt.Sprintf("Linux by Zabbix agent active - %d", id),
 		Description: fmt.Sprintf("updated description - %d", id),
 		Groups:      groups,
 		Tags:        sysTemplate.Result[0].Tags,
-		Macros:      sysTemplate.Result[0].Macros,
+		Macros:      macros,
 	})
 
 	if err != nil {
@@ -203,7 +213,7 @@ func TestTemplateMassAdd(t *testing.T) {
 				Id: sysHostGroup.Result[0].Id,
 			},
 		},
-		Macros: []*TemplateMacro{
+		Macros: []*HostMacroCreateParamaters{
 			{
 				Macro:       "{$TESTS.MACRO}",
 				Value:       "testing-macro",
@@ -243,6 +253,16 @@ func TestTemplateMassUpdate(t *testing.T) {
 		})
 	}
 
+	macros := make([]*HostMacroUpdateParamaters, len(sysTemplate.Result[0].Macros))
+	for _, m := range sysTemplate.Result[0].Macros {
+		macros = append(macros, &HostMacroUpdateParamaters{
+			Macro:       m.Macro,
+			Value:       m.Value,
+			Type:        m.Type,
+			Description: m.Description,
+		})
+	}
+
 	template, err := testingClient.Template.MassUpdate(&TemplateMassUpdateParameters{
 		Templates: []*TemplateId{
 			{
@@ -250,7 +270,7 @@ func TestTemplateMassUpdate(t *testing.T) {
 			},
 		},
 		Groups: groups,
-		Macros: sysTemplate.Result[0].Macros,
+		Macros: macros,
 	})
 
 	if err != nil {

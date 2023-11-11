@@ -16,7 +16,7 @@ const (
 // HostGroup properties.
 type HostGroup struct {
 	Id       string            `json:"groupid,omitempty"`
-	Name     string            `json:"name,omitempty"`
+	Name     string            `json:"name"`
 	Flags    OriginType        `json:"flags,omitempty"`
 	Internal HostGroupInternal `json:"internal,omitempty"`
 	Uuid     string            `json:"uuid,omitempty"`
@@ -93,10 +93,10 @@ type HostGroupGetParameters struct {
 // hostGroupGetResponse define the format of the Result field for the Response struct.
 type hostGroupGetResponse struct {
 	HostGroup
-	DiscoveryRules   []*DiscoveryRule      `json:"discoveryRule"`
-	GroupDiscoveries []*HostGroupDiscovery `json:"groupDiscovery"`
-	Hosts            []*Host               `json:"hosts"`
-	Templates        []*Template           `json:"templates"`
+	DiscoveryRules   []*DiscoveryRule      `json:"discoveryRule,omitempty"`
+	GroupDiscoveries []*HostGroupDiscovery `json:"groupDiscovery,omitempty"`
+	Hosts            []*Host               `json:"hosts,omitempty"`
+	Templates        []*Template           `json:"templates,omitempty"`
 }
 
 // Get is used to retrieve one or multiple HostGroups matching the given criterias.

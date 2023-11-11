@@ -44,14 +44,6 @@ type TemplateTag struct {
 	Value string `json:"value,omitempty"`
 }
 
-// TemplateMacro define a Macro assignable to a Template.
-type TemplateMacro struct {
-	Macro       string        `json:"macro,omitempty"`
-	Value       string        `json:"value,omitempty"`
-	Type        UserMacroType `json:"type,omitempty"`
-	Description string        `json:"description,omitempty"`
-}
-
 // TemplateValueMap define a ValueMap assignable to a Template.
 type TemplateValueMap struct {
 	Id       string          `json:"valuemapid,omitempty"`
@@ -69,13 +61,13 @@ type TemplateIds struct {
 // TemplateCreateParameters define the properties used to create a new Template.
 // Properties using the 'omitempty' json parameters are optionals.
 type TemplateCreateParameters struct {
-	Host        string           `json:"host"`
-	Groups      []*HostGroupId   `json:"groups"`
-	Description string           `json:"description,omitempty"`
-	Name        string           `json:"name,omitempty"`
-	Tags        []*TemplateTag   `json:"tags,omitempty"`
-	Templates   []*TemplateId    `json:"templates,omitempty"`
-	Macros      []*TemplateMacro `json:"macros,omitempty"`
+	Host        string                       `json:"host"`
+	Groups      []*HostGroupId               `json:"groups"`
+	Description string                       `json:"description,omitempty"`
+	Name        string                       `json:"name,omitempty"`
+	Tags        []*TemplateTag               `json:"tags,omitempty"`
+	Templates   []*TemplateId                `json:"templates,omitempty"`
+	Macros      []*HostMacroCreateParamaters `json:",omitempty"`
 }
 
 // Create is used to create a new Template.
@@ -119,29 +111,17 @@ type TemplateGetParameters struct {
 	SelectMacros          interface{}  `json:"selectMacros,omitempty"`
 	SelectDashboards      interface{}  `json:"selectDashboards,omitempty"`
 	SelectValueMaps       interface{}  `json:"selectValueMaps,omitempty"`
-	LimitSelects          int          `json:"limitSelects,omitempty"`
+	LimitSelects          string       `json:"limitSelects,omitempty"`
 	CommonGetParameters
 }
 
 // TemplateGetResponse define the format of the Result field for the Response struct.
 type TemplateGetResponse struct {
 	Template
-	DisableUntil     string               `json:"disable_until,omitempty"`
-	Error            string               `json:"error,omitempty"`
-	Available        string               `json:"available,omitempty"`
-	ErrorsFrom       string               `json:"errors_from,omitempty"`
-	IpmiDisableUntil string               `json:"ipmi_disable_until,omitempty"`
-	IpmiAvailable    string               `json:"ipmi_available,omitempty"`
-	SnmpDisableUntil string               `json:"snmp_disable_until,omitempty"`
-	SnmpAvailable    string               `json:"snmp_available,omitempty"`
-	IpmiErrorsFrom   string               `json:"ipmi_errors_from,omitempty"`
-	SnmpErrorsFrom   string               `json:"snmp_errors_from,omitempty"`
-	IpmiError        string               `json:"ipmi_error,omitempty"`
-	SnmpError        string               `json:"snmp_error,omitempty"`
-	JmxDisableUntil  string               `json:"jmx_disable_until,omitempty"`
-	JmxAvailable     string               `json:"jmx_available,omitempty"`
-	JmxErrorsFrom    string               `json:"jmx_errors_from,omitempty"`
-	JmxError         string               `json:"jmx_error,omitempty"`
+	ProxyAddress     string               `json:"proxy_address,omitempty"`
+	AutoCompress     string               `json:"auto_compress,omitempty"`
+	CustomInterfaces string               `json:"custom_interfaces,omitempty"`
+	Uuid             string               `json:"uuid,omitempty"`
 	HostGroups       []*HostGroup         `json:"groups,omitempty"`
 	Tags             []*TemplateTag       `json:"tags,omitempty"`
 	Hosts            []*Host              `json:"hosts,omitempty"`
@@ -152,7 +132,7 @@ type TemplateGetResponse struct {
 	Discoveries      []*LowLevelDiscovery `json:"discoveries,omitempty"`
 	Triggers         []*Trigger           `json:"triggers,omitempty"`
 	Graphs           []*Graph             `json:"graphs,omitempty"`
-	Macros           []*TemplateMacro     `json:"macros,omitempty"`
+	Macros           []*HostMacro         `json:"macros,omitempty"`
 	Dashboards       []*Dashboard         `json:"dashboards,omitempty"`
 	ValueMaps        []*TemplateValueMap  `json:"valuemaps,omitempty"`
 }
@@ -172,15 +152,15 @@ func (t *TemplateService) Get(p *TemplateGetParameters) (*Response[[]*TemplateGe
 // TemplateUpdateParameters define the properties used to update a Template.
 // Properties using the 'omitempty' json parameters are optional.
 type TemplateUpdateParameters struct {
-	Id            string           `json:"templateid"`
-	Host          string           `json:"host,omitempty"`
-	Description   string           `json:"description,omitempty"`
-	Name          string           `json:"name,omitempty"`
-	Groups        []*HostGroupId   `json:"groups,omitempty"`
-	Tags          []*TemplateTag   `json:"tags,omitempty"`
-	Macros        []*TemplateMacro `json:"macros,omitempty"`
-	TemplateLink  []*TemplateId    `json:"templates,omitempty"`
-	TemplateClear []*TemplateId    `json:"templates_clear,omitempty"`
+	Id            string                       `json:"templateid"`
+	Host          string                       `json:"host,omitempty"`
+	Description   string                       `json:"description,omitempty"`
+	Name          string                       `json:"name,omitempty"`
+	Groups        []*HostGroupId               `json:"groups,omitempty"`
+	Tags          []*TemplateTag               `json:"tags,omitempty"`
+	Macros        []*HostMacroUpdateParamaters `json:"macros,omitempty"`
+	TemplateLink  []*TemplateId                `json:"templates,omitempty"`
+	TemplateClear []*TemplateId                `json:"templates_clear,omitempty"`
 }
 
 // Update is used to update or replace properties for a Template.
@@ -210,10 +190,10 @@ func (t *TemplateService) Delete(ids []string) (*Response[*TemplateIds], error) 
 // TemplateMassAddParameters define the properties used for the MassAdd method.
 // Properties using the 'omitempty' json parameters are optional.
 type TemplateMassAddParameters struct {
-	Templates     []*TemplateId    `json:"templates"`
-	Groups        []*HostGroupId   `json:"groups,omitempty"`
-	Macros        []*TemplateMacro `json:"macros,omitempty"`
-	TemplatesLink []*TemplateId    `json:"templates_link,omitempty"`
+	Templates     []*TemplateId                `json:"templates"`
+	Groups        []*HostGroupId               `json:"groups,omitempty"`
+	Macros        []*HostMacroCreateParamaters `json:"macros,omitempty"`
+	TemplatesLink []*TemplateId                `json:"templates_link,omitempty"`
 }
 
 // MassAdd is used to massively add properties to a given list of Templates.
@@ -231,11 +211,11 @@ func (t *TemplateService) MassAdd(p *TemplateMassAddParameters) (*Response[*Temp
 // TemplateMassUpdateParameters define the properties used for the MassUpdate method.
 // Properties using the 'omitempty' json parameters are optional.
 type TemplateMassUpdateParameters struct {
-	Templates      []*TemplateId    `json:"templates"`
-	Groups         []*HostGroupId   `json:"groups,omitempty"`
-	Macros         []*TemplateMacro `json:"macros,omitempty"`
-	TemplateClear  []*TemplateId    `json:"templates_clear,omitempty"`
-	TemplateUnlink []*TemplateId    `json:"templates_link,omitempty"`
+	Templates      []*TemplateId                `json:"templates"`
+	Groups         []*HostGroupId               `json:"groups,omitempty"`
+	Macros         []*HostMacroUpdateParamaters `json:"macros,omitempty"`
+	TemplateClear  []*TemplateId                `json:"templates_clear,omitempty"`
+	TemplateUnlink []*TemplateId                `json:"templates_link,omitempty"`
 }
 
 // MassUpdate is used to massively update or replace properties for a given list of Templates.

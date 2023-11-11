@@ -10,113 +10,106 @@ package zabbixgosdk
 // 	Client *ApiClient
 // }
 
-// // HostInterfaceMain define if an interface should be used as default or not.
-// type HostInterfaceMain string
+// HostInterfaceMain define if an interface should be configured as the default interface.
+type HostInterfaceMain string
 
-// // HostInterfaceType define the available types of interface.
-// type HostInterfaceType string
+// HostInterfaceType define the available types of interface.
+type HostInterfaceType string
 
-// // HostInterfaceVersion define the available SNMP versions.
-// type HostInterfaceVersion string
+// HostInterfaceConnection define if DNS or IP should be used to connect with an host.
+type HostInterfaceConnection string
 
-// // HostInterfaceSecurityLevel define the available SNMPv3 security levels.
-// type HostInterfaceSecurityLevel string
+// HostInterfaceSnmpVersion define the available version of SNMP.
+type HostInterfaceSnmpVersion string
 
-// // HostInterfaceAuthProtocol define the available SNMPv3 authentification protocols.
-// type HostInterfaceAuthProtocol string
+// HostInterfaceSnmpBulk define if SNMP bulk requests should be used.
+type HostInterfaceSnmpBulk string
 
-// // HostInterfacePrivProtocol define the available SNMPv3 encryption (priv) protocols.
-// type HostInterfacePrivProtocol string
+// HostInterfaceSecurityLevel define the available types of SnmpV3 security level.
+type HostInterfaceSecurityLevel string
 
-// // HostInterfaceUseIp define the DNS or IP should be used to connect with the host
-// type HostInterfaceUseIp string
+// HostInterfaceAuthProtocol define the available types of SnmpV3 authentification protocol.
+type HostInterfaceAuthProtocol string
 
-// // HostInterfaceBulkRequest define if bulk request should be used or not
-// type HostInterfaceBulkRequest string
+// HostInterfacePrivProtocol define the available types of SnmpV3 encryption protocol.
+type HostInterfacePrivProtocol string
 
-// // HostInterfaceAvailability define if the interface is available or not
-// type HostInterfaceAvailability string
+// HostInterfaceAvailability define if an interface is available.
+type HostInterfaceAvailability string
 
-// const (
-// 	HostInterfaceNotDefault HostInterfaceMain = "0"
-// 	HostInterfaceDefault    HostInterfaceMain = "1"
+const (
+	HostInterfaceNotDefault HostInterfaceMain = "0"
+	HostInterfaceDefault    HostInterfaceMain = "1"
 
-// 	HostInterfaceAgent HostInterfaceType = "1"
-// 	HostInterfaceSNMP  HostInterfaceType = "2"
-// 	HostInterfaceIPMI  HostInterfaceType = "3"
-// 	HostInterfaceJMX   HostInterfaceType = "4"
+	HostInterfaceAgent HostInterfaceType = "1"
+	HostInterfaceSNMP  HostInterfaceType = "2"
+	HostInterfaceIPMI  HostInterfaceType = "3"
+	HostInterfaceJMX   HostInterfaceType = "4"
 
-// 	HostInterfaceSNMPv1  HostInterfaceVersion = "1"
-// 	HostInterfaceSNMPv2c HostInterfaceVersion = "2"
-// 	HostInterfaceSNMPv3  HostInterfaceVersion = "3"
+	HostInterfaceUseDns HostInterfaceConnection = "0"
+	HostInterfaceUseIp  HostInterfaceConnection = "1"
 
-// 	HostInterfaceNoAuthNoPriv HostInterfaceSecurityLevel = "0"
-// 	HostInterfaceAuthNoPriv   HostInterfaceSecurityLevel = "1"
-// 	HostInterfaceAuthPriv     HostInterfaceSecurityLevel = "3"
+	HostInterfaceSnmpV1  HostInterfaceSnmpVersion = "1"
+	HostInterfaceSnmpV2c HostInterfaceSnmpVersion = "2"
+	HostInterfaceSnmpV3  HostInterfaceSnmpVersion = "3"
 
-// 	HostInterfaceMD5    HostInterfaceAuthProtocol = "0"
-// 	HostInterfaceSHA1   HostInterfaceAuthProtocol = "1"
-// 	HostInterfaceSHA224 HostInterfaceAuthProtocol = "2"
-// 	HostInterfaceSHA256 HostInterfaceAuthProtocol = "3"
-// 	HostInterfaceSHA384 HostInterfaceAuthProtocol = "4"
-// 	HostInterfaceSHA512 HostInterfaceAuthProtocol = "5"
+	HostInterfaceNoSnmpBulk  HostInterfaceSnmpBulk = "0"
+	HostInterfaceUseSnmpBulk HostInterfaceSnmpBulk = "1"
 
-// 	HostInterfaceDES     HostInterfacePrivProtocol = "0"
-// 	HostInterfaceAES128  HostInterfacePrivProtocol = "1"
-// 	HostInterfaceAES192  HostInterfacePrivProtocol = "2"
-// 	HostInterfaceAES256  HostInterfacePrivProtocol = "3"
-// 	HostInterfaceAES192C HostInterfacePrivProtocol = "4"
-// 	HostInterfaceAES256C HostInterfacePrivProtocol = "5"
+	HostInterfaceNoAuthNoPriv HostInterfaceSecurityLevel = "0"
+	HostInterfaceAuthNoPriv   HostInterfaceSecurityLevel = "1"
+	HostInterfaceAuthPriv     HostInterfaceSecurityLevel = "2"
 
-// 	HostInterfaceDns HostInterfaceUseIp = "0"
-// 	HostInterfaceIp  HostInterfaceUseIp = "1"
+	HostInterfaceMD5    HostInterfaceAuthProtocol = "0"
+	HostInterfaceSHA1   HostInterfaceAuthProtocol = "1"
+	HostInterfaceSHA224 HostInterfaceAuthProtocol = "2"
+	HostInterfaceSHA256 HostInterfaceAuthProtocol = "3"
+	HostInterfaceSHA384 HostInterfaceAuthProtocol = "4"
+	HostInterfaceSHA512 HostInterfaceAuthProtocol = "5"
 
-// 	HostInterfaceBulkFalse HostInterfaceBulkRequest = "0"
-// 	HostInterfaceBulkTrue  HostInterfaceBulkRequest = "1"
+	HostInterfaceDES     HostInterfacePrivProtocol = "0"
+	HostInterfaceAES128  HostInterfacePrivProtocol = "1"
+	HostInterfaceAES192  HostInterfacePrivProtocol = "2"
+	HostInterfaceAES256  HostInterfacePrivProtocol = "3"
+	HostInterfaceAES192C HostInterfacePrivProtocol = "4"
+	HostInterfaceAES256C HostInterfacePrivProtocol = "5"
 
-// 	HostInterfaceUnknown     HostInterfaceAvailability = "0"
-// 	HostInterfaceAvailable   HostInterfaceAvailability = "1"
-// 	HostInterfaceUnavailable HostInterfaceAvailability = "2"
-// )
+	HostInterfaceUnknown     HostInterfaceAvailability = "0"
+	HostInterfaceAvailable   HostInterfaceAvailability = "1"
+	HostInterfaceUnavailable HostInterfaceAvailability = "2"
+)
 
-// // HostInterface details properties for SNMP interface.
-// // Properties using the 'omitempty' json parameters are optional
-// type HostInterfaceDetail struct {
-// 	Version        HostInterfaceVersion       `json:"version,omitempty"`
-// 	Bulk           HostInterfaceBulkRequest   `json:"bulk,omitempty"`
-// 	Community      string                     `json:"community,omitempty"`
-// 	SecurityName   string                     `json:"securityname,omitempty"`
-// 	SecurityLevel  HostInterfaceSecurityLevel `json:"securitylevel,omitempty"`
-// 	AuthPassPhrase string                     `json:"authpassphrase,omitempty"`
-// 	PrivPassPhrase string                     `json:"privpassphrase,omitempty"`
-// 	AuthProtocol   HostInterfaceAuthProtocol  `json:"authprotocol,omitempty"`
-// 	PrivProtocol   HostInterfacePrivProtocol  `json:"privprotocol,omitempty"`
-// 	ContextName    string                     `json:"contextname,omitempty"`
-// }
+// HostInterfaceDetail properties for SNMP interface.
+// Properties using the 'omitempty' json parameters are optional.
+type HostInterfaceDetail struct {
+	Version        HostInterfaceSnmpVersion   `json:"version"`
+	Bulk           HostInterfaceSnmpBulk      `json:"bulk,omitempty"`
+	Community      string                     `json:"community,omitempty"`
+	SecurityName   string                     `json:"securityname,omitempty"`
+	ContextName    string                     `json:"contextname,omitempty"`
+	SecurityLevel  HostInterfaceSecurityLevel `json:"securitylevel,omitempty"`
+	AuthPassPhrase string                     `json:"authpassphrase,omitempty"`
+	PrivPassPhrase string                     `json:"privpassphrase,omitempty"`
+	AuthProtocol   HostInterfaceAuthProtocol  `json:"authprotocol,omitempty"`
+	PrivProtocol   HostInterfacePrivProtocol  `json:"privprotocol,omitempty"`
+}
 
-// // HostInterface properties.
-// // Some properties are read-only, which means they are only accessible after creation
-// // and should not be passed as arguments in other methods.
-// type HostInterface struct {
-// 	// ReadOnly
-// 	InterfaceId string               `json:"interfaceid,omitempty"`
-// 	HostId      string               `json:"hostid,omitempty"`
-// 	Ip          string               `json:"ip"`
-// 	Dns         string               `json:"dns"`
-// 	Main        HostInterfaceMain    `json:"main"`
-// 	Port        string               `json:"port"`
-// 	Type        HostInterfaceType    `json:"type"`
-// 	UseIp       HostInterfaceUseIp   `json:"useip"`
-// 	Details     *HostInterfaceDetail `json:"details,omitempty"`
-// 	// ReadOnly
-// 	Available HostInterfaceAvailability `json:"available,omitempty"`
-// 	// ReadOnly
-// 	DisableUntil string `json:"disable_until,omitempty"`
-// 	// ReadOnly
-// 	Error string `json:"error,omitempty"`
-// 	// ReadOnly
-// 	ErrorsFrom string `json:"errors_from,omitempty"`
-// }
+// HostInterface properties.
+type HostInterface struct {
+	InterfaceId  string                    `json:"interfaceid,omitempty"`
+	HostId       string                    `json:"hostid"`
+	Ip           string                    `json:"ip"`
+	Dns          string                    `json:"dns"`
+	Main         HostInterfaceMain         `json:"main"`
+	Port         string                    `json:"port"`
+	Type         HostInterfaceType         `json:"type"`
+	UseIp        HostInterfaceConnection   `json:"useip"`
+	Details      HostInterfaceDetail       `json:"details,omitempty"`
+	Available    HostInterfaceAvailability `json:"available,omitempty"`
+	DisableUntil string                    `json:"disable_until,omitempty"`
+	Error        string                    `json:"error,omitempty"`
+	ErrorsFrom   string                    `json:"errors_from,omitempty"`
+}
 
 // // HostInterfaceResponse define the server response format for HostInterface methods.
 // type HostInterfaceResponse struct {
@@ -161,6 +154,17 @@ package zabbixgosdk
 // 	}
 // 	return nil
 // }
+
+// HostInterfaceCreateParameters define the parameters use to create a new interface on an Host.
+type HostInterfaceCreateParameters struct {
+	Dns     string                  `json:"dns"`
+	Ip      string                  `json:"ip"`
+	Main    HostInterfaceMain       `json:"main"`
+	Port    string                  `json:"port"`
+	Type    HostInterfaceType       `json:"type"`
+	UseIp   HostInterfaceConnection `json:"useip"`
+	Details *HostInterfaceDetail    `json:"details,omitempty"`
+}
 
 // type HostInterfaceCreateParameters struct {
 // 	HostId  string               `json:"hostid"`
